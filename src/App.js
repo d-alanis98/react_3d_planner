@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment, useEffect } from 'react';
+import $ from 'jquery';
+//Componentes
+import FlexRow from './components/Layout/Flex/FlexRow';
+import SideBar from './components/Layout/Sidebar/Sidebar';
+import FixedWidthContainer from './components/Layout/Containers/FixedWidthContainer';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Editor from './components/Editor/3D/Layout/Editor/Editor';
+
+
+
+function App({ addObject, toggleOrbitControls, orbitControlsEnabled }) {
+
+    useEffect(() => {
+        $(() => $('[data-toggle="tooltip"]').tooltip());
+    }, [])
+    return (
+        <Fragment>
+            <FlexRow
+                className = 'w-100 h-100'
+            >
+                <SideBar />
+                <FixedWidthContainer
+                    width = { 95 }
+                >
+                    <Editor />
+                </FixedWidthContainer>
+            </FlexRow>
+        </Fragment>
+    );
 }
 
 export default App;

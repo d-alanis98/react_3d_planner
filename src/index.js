@@ -1,7 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+//Componentes
 import App from './App';
+//Estilos
+import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+//Librerías
+import 'bootstrap/dist/js/bootstrap.bundle';
+//Service worker
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(

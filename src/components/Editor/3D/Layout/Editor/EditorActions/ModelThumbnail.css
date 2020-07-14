@@ -1,0 +1,21 @@
+.model-thumbnail-container{
+    position: relative;
+}
+
+.model-thumbnail{
+    position: relative;
+    max-height: 7vh;
+}
+
+.quantity-tile{
+    position: absolute;
+    top: 0; 
+    right: 0; 
+    margin-right: -0.7rem;
+    margin-top: -0.35rem;
+}
+
+.circle-tile{
+    padding: 0 0.35rem;
+    border-radius: 50%;
+}
