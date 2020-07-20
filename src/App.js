@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from 'react';
 import $ from 'jquery';
-//Componentes
+//Components
 import FlexRow from './components/Layout/Flex/FlexRow';
 import SideBar from './components/Layout/Sidebar/Sidebar';
 import FixedWidthContainer from './components/Layout/Containers/FixedWidthContainer';
@@ -9,9 +9,10 @@ import Editor from './components/Editor/3D/Layout/Editor/Editor';
 
 
 
-function App({ addObject, toggleOrbitControls, orbitControlsEnabled }) {
+const App = () => {
 
     useEffect(() => {
+        //We enable tooltips
         $(() => $('[data-toggle="tooltip"]').tooltip());
     }, [])
     return (

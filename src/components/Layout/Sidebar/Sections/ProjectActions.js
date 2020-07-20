@@ -1,8 +1,8 @@
 import React from 'react';
-//Componentes
+//Components
 import FlexColumn from '../../Flex/FlexColumn';
 import LabelWithIcon from '../../Labels/LabelWithIcon';
-//Íconos
+//Icons
 import { faSave, faDownload, faFolderOpen,} from '@fortawesome/free-solid-svg-icons';
 
 const ProjectActions = ({ className }) => {

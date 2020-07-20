@@ -1,8 +1,8 @@
 import React from 'react';
-//Componentes
+//Components
 import FlexColumn from '../../Flex/FlexColumn';
 import LabelWithIcon from '../../Labels/LabelWithIcon';
-//Íconos
+//Icons
 import { faToolbox, faObjectGroup, faCube } from '@fortawesome/free-solid-svg-icons';
 
 

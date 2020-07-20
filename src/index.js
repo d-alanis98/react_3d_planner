@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//Componentes
+//Components
 import App from './App';
-//Estilos
+//Styles
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//Librerías
+//Libraries
 import 'bootstrap/dist/js/bootstrap.bundle';
 //Service worker
 import * as serviceWorker from './serviceWorker';

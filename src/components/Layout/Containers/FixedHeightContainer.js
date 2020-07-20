@@ -1,5 +1,5 @@
 import React from 'react';
-//Estilos
+//Styles
 import './Heights.css';
 
 const FixedHeightContainer = ({ height, children, className, ...extraProps }) => (

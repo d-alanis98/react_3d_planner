@@ -1,9 +1,17 @@
 .w-5{
-  width: 3vw;
+  width: 4vw;
 }
 
 .w-10{
   width: 10vw;
+}
+
+.w-25{
+  width: 25vw;
+}
+
+.w-75{
+  width: 75vw;
 }
 
 .w-90{
@@ -11,5 +19,14 @@
 }
   
 .w-95{
-  width: 97vw;
+  width: 96vw;
+}
+
+@media (max-width: 950px){
+  .w-5{
+    width: 7vw;
+  }
+  .w-95{
+    width: 93vw;
+  }
 }

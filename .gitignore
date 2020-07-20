@@ -24,4 +24,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Modelos 3D
-/models
+/public/assets/models

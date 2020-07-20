@@ -1,9 +1,9 @@
 import React from 'react';
-//Componentes
+//Components
 import FlexColumn from '../Flex/FlexColumn';
 import EditorActions from './Sections/EditorActions';
 import ProjectActions from './Sections/ProjectActions';
-//Estilos
+//Styles
 import './Sidebar.css';
 
 const Sidebar = () => {

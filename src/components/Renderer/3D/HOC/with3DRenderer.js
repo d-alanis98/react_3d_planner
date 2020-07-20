@@ -5,6 +5,7 @@ import TridimensionalRenderer from '../../../../classes/Renderers/Tridimensional
 
 //Constantes
 import { getModelUri } from '../../../../constants/models/models';
+import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
 
 
 const with3DRenderer = (WrappedComponent) => {
@@ -36,6 +37,14 @@ const with3DRenderer = (WrappedComponent) => {
             setModels(modelsCopy);
         }
 
+        const rotateCamera = (view = 'TOP_VIEW', distance = null) => {
+            let cameraDistance = distance || TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE;
+            //We get the available views
+            let { TOP_VIEW, BACK_VIEW, FRONT_VIEW, FRONT_LEFT, FRONT_RIGHT, ISOMETRIC_VIEW } = CameraRotationFactory;
+            
+            let cameraPositionVector = CameraRotationFactory.createCameraRotationVector(view);
+            sceneInstance.camera.position.copy(cameraPositionVector);
+        }
         useEffect(() => {
             if(sceneInstance){
                 sceneInstance.setOrbitControlsEnabled(orbitControlsEnabled);
@@ -45,6 +54,7 @@ const with3DRenderer = (WrappedComponent) => {
         return <WrappedComponent
             models = { models }
             addModel = { addModel }
+            rotateCamera = { rotateCamera }
             orbitControlsEnabled = { orbitControlsEnabled }
             toggleOrbitControls = { toggleOrbitControls }
             { ...props }

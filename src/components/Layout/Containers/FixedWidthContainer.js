@@ -1,5 +1,5 @@
 import React from 'react';
-//Estilos
+//Styles
 import './Widths.css';
 
 const FixedWidthContainer = ({ width, children, className, ...extraProps }) => (

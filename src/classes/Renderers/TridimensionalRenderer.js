@@ -12,6 +12,8 @@ export default class TridimensionalRenderer{
     //Light parameters
     static DEFAULT_LIGHT_COLOR = 0xFFFFFF;
     static DEFAULT_LIGHT_INTENSITY = 1;
+    //Camera parameters
+    static DEFAULT_CAMERA_DISTANCE = 6;
 
 
     //CONSTRUCTOR
@@ -63,12 +65,8 @@ export default class TridimensionalRenderer{
      */
     setInitialCameraState(){
         this.camera = new THREE.PerspectiveCamera(50, this.containerAspectRatio, 0.01, 3000);
-        //Para Plane
-        //this.camera.position.z = 16;
-        //Para GridHelper
-        
-        this.camera.position.set(0, 6, 0);
-        this.camera.lookAt(0, 0, 4)
+        this.camera.position.set(0, TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE, 0);
+        this.camera.lookAt(0, TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE, 0)
         
     }
 
@@ -188,8 +186,17 @@ export default class TridimensionalRenderer{
                 gltf.scene.position.set(0,0,0)
                 gltf.scene.position.set(0, 0, 0);
                 this.addToScene(gltf.scene)
+                let map = new THREE.TextureLoader().load('/assets/textures/wood.png');
+                map.encoding = THREE.sRGBEncoding;
+                map.flipY = false;
                 gltf.scene.traverse( object => {
-                    if ( object.isMesh ) this.addObject(object);
+                    if ( object.isMesh ) {
+                        object.material = new THREE.MeshPhongMaterial({
+                            map: map,
+                        });
+                        this.addObject(object);
+
+                    }
                 }) 
             }
         );
@@ -215,16 +222,17 @@ export default class TridimensionalRenderer{
     updateDragControls(){
         this.dragControls = new DragControls(this.objects, this.camera, this.renderer.domElement)
         let orbitControls = this.orbitControls;
+        let initialYPosition = 0;
         //On drag event start we disable orbit controls to avoid events interference (we don´t want to trigger orbit controls while dragging an object)
         this.dragControls.addEventListener('dragstart', event => {
+            initialYPosition = event.object.position.y;
             if(orbitControls)
                 orbitControls.enabled = false
         })
         //During the drag event we apply validations in the position where the object is trying to be placed
         this.dragControls.addEventListener ( 'drag', event => {
-            //Position in Y axis fixed to origin.
-            console.log({ object: event.object })
-            event.object.position.y = 0; 
+            //Position in Y axis fixed to object´s initial Y axis position.
+            event.object.position.y = initialYPosition; 
             //Border conditions (X & Z)
             event.object.position.x = Math.abs(event.object.position.x) >= 2 ? 2 * (event.object.position.x > 0 ? 1 : -1) : event.object.position.x
             event.object.position.z = Math.abs(event.object.position.z) >= 2 ? 2 * (event.object.position.z > 0 ? 1 : -1) : event.object.position.z

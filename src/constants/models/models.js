@@ -1,8 +1,9 @@
 
-export const WALL  = 'WALL';
-export const KIOSK = 'KIOSK';
-export const TABLE = 'TABLE';
-export const BOARD = 'BOARD';
+export const WALL       = 'WALL';
+export const KIOSK      = 'KIOSK';
+export const TABLE      = 'TABLE';
+export const BOARD      = 'BOARD';
+export const FURNITURE  = 'FURNITURE';
 
 
 export let models = {
@@ -16,7 +17,11 @@ export let models = {
     },
     [BOARD]: {
         uri: '/assets/models/3D/board/board.glb',
-        thumbnail: '/assets/models/3D/board/thumbnail.png'
+        thumbnail: '/assets/models/3D/board/thumbnail.png',
+    },
+    [FURNITURE]: {
+        uri: '/assets/models/3D/furniture/furniture.glb',
+        thumbnail: '/assets/models/3D/furniture/thumbnail.png',
     }
 }
 
@@ -30,6 +35,8 @@ export let getModelUri = type => {
             return models[TABLE].uri;
         case BOARD:
             return models[BOARD].uri;
+        case FURNITURE:
+            return models[FURNITURE].uri;
         default:
             return models[KIOSK].uri;
     }
@@ -43,6 +50,8 @@ export let getModelThumbnail = type => {
             return models[TABLE].thumbnail;
         case BOARD:
             return models[BOARD].thumbnail;
+        case FURNITURE:
+            return models[FURNITURE].thumbnail;
         default:
             return models[TABLE].thumbnail;
     }

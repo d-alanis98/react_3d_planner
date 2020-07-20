@@ -1,5 +1,5 @@
 import React from 'react';
-//Componentes
+//Components
 import Flex from './Flex';
 
 const FlexRow = ({ children, className, }) => (

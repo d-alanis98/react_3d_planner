@@ -1,7 +1,7 @@
 import React from 'react';
-//Métodos
+//Functions
 import { getModelThumbnail } from '../../../../../../constants/models/models';
-//Estilos
+//Styles
 import './ModelThumbnail.css';
 
 

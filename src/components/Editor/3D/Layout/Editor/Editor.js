@@ -1,5 +1,5 @@
 import React from 'react';
-//Componentes
+//Components
 import EditorActions from './EditorActions/EditorActions';
 import RendererContainer from '../RendererContainer';
 import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightContainer';
@@ -7,7 +7,7 @@ import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightConta
 import with3DRenderer from '../../../../Renderer/3D/HOC/with3DRenderer';
 
 
-const Editor = ({ models, addModel, toggleOrbitControls, orbitControlsEnabled }) => {
+const Editor = ({ models, addModel, rotateCamera, toggleOrbitControls, orbitControlsEnabled }) => {
     return(
         <FixedHeightContainer
             height = { 100 }
@@ -24,6 +24,7 @@ const Editor = ({ models, addModel, toggleOrbitControls, orbitControlsEnabled })
                 <EditorActions
                     models = { models } 
                     addModel = { addModel }
+                    rotateCamera = { rotateCamera }
                     toggleOrbitControls = { toggleOrbitControls }
                     orbitControlsEnabled = { orbitControlsEnabled }
                 />

@@ -27,6 +27,13 @@ const ModelsLibrary = ({ models, addModel }) => (
             className = 'mr-3'
             modelQuantity = { models['BOARD'] ? models['BOARD'].quantity : 0 }
         />
+        <ModelThumbnail 
+            model = 'FURNITURE'
+            title = 'Entrepaños'
+            onClick = { (e) => addModel('FURNITURE') }
+            className = 'mr-3'
+            modelQuantity = { models['FURNITURE'] ? models['FURNITURE'].quantity : 0 }
+        />
     </FlexRow>
 );
 

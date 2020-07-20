@@ -1,19 +1,17 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-//Componentes
+//Components
 import FlexRow from '../../../../../Layout/Flex/FlexRow';
 import ModelsLibrary from './ModelsLibrary/ModelsLibrary';
-import ButtonWithIcon from '../../../../../Layout/Buttons/ButtonWithIcon';
 import FixedWidthContainer from '../../../../../Layout/Containers/FixedWidthContainer';
-//Íconos
-import { faArrowsAlt, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import PlaneActions from './PlaneActions/PlaneActions';
 
-const EditorActions = ({ models, addModel, toggleOrbitControls, orbitControlsEnabled }) => (
+const EditorActions = ({ models, addModel, rotateCamera, toggleOrbitControls, orbitControlsEnabled }) => (
     <FlexRow
-        className = 'justify-content-around align-items-around'
+        className = 'justify-content-around align-items-center'
     >
         <FixedWidthContainer
-            width = { 90 }
+            width = { 75 }
             className = 'overflow-auto h-100'
         >
             <ModelsLibrary 
@@ -21,17 +19,16 @@ const EditorActions = ({ models, addModel, toggleOrbitControls, orbitControlsEna
                 addModel = { addModel }
             />
         </FixedWidthContainer>
-        <ButtonWithIcon 
-            icon = { orbitControlsEnabled ? faLock : faLockOpen }
-            type = 'secondary'
-            onClick = { toggleOrbitControls }
-            className = 'btn-sm my-2'
-            buttonText = {
-                <FontAwesomeIcon 
-                    icon = { faArrowsAlt }
-                />
-            }
-        />    
+        <FixedWidthContainer
+            width = { 25 }
+        >
+            <PlaneActions 
+                rotateCamera = { rotateCamera }
+                toggleOrbitControls = { toggleOrbitControls }
+                orbitControlsEnabled = { orbitControlsEnabled }
+            />
+        </FixedWidthContainer>
+
     </FlexRow>
 );
 
