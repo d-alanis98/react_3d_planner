@@ -12,9 +12,8 @@ export default class TridimensionalRenderer{
     //Light parameters
     static DEFAULT_LIGHT_COLOR = 0xFFFFFF;
     static DEFAULT_LIGHT_INTENSITY = 1;
-    //Camera parameters
-    static DEFAULT_CAMERA_DISTANCE = 6;
-
+    //Default texture
+    static DEFAULT_TEXTURE_URI = '/assets/textures/wood.png'
 
     //CONSTRUCTOR
     constructor(sceneWidth = PlaneFactory.DEFAULT_SIZE, sceneHeight = PlaneFactory.DEFAULT_SIZE){
@@ -27,12 +26,15 @@ export default class TridimensionalRenderer{
         this.containerWidth = this.domContainer.clientWidth;
         this.containerHeight = this.domContainer.clientHeight;
         this.containerAspectRatio = this.containerWidth / this.containerHeight;
+        //Plane
+        this.plane = null;
         //Controls
         this.orbitControls = null;
         this.dragControls = null;
         this.enableOrbitControls = true;
         //Methods linkage
         this.render = this.render.bind(this);
+
     }
 
     //PRIMARY METHODS
@@ -64,10 +66,12 @@ export default class TridimensionalRenderer{
      * to the default ones) and setting it far enough to cover the whole scene
      */
     setInitialCameraState(){
+        //We get optimal camera distance
+        let cameraDistance = this.getOptimalCameraDistance();
+        //Then we instantiate a perspective camera and set it´s parameters (position and look point)
         this.camera = new THREE.PerspectiveCamera(50, this.containerAspectRatio, 0.01, 3000);
-        this.camera.position.set(0, TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE, 0);
-        this.camera.lookAt(0, TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE, 0)
-        
+        this.camera.position.set(0, cameraDistance, 0);
+        this.camera.lookAt(0, cameraDistance, 0)
     }
 
     /**
@@ -95,8 +99,12 @@ export default class TridimensionalRenderer{
      * This method creates a plane and adds it to the scene
      */
     addPlane(){
-        let meshPlane = PlaneFactory.create(PlaneFactory.GRID, this.sceneWidth, this.sceneHeight);
-        this.addToScene(meshPlane);  
+        //Grid plane
+        let gridPlane = PlaneFactory.create(PlaneFactory.GRID, 50)
+        this.addToScene(gridPlane)
+        //Main plane (which can be personalized with different textures)
+        this.plane = PlaneFactory.create(PlaneFactory.MESH_PLANE, this.sceneWidth, this.sceneHeight);
+        this.addToScene(this.plane);  
     }
 
     /**
@@ -144,8 +152,9 @@ export default class TridimensionalRenderer{
      */
     addLight(){
         let light = new THREE.AmbientLight(TridimensionalRenderer.DEFAULT_LIGHT_COLOR, TridimensionalRenderer.DEFAULT_LIGHT_INTENSITY)
-        light.position.set(1, 1, 1);
+        light.position.set(0, 0, 0);
         this.addToScene(light);
+       
     }
 
     /**
@@ -182,24 +191,48 @@ export default class TridimensionalRenderer{
         loader.load(
             uri,
             gltf => {
+                //Scaled to real dimensions
                 gltf.scene.scale.set(1, 1, 1);
+                //New objects starts at origin
                 gltf.scene.position.set(0,0,0)
-                gltf.scene.position.set(0, 0, 0);
+                //We add the object to the scene
                 this.addToScene(gltf.scene)
-                let map = new THREE.TextureLoader().load('/assets/textures/wood.png');
-                map.encoding = THREE.sRGBEncoding;
-                map.flipY = false;
+                //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
                 gltf.scene.traverse( object => {
-                    if ( object.isMesh ) {
-                        object.material = new THREE.MeshPhongMaterial({
-                            map: map,
-                        });
+                    if(object.isMesh) {
+                        //We load the default texture to the object if this does not have one already
+                        if(!object.material.map)
+                            this.addTextureToObject(object, TridimensionalRenderer.DEFAULT_TEXTURE_URI);
+                        //We add the object to the array
                         this.addObject(object);
 
                     }
                 }) 
             }
         );
+    }
+
+    /**
+     * This method adds a texture to the object´s material, it can be modified at runtime
+     * @param {mesh} object 
+     * @param {string} textureUri
+     */
+    addTextureToObject = (object, textureUri = null) => {
+        if(!object.isMesh)
+            return;
+        /**
+         * @todo Texture factory
+         */
+        //We load the texture 
+        let texture = new THREE.TextureLoader().load(textureUri || TridimensionalRenderer.DEFAULT_TEXTURE_URI);
+        //Required parameters, specially encoding, which is set to LuminanceFormat
+        texture.encoding = THREE.LuminanceFormat;
+        texture.flipY = false;
+        //We add the texture in the material property of the object
+        object.material = new THREE.MeshPhongMaterial({
+            map: texture,
+        });
+        object.material.side = THREE.DoubleSide;
     }
 
     /**
@@ -245,4 +278,9 @@ export default class TridimensionalRenderer{
         })
 
     }
+    /**
+     * Method to get camera´s optimal distance, we need to get far enough to get the whole scene, therefore we 
+     * take the maximum value between height and width
+     */
+    getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth)  * 1.15;
 }

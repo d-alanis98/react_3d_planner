@@ -3,8 +3,8 @@ import * as THREE from 'three';
 export default class PlaneFactory {
     static GRID         = 'GRID';
     static MESH_PLANE   = 'MESH_PLANE';
-    static DEFAULT_SIZE = 4;
-    static DEFAULT_GRID = 10;
+    static DEFAULT_SIZE = 5;
+    static DEFAULT_GRID = 100;
     /**
      * Returns an instance of the desired plane class
      * @param {string} type 
@@ -24,11 +24,14 @@ export default class PlaneFactory {
                         PlaneFactory.DEFAULT_GRID, 
                         PlaneFactory.DEFAULT_GRID
                     ),
-                    new THREE.MeshBasicMaterial({ 
-                        color: 0xFFFFFF,
-                        map: loader.load('/assets/textures/floor.png')
+                    new THREE.MeshBasicMaterial({ //We load the default texture
+                        color: 0xD3D3D3
                     })
                 );
+                //We rotate -90° the plane in order to be aligned with the 3D objects origin
+                plane.rotateX(-Math.PI / 2); 
+                //Double sided material in order to prevent it to disappear when it is rotated
+                plane.material.side = THREE.DoubleSide;
                 break;
             default:
                 plane = new THREE.GridHelper(PlaneFactory.DEFAULT_SIZE, PlaneFactory.DEFAULT_GRID);

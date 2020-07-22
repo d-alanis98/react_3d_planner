@@ -7,7 +7,7 @@ import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightConta
 import with3DRenderer from '../../../../Renderer/3D/HOC/with3DRenderer';
 
 
-const Editor = ({ models, addModel, rotateCamera, toggleOrbitControls, orbitControlsEnabled }) => {
+const Editor = ({ models, addModel, rotateCamera, addTextureToPlane, toggleOrbitControls, orbitControlsEnabled }) => {
     return(
         <FixedHeightContainer
             height = { 100 }
@@ -25,6 +25,7 @@ const Editor = ({ models, addModel, rotateCamera, toggleOrbitControls, orbitCont
                     models = { models } 
                     addModel = { addModel }
                     rotateCamera = { rotateCamera }
+                    addTextureToPlane = { addTextureToPlane }
                     toggleOrbitControls = { toggleOrbitControls }
                     orbitControlsEnabled = { orbitControlsEnabled }
                 />

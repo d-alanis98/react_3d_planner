@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 //Classes
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 //Factories
-
-//Constantes
-import { getModelUri } from '../../../../constants/models/models';
+import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
+//Functions
+import { getModelUri } from '../../../../constants/models/models';
 
 
 const with3DRenderer = (WrappedComponent) => {
@@ -37,14 +37,20 @@ const with3DRenderer = (WrappedComponent) => {
             setModels(modelsCopy);
         }
 
-        const rotateCamera = (view = 'TOP_VIEW', distance = null) => {
-            let cameraDistance = distance || TridimensionalRenderer.DEFAULT_CAMERA_DISTANCE;
+        const addTextureToObject = (object, textureUri) => sceneInstance.addTextureToObject(object, textureUri);
+
+        const addTextureToPlane = texture => {
+            let textureUri = TextureFactory.getTextureUri(texture);
+            sceneInstance.addTextureToObject(sceneInstance.plane, textureUri);
+        }
+
+        const rotateCamera = (view = 'TOP_VIEW') => {
+            let cameraDistance = sceneInstance.getOptimalCameraDistance();
             //We get the available views
-            let { TOP_VIEW, BACK_VIEW, FRONT_VIEW, FRONT_LEFT, FRONT_RIGHT, ISOMETRIC_VIEW } = CameraRotationFactory;
-            
-            let cameraPositionVector = CameraRotationFactory.createCameraRotationVector(view);
+            let cameraPositionVector = CameraRotationFactory.createCameraRotationVector(view, cameraDistance);
             sceneInstance.camera.position.copy(cameraPositionVector);
         }
+        
         useEffect(() => {
             if(sceneInstance){
                 sceneInstance.setOrbitControlsEnabled(orbitControlsEnabled);
@@ -55,8 +61,10 @@ const with3DRenderer = (WrappedComponent) => {
             models = { models }
             addModel = { addModel }
             rotateCamera = { rotateCamera }
-            orbitControlsEnabled = { orbitControlsEnabled }
+            addTextureToPlane = { addTextureToPlane }
+            addTextureToObject = { addTextureToObject }
             toggleOrbitControls = { toggleOrbitControls }
+            orbitControlsEnabled = { orbitControlsEnabled }
             { ...props }
         />
     }
