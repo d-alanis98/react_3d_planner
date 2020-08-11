@@ -2,9 +2,9 @@ import React from 'react';
 import FlexRow from '../../../../../../Layout/Flex/FlexRow';
 import ModelThumbnail from '../ModelThumbnail';
 
-const ModelsLibrary = ({ models, addModel }) => (
+const ModelsLibrary = ({ models, addModel, className }) => (
     <FlexRow
-        className = 'justify-content-start pt-2'
+        className = { `justify-content-start pt-2 ${className || ''}` }
     >
         <ModelThumbnail
             model = 'TABLE'

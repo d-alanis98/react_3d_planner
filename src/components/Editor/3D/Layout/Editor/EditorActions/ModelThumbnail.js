@@ -5,7 +5,7 @@ import { getModelThumbnail } from '../../../../../../constants/models/models';
 import './ModelThumbnail.css';
 
 
-const ModelThumbnail = ({ title, model, onClick, className, modelQuantity }) => {
+const ModelThumbnail = ({ title, model, onClick, className, modelQuantity, imageClassName }) => {
     return(
         <div 
             title = { title }
@@ -16,8 +16,9 @@ const ModelThumbnail = ({ title, model, onClick, className, modelQuantity }) => 
         >
             <img 
                 src = { getModelThumbnail(model) } 
-                className = 'model-thumbnail'
                 alt = { model }
+                className =  { imageClassName || 'model-thumbnail' }
+                
             />
             {
                 modelQuantity > 0 && 

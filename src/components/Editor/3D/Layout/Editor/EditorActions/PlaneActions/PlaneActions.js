@@ -2,16 +2,39 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import FlexRow from '../../../../../../Layout/Flex/FlexRow';
+import PlaneSettings from './PlaneSettings/PlaneSettings';
 import ButtonWithIcon from '../../../../../../Layout/Buttons/ButtonWithIcon';
 import CameraPositionMenu from './CameraPositionMenu';
-//Factories
-import TextureFactory from '../../../../../../../classes/3D/Models/TextureFactory';
+//HOC
+import withProjectState from '../../../../../../../redux/HOC/withProjectState';
+import withEditorState from '../../../../../../../redux/HOC/withEditorState';
 //Icons
-import { faArrowsAlt, faLock, faLockOpen, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsAlt, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 
 
 
-const PlaneActions = ({ rotateCamera, addTextureToPlane, toggleOrbitControls, orbitControlsEnabled }) => {
+
+const PlaneActions = props => {
+    //PROPS
+    let {
+        //From editor state HOC
+        editorState, 
+        setEditorWidth, 
+        setEditorHeight, 
+        //From parent component
+        rotateCamera, 
+        addTextureToPlane, 
+        toggleOrbitControls, 
+        orbitControlsEnabled, 
+    } = props;
+
+    //Object destructuring
+    const { editorHeight, editorWidth } = editorState;
+    
+    /**
+     * Method that changes the plane texture based on the desired one
+     * @param {object} event 
+     */
     const handleTextureChange = event => {
         let { checked, value } = event.target;
         if(checked)
@@ -25,73 +48,13 @@ const PlaneActions = ({ rotateCamera, addTextureToPlane, toggleOrbitControls, or
             <CameraPositionMenu 
                 rotateCamera = { rotateCamera }
             />
-            <div className='dropup'
-                title = 'Ajustes de escena 3D'
-                data-toggle = 'tooltip' 
-                data-placement = 'top' 
-            >
-                <div className='dropdown'>
-                    <ButtonWithIcon 
-                        id = '3d_scene_settings'
-                        icon = { faCog }
-                        type = 'outline-secondary'
-                        className = 'rounded-pill pr-1 py-2 mr-2'
-                        data-toggle='dropdown' 
-                        aria-haspopup='true' 
-                        aria-expanded='false'
-                    />
-                    <div className='dropdown-menu mb-5 px-3 oveflow-auto' aria-labelledby='3d_scene_settings'>
-                        <h5>Plane</h5>
-                        <div className='form-group'>
-                            <h6>Dimensiones: </h6>
-                            <label>Alto: </label>
-                            <input type='text' className='form-control' />
-                            <label>Ancho: </label>
-                            <input type='text' className='form-control' />
-                        </div>
-                        <div className='form-group'>
-                            <h6>Textura:</h6>
-                            <div>
-                                <label>
-                                    <input 
-                                        type = 'checkbox'
-                                        value = { TextureFactory.FLOOR_TEXTURE } 
-                                        onChange = { handleTextureChange }
-                                        className = 'mr-2'
-                                    />
-                                    <img 
-                                        src = { TextureFactory.getTextureUri(TextureFactory.FLOOR_TEXTURE) } 
-                                        width = '30px' 
-                                        height = '30px' 
-                                        className = 'mr-2'
-                                    />
-                                    Piso
-                                </label>
-                            </div>
-                            <div className='mt-2'>
-                                <label>
-                                    <input 
-                                        type = 'checkbox'
-                                        value = { TextureFactory.WOOD_TEXTURE } 
-                                        onChange = { handleTextureChange }
-                                        className = 'mr-2'
-                                    />
-                                    <img 
-                                        src = { TextureFactory.getTextureUri(TextureFactory.WOOD_TEXTURE) } 
-                                        width = '30px' 
-                                        height = '30px' 
-                                        className = 'mr-2'
-                                    />
-                                    Duela
-                                </label>
-                            </div>
-                        </div>
-                        <a className='dropdown-item' href='#'>Another action</a>
-                        <div className='dropdown-divider'></div>
-                        <a className='dropdown-item' href='#'>Something else here</a>
-                    </div>
-                </div>
-            </div>
+            <PlaneSettings 
+                editorWidth = { editorWidth }
+                editorHeight = { editorHeight }
+                setEditorWidth = { setEditorWidth }
+                setEditorHeight = { setEditorHeight }
+                handleTextureChange = { handleTextureChange }
+            />
             <ButtonWithIcon 
                 icon = { orbitControlsEnabled ? faLock : faLockOpen }
                 title = 'Bloquear/desbloquear plano'
@@ -110,4 +73,9 @@ const PlaneActions = ({ rotateCamera, addTextureToPlane, toggleOrbitControls, or
     );
 }
 
-export default PlaneActions;
+//We apply the project state HOC
+let WithProjectState = withProjectState(PlaneActions);
+//We apply the editor state decorator 
+let WithEditorState = withEditorState(WithProjectState);
+//We return the decorated component
+export default WithEditorState;

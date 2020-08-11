@@ -1,4 +1,5 @@
 import React from 'react';
+//Components
 import FixedHeightContainer from '../../../Layout/Containers/FixedHeightContainer';
 
 const RendererContainer = () => (

@@ -4,6 +4,8 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 //Factories
 import PlaneFactory from '../3D/Plane/PlaneFactory';
+//Functions
+import { getModelUri } from '../../constants/models/models';
 
 export default class TridimensionalRenderer{
     //CONSTANTS
@@ -140,6 +142,17 @@ export default class TridimensionalRenderer{
     //SECONDARY METHODS
 
     /**
+     * This methos sets the global callback for the drag end event
+     * @param {function} callback 
+     */
+    setDragEndCallback(callback){
+        if(callback && typeof(callback) === 'function')
+            this.onDragEnd = callback;
+        //We bind the this context (instance)
+        this.onDragEnd = this.onDragEnd.bind(this);
+    }
+
+    /**
      * This method adds an item to the current scene
      * @param {any} element 
      */
@@ -186,7 +199,8 @@ export default class TridimensionalRenderer{
         this.updateDragControls();
     }
 
-    load3DModel(uri){
+    load3DModel(type, { x = 0, y = 0, z = 0 }, onSuccess){
+        let uri = getModelUri(type);
         let loader = new GLTFLoader();
         loader.load(
             uri,
@@ -194,7 +208,7 @@ export default class TridimensionalRenderer{
                 //Scaled to real dimensions
                 gltf.scene.scale.set(1, 1, 1);
                 //New objects starts at origin
-                gltf.scene.position.set(0,0,0)
+                gltf.scene.position.set(x, y, z);
                 //We add the object to the scene
                 this.addToScene(gltf.scene)
                 //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
@@ -203,6 +217,9 @@ export default class TridimensionalRenderer{
                         //We load the default texture to the object if this does not have one already
                         if(!object.material.map)
                             this.addTextureToObject(object, TridimensionalRenderer.DEFAULT_TEXTURE_URI);
+                        if(onSuccess && typeof(onSuccess) === 'function')
+                            onSuccess(object);
+                        
                         //We add the object to the array
                         this.addObject(object);
 
@@ -254,7 +271,7 @@ export default class TridimensionalRenderer{
      */
     updateDragControls(){
         this.dragControls = new DragControls(this.objects, this.camera, this.renderer.domElement)
-        let orbitControls = this.orbitControls;
+        let { orbitControls, onDragEnd } = this;
         let initialYPosition = 0;
         //On drag event start we disable orbit controls to avoid events interference (we don´t want to trigger orbit controls while dragging an object)
         this.dragControls.addEventListener('dragstart', event => {
@@ -267,12 +284,16 @@ export default class TridimensionalRenderer{
             //Position in Y axis fixed to object´s initial Y axis position.
             event.object.position.y = initialYPosition; 
             //Border conditions (X & Z)
+            /*
             event.object.position.x = Math.abs(event.object.position.x) >= 2 ? 2 * (event.object.position.x > 0 ? 1 : -1) : event.object.position.x
             event.object.position.z = Math.abs(event.object.position.z) >= 2 ? 2 * (event.object.position.z > 0 ? 1 : -1) : event.object.position.z
+            */
         })
         //On drag event end we enable the orbit controls again
         this.dragControls.addEventListener('dragend', event => {
-            event.object.material.opacity = 1
+            event.object.material.opacity = 1;
+            if(onDragEnd && typeof(onDragEnd) === 'function')
+                onDragEnd(event);
             if(orbitControls)
                 orbitControls.enabled = this.enableOrbitControls;
         })
