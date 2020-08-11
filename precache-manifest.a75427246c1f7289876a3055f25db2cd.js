@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "38c4b87207ee6043d366fc8a13eda1ce",
+    "revision": "d262f9b944c729e40502766bed466796",
     "url": "/react_3d_planner/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/react_3d_planner/static/css/2.af3c1da9.chunk.css"
   },
   {
-    "revision": "70f0ec98f0d621bebfb4",
+    "revision": "ef713d3ac1f8173b45d6",
     "url": "/react_3d_planner/static/css/main.aed6def8.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/react_3d_planner/static/js/2.36d2f1c1.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "70f0ec98f0d621bebfb4",
-    "url": "/react_3d_planner/static/js/main.42b0d79c.chunk.js"
+    "revision": "ef713d3ac1f8173b45d6",
+    "url": "/react_3d_planner/static/js/main.af88097e.chunk.js"
   },
   {
     "revision": "694bf3180281eac34f40",
