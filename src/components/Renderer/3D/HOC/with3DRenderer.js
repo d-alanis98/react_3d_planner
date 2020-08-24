@@ -5,15 +5,26 @@ import TridimensionalRenderer from '../../../../classes/Renderers/Tridimensional
 import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
 //Functions
-import { getModelUri } from '../../../../constants/models/models';
 import withProjectState from '../../../../redux/HOC/withProjectState';
+import withEditorState from '../../../../redux/HOC/withEditorState';
+import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 
 
 const with3DRenderer = (WrappedComponent) => {
 
-    const With3DRenderer = ({ project, addObject, updateObject, removeObject, set2DSceneDimensions, set3DSceneDimensions, ...extraProps}) => {
+    const With3DRenderer = props => {
         //PROPS
         //Destructuring
+        const { 
+            project, 
+            addObject,
+            editorState: { editorWidth, editorHeight },
+            updateObject, 
+            removeObject, 
+            set2DSceneDimensions, 
+            set3DSceneDimensions, 
+            ...extraProps
+        } = props;
         const { objects: projectObjects } = project;
 
         //HOOKS
@@ -22,26 +33,21 @@ const with3DRenderer = (WrappedComponent) => {
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
         const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
+        
 
         //Effects
         useEffect(() => {
-            let sceneInstance = new TridimensionalRenderer();
+            //We generate a tridimensional renderer instance with the width and height that are currently set in the state
+            let sceneInstance = new TridimensionalRenderer(editorWidth, editorHeight);
+            //We initialize the scene instance and provide the drag end callback, which is the update model function
             sceneInstance.init();
             sceneInstance.setDragEndCallback(updateModel);
             setSceneInstance(sceneInstance);
-            //We set the container dimensions
-            const { sceneWidth, sceneHeight } = sceneInstance;
-            set3DSceneDimensions(sceneWidth, sceneHeight);
-            //If not set already, we set the 2D editor dimensions (the whole dom container dimensions)
-            if(!project.scene || !project.scene['2d']){
-                let editorContainer = document.getElementById(TridimensionalRenderer.DOM_CONTAINER_ID);
-                set2DSceneDimensions(editorContainer.clientWidth, editorContainer.clientHeight);
-            }
             /**
              * This method restores the existing objects in the plane
              */
             const restoreModels = () => {
-                //We retrieve the existing models in state
+                //We retrieve the existing models
                 let modelsCopy = { ...models };
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
@@ -50,6 +56,7 @@ const with3DRenderer = (WrappedComponent) => {
                     const { coordinates } = model['3d'];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
+                    
                     //We create the 3D model
                     sceneInstance.load3DModel(
                         type,
@@ -60,10 +67,11 @@ const with3DRenderer = (WrappedComponent) => {
                                 ...model,
                                 '3d': {
                                     uuid: uuid,
+                                    container: getBoxBound(createdModel),
                                     coordinates,
                                 }
                             };
-                            updateObject(modelWithUpdatedId) 
+                            updateObject(modelWithUpdatedId);
                         },
                         updateModel //updateCallback
                     );
@@ -71,26 +79,33 @@ const with3DRenderer = (WrappedComponent) => {
                 setModels(modelsCopy);
             }
             restoreModels();
+            sceneInstance = null;
         }, []);
 
         useEffect(() => {
             if(!draggedObject)
                 return;
-            const { uuid, x, y, z } = draggedObject;
+            let { uuid, x, y, z } = draggedObject;
             let existingObject = findObjectBy3DModelId(uuid);
+
+
             if(!existingObject){
                 console.log('Objeto no encontrado')
                 return;
             }
+
+
             let bidimensionalEditorState = { ...existingObject['2d'] };
+            let tridimensionalEditorState = { ...existingObject['3d'] };
             let updatedObject = {
                 ...existingObject,
                 '2d': {
                     ...bidimensionalEditorState,
-                    coordinates: get2DCoordinates(x, z)
+                    coordinates: get2DCoordinates(x, y, z)
                 },
                 '3d': {
-                    uuid: uuid,
+                    ...tridimensionalEditorState,
+                    uuid,
                     coordinates: { x, y: 0, z }
                 }
             }
@@ -119,10 +134,11 @@ const with3DRenderer = (WrappedComponent) => {
                 type,
                 '2d': {
                     uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
-                    coordinates: get2DCoordinates(x, z)
+                    coordinates: get2DCoordinates(x, y, z)
                 },
                 '3d': {
                     uuid: uuid, //THREE.js generated ID 
+                    container: getBoxBound(createdModel),
                     coordinates: { x, y: 0, z }
                 }
             }
@@ -132,6 +148,19 @@ const with3DRenderer = (WrappedComponent) => {
         const addModel = type => {
             increaseModelQuantity(type);
             sceneInstance.load3DModel(type, {x: 0, y: 0, z: 0}, model => onCreationSuccess(model, type));
+        }
+
+        const getBoxBound = object => {
+            const { 
+                scale: { x: scaleX, z: scaleZ },
+                geometry: { boundingBox: { min: { x: minimumX, z: minimumZ }, max: { x: maximumX, z: maximumZ }} },
+            } = object;
+            let itemSizeInXAxis = (maximumX - minimumX) * scaleX;
+            let itemSizeInZAxis = (maximumZ - minimumZ) * scaleZ;
+            return {
+                itemDepth: itemSizeInZAxis,
+                itemWidth: itemSizeInXAxis,
+            }
         }
 
         const updateModel = event => {
@@ -145,27 +174,18 @@ const with3DRenderer = (WrappedComponent) => {
          * @param {string} id2DModel 
          */
         const findObjectBy3DModelId = id3DModel => projectObjects.find(object => object['3d'].uuid === id3DModel);
-
-        const calculateOriginCoordinates = (x, y) => {
-            let { sceneWidth, sceneHeight } = { ...project.scene['2d'] };
-            let planeCenterX = sceneWidth / 2;
-            let planeCenterY = sceneHeight / 2;
-            return {
-                x: planeCenterX - x,
-                y: planeCenterY - y
-            }
-        }
-
-        const get2DCoordinates = (x, z) => {
+        
+        /**
+         * This method transforms the 3D coordinates to the corresponding 2D ones, to get the object placed in the same
+         * way between both editors, making use of the class CoordinatesTransformation.
+         * @param {number} x 
+         * @param {number} y 
+         * @param {number} z
+         */
+        const get2DCoordinates = (x, y, z) => {
             const { scene } = project;
-            //We get the dimensions of each scene
-            let { sceneWidth: bidimensionalSceneWidth, sceneHeight: bidimensionalSceneHeight } = { ...scene['2d'] };
-            let { sceneWidth: tridimensionalSceneWidth, sceneHeight: tridimensionalSceneHeight } = { ...scene['3d'] };
-            //We get the ratio between the two scenes dimensions
-            let xRatio = bidimensionalSceneWidth / tridimensionalSceneWidth;
-            let yRatio = bidimensionalSceneHeight / tridimensionalSceneHeight;
-            //Remembering that z (depth) in 3D editor is y in 2D editor (TOP_VIEW), and that they are inverted
-            return calculateOriginCoordinates(-1 * x * xRatio, -1 * z * yRatio);
+            let coordinatesTransformation = new CoordinatesTransformation(scene, x, y, z);
+            return coordinatesTransformation.tridimensionalToBidimensionalCoordinates();
         }
 
         const toggleOrbitControls = () => {
@@ -208,8 +228,10 @@ const with3DRenderer = (WrappedComponent) => {
 
     //We apply the project state HOC
     let WithProjectState = withProjectState(With3DRenderer);
+    //We apply the editor state HOC
+    let WithEditorState = withEditorState(WithProjectState);
     //We return the decorated component
-    return WithProjectState;
+    return WithEditorState;
 }
 
 export default with3DRenderer;

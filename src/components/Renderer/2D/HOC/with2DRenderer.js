@@ -2,11 +2,27 @@ import React, { useState, useEffect } from 'react';
 //Classes
 import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import withProjectState from '../../../../redux/HOC/withProjectState';
+import withEditorState from '../../../../redux/HOC/withEditorState';
+import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
+import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 
 const with2DRenderer = WrappedComponent => {
-    const With2DRenderer = ({ project, addObject, updateObject, removeObject, set2DSceneDimensions, ...ownProps }) => {
+    const With2DRenderer = props => {
+        //CONSTANTS
+        const BIDIMENSIONAL  = BidimensionalRenderer.BIDIMENSIONAL_SCENE;
+        const TRIDIMENSIONAL = TridimensionalRenderer.TRIDIMENSIONAL_SCENE;
         //PROPS
         //Destructuring
+        const { 
+            project,
+            addObject, 
+            editorState: { editorWidth, editorHeight },
+            updateObject, 
+            removeObject, 
+            set2DRoomDimensions,
+            set2DSceneDimensions, 
+            ...ownProps 
+        } = props;
         const { objects: projectObjects } = project;
         //HOOKS
         //State
@@ -18,12 +34,16 @@ const with2DRenderer = WrappedComponent => {
         //Effects
         useEffect(() => {
             //We set the scene instance
-            let sceneInstance = new BidimensionalRenderer();
+            let sceneInstance = new BidimensionalRenderer(editorWidth, editorHeight);
             sceneInstance.init();
             setSceneInstance(sceneInstance);
             //We set the container dimensions
-            const { containerWidth, containerHeight } = sceneInstance;
+            let { containerWidth, containerHeight } = sceneInstance;
             set2DSceneDimensions(containerWidth, containerHeight);
+            //We set the room dimensions 
+            const { width: roomWidth, height: roomHeight } = sceneInstance.getRoomDimensionInPixels();
+            set2DRoomDimensions(roomWidth, roomHeight);
+
             /**
              * This method restores the existing objects in the plane
              */
@@ -34,7 +54,7 @@ const with2DRenderer = WrappedComponent => {
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
                     const { type } = model;
-                    const { coordinates } = model['2d'];
+                    const { coordinates } = model[BIDIMENSIONAL];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the SVG model
@@ -45,7 +65,7 @@ const with2DRenderer = WrappedComponent => {
                             let { _id, attrs: { x, y } } = createdModel;
                             let modelWithUpdatedId = {
                                 ...model,
-                                '2d': {
+                                [BIDIMENSIONAL]: {
                                     uuid: _id,
                                     coordinates: { x, y }
                                 }
@@ -74,14 +94,14 @@ const with2DRenderer = WrappedComponent => {
             let existingObject = findObjectBy2DModelId(_id);
             if(!existingObject)
                 return;
-            let tridimensionalEditorState = { ...existingObject['3d'] };
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
             let updatedObject = { 
                 ...existingObject,
-                '2d': {
+                [BIDIMENSIONAL]: {
                     uuid: _id,
                     coordinates: { x, y }
                 },
-                '3d': {
+                [TRIDIMENSIONAL]: {
                     ...tridimensionalEditorState,
                     coordinates: get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
                 }
@@ -101,11 +121,11 @@ const with2DRenderer = WrappedComponent => {
             let objectToAdd = {
                 id: projectObjects.length,
                 type,
-                '2d': {
+                [BIDIMENSIONAL]: {
                     uuid: _id, //Konva generated ID
                     coordinates: { x, y }
                 },
-                '3d': {
+                [TRIDIMENSIONAL]: {
                     uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
                     coordinates: { x: 0, y: 0, z: 0 }
                 }
@@ -118,7 +138,7 @@ const with2DRenderer = WrappedComponent => {
          * This method return the complete object based on it´s 2d model id
          * @param {string} id2DModel 
          */
-        const findObjectBy2DModelId = id2DModel => projectObjects.find(object => object['2d'].uuid === id2DModel);
+        const findObjectBy2DModelId = id2DModel => projectObjects.find(object => object[BIDIMENSIONAL].uuid === id2DModel);
 
         const updateModel = event => {
             if(!event.target)
@@ -148,25 +168,16 @@ const with2DRenderer = WrappedComponent => {
             setModels(modelsCopy);
         }
 
-        const calculateOriginCoordinates = (x, y) => {
-            let { x: planeCenterX, y: planeCenterY } = sceneInstance.planeCenterCoordinates;
-            return {
-                x: planeCenterX - x,
-                y: planeCenterY - y
-            }
-        }
-
+        /**
+         * This method transforms the 2D coordinates to the corresponding 3D ones, to get the object placed in the same
+         * way between both editors, making use of the class CoordinatesTransformation.
+         * @param {number} x 
+         * @param {number} y 
+         */
         const get3DCoordinates = (x, y) => {
-            let originCoordinates = calculateOriginCoordinates(x, y);
-            let { x: originX, y: originY } = originCoordinates;
-            let xRatio = 5 / sceneInstance.containerWidth; //Posteriormente se obtiene del estado
-            let yRatio = 5 / sceneInstance.containerHeight;
-            return {
-                x:  -1 * originX * xRatio,
-                y: 0,
-                z: -1 * originY * yRatio
-            }
-
+            const { scene } = project;
+            let coordinatesTransformation = new CoordinatesTransformation(scene, x, y);
+            return coordinatesTransformation.bidimensionalToTridimensionalCoordinates();
         }
 
         return <WrappedComponent 
@@ -178,8 +189,10 @@ const with2DRenderer = WrappedComponent => {
 
     //We apply the project state HOC
     let WithProjectState = withProjectState(With2DRenderer);
+    //We apply the editor state decorator
+    let WithEditorState = withEditorState(WithProjectState);
     //We return the decorated component
-    return WithProjectState;
+    return WithEditorState;
 }
 
 

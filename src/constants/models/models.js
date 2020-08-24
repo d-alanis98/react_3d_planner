@@ -55,21 +55,21 @@ export let getDimensions = type => {
     switch(type){
         case TABLE:
             return {
-                width: 50,
-                depth: 50,
-                height: 75,
+                width: 0.75,
+                depth: 0.5,
+                height: 0.75,
             }
         case FURNITURE:
             return {
-                width: 100,
-                depth: 50,
-                height: 200,
+                width: 7,
+                depth: 1.5,
+                height: 2,
             }
         default:
             return {
-                width: 100,
-                depth: 100,
-                height: 100
+                width: 1,
+                depth: 1,
+                height: 1
             }
     }
 }

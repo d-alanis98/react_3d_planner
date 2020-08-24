@@ -2,7 +2,6 @@
  * @author Damián Alanís Ramírez
  * @version 1.0.0
  */
-//Imported constants
 
 
 //CONSTANTS
@@ -11,10 +10,10 @@ const SET_EDITOR_TYPE   = 'SET_EDITOR_TYPE';
 const SET_EDITOR_WIDTH  = 'SET_EDITOR_WIDTH';
 const SET_EDITOR_HEIGHT = 'SET_EDITOR_HEIGHT';
 //Others
-const TRIDIMENSIONAL    = 'TRIDIMENSIONAL_EDITOR';
+const BIDIMENSIONAL_EDITOR = 'BIDIMENSIONAL EDITOR';
 //Initial state
 const initialState = {
-    editorType: TRIDIMENSIONAL,
+    editorType: BIDIMENSIONAL_EDITOR,
     editorWidth: 0,
     editorHeight: 0,
 }

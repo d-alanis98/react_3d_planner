@@ -2,13 +2,29 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Interaction } from 'three.interaction';
+//Classes
+import BoundDetector from '../3D/BoxPositioning/BoundDetector';
+import ModelScaleCalculator from '../3D/Models/ModelScaleCalculator';
 //Factories
 import PlaneFactory from '../3D/Plane/PlaneFactory';
 //Functions
-import { getModelUri } from '../../constants/models/models';
+import { getModelUri, getDimensions } from '../../constants/models/models';
+
+
+/**
+ * @author Damián Alanís Ramírez
+ * @version 7.4.1
+ * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
+ * manipulate the 3D editor and provide actions to change its behavior in runtime.
+ * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
+ * the scene dimensions (which are the same as the real room dimensions that were set in the project settings).
+ */
 
 export default class TridimensionalRenderer{
     //CONSTANTS
+    //Scene identifier
+    static TRIDIMENSIONAL_SCENE = '3d';
     //DOM container
     static DOM_CONTAINER_ID = 'tridimensional_renderer';
     //Light parameters
@@ -52,6 +68,7 @@ export default class TridimensionalRenderer{
         this.addControls();
         this.addPlane();
         this.addResizeListener();
+        this.addInteractionEvents();
         this.render()
     }
 
@@ -83,7 +100,7 @@ export default class TridimensionalRenderer{
     setInitialRenderer(){
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         //Renderer settings
-        this.renderer.setClearColor("#e5e5e5");
+        this.renderer.setClearColor('#e5e5e5');
         this.renderer.setSize(this.containerWidth, this.containerHeight);
         //Append renderer in DOM
         this.domContainer.appendChild(this.renderer.domElement);
@@ -95,6 +112,36 @@ export default class TridimensionalRenderer{
     addControls(){
         this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );
         this.dragControls = new DragControls(this.objects, this.camera, this.renderer.domElement);
+        this.addControlsEventListeners();
+    }
+
+    /**
+     * This method adds the main event listeners for the drag controls
+     */
+    addControlsEventListeners(){
+        let initialYPosition = 0;
+        //On drag event start we disable orbit controls to avoid events interference (we don´t want to trigger orbit controls while dragging an object)
+        this.dragControls.addEventListener('dragstart', event => {
+            initialYPosition = event.object.position.y;
+            if(this.orbitControls)
+                this.orbitControls.enabled = false
+        })
+        //During the drag event we apply validations in the position where the object is trying to be placed via the BoundDetector class
+        this.dragControls.addEventListener('drag', event => {
+            let { sceneHeight, sceneWidth } = this;
+            let boundDetector = new BoundDetector(event.object, initialYPosition, sceneWidth, sceneHeight);
+            boundDetector.applyBoundDetectionAlgorithm();
+        });
+        //On drag event end we enable the orbit controls again
+        this.dragControls.addEventListener('dragend', event => {
+            event.object.material.opacity = 1;
+            if(this.onDragEnd && typeof(this.onDragEnd) === 'function')
+                this.onDragEnd(event);
+            if(this.orbitControls)
+                this.orbitControls.enabled = this.enableOrbitControls;
+        })
+
+        
     }
 
     /**
@@ -122,6 +169,13 @@ export default class TridimensionalRenderer{
                 this.camera.updateProjectionMatrix()
             }
         })
+    }
+
+    /**
+     * This method adds the interaction capabilities, so we can handle events like click or mouse events in the objects.
+     */
+    addInteractionEvents(){
+        this.interaction = new Interaction(this.renderer, this.scene, this.camera);
     }
 
     /**
@@ -186,7 +240,6 @@ export default class TridimensionalRenderer{
      */
     addObject(object){
         this.objects.push(object);
-        this.updateDragControls();
     }
 
     /**
@@ -196,11 +249,19 @@ export default class TridimensionalRenderer{
     setObjects(objects){
         if(Array.isArray(objects))
             this.objects = objects;
-        this.updateDragControls();
     }
 
-    load3DModel(type, { x = 0, y = 0, z = 0 }, onSuccess){
+    /**
+     * This method loads a 3D model of the specified type and in the provided coordinates to the scene.
+     * @param {string} type 
+     * @param {object} initialCoordinates 
+     * @param {function} onSuccess 
+     */
+    load3DModel(type, { x = 0, y = 0, z = 0 }, onSuccess, onSelection){
+        //We get the data of the model based on the type (uri of the model and dimensions)
         let uri = getModelUri(type);
+        let { width, height, depth } = getDimensions(type);
+        //We load the model
         let loader = new GLTFLoader();
         loader.load(
             uri,
@@ -208,12 +269,25 @@ export default class TridimensionalRenderer{
                 //Scaled to real dimensions
                 gltf.scene.scale.set(1, 1, 1);
                 //New objects starts at origin
-                gltf.scene.position.set(x, y, z);
+                gltf.scene.position.set(0, 0, 0);
                 //We add the object to the scene
                 this.addToScene(gltf.scene)
                 //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
                 gltf.scene.traverse( object => {
                     if(object.isMesh) {
+                        object.on('click', event => {
+                            const { data: { originalEvent: { detail } } } = event;
+                            //On double click we execute the onSelection callback
+                            if(detail > 1)
+                                onSelection && typeof(onSelection) === 'function' && onSelection(event);
+                        });
+                        //We set the proper scale to be accurate between the real dimensions and the dimensions in the 3D scene
+                        let scaleCalculator = new ModelScaleCalculator(object, width, height, depth);
+                        let { x: scaleInX, y: scaleInY, z: scaleInZ } = scaleCalculator.calculateScale();
+                        object.scale.set(scaleInX, scaleInY, scaleInZ)
+                        //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
+                        let yPosition = this.getObjectYInitialPosition(y, object);
+                        object.position.set(x, yPosition, z);
                         //We load the default texture to the object if this does not have one already
                         if(!object.material.map)
                             this.addTextureToObject(object, TridimensionalRenderer.DEFAULT_TEXTURE_URI);
@@ -227,6 +301,17 @@ export default class TridimensionalRenderer{
                 }) 
             }
         );
+    }
+
+    /**
+     * This method gets the object Y position in order to get it to the desired height (initialY). 
+     * If initialY = 0, it will appear at the origin of that axis.
+     * This is done by the addition of the scaled minimum Y point and the initialY.
+     * @param {number} initialY 
+     * @param {object} object 
+     */
+    getObjectYInitialPosition(initialY, object){
+        return  initialY + (Math.abs(object.geometry.boundingBox.min.y) * object.scale.y);
     }
 
     /**
@@ -261,44 +346,6 @@ export default class TridimensionalRenderer{
         this.orbitControls.enabled = value;
     }
 
-    /**
-     * This method creates a new instance of DragControls with the new objects, also, it adds the respective listeners for
-     * the drag-start, drag and drag-end events.
-     * When the drag event is fired (drag-start) the orbit control is disabled to avoid events interference.
-     * During the object drag, the position where the user is placing the object is validated (border conditions), also, 
-     * the Y axis is locked in the origin.
-     * When the drag event ends (drag-end) the orbit control is enabled.
-     */
-    updateDragControls(){
-        this.dragControls = new DragControls(this.objects, this.camera, this.renderer.domElement)
-        let { orbitControls, onDragEnd } = this;
-        let initialYPosition = 0;
-        //On drag event start we disable orbit controls to avoid events interference (we don´t want to trigger orbit controls while dragging an object)
-        this.dragControls.addEventListener('dragstart', event => {
-            initialYPosition = event.object.position.y;
-            if(orbitControls)
-                orbitControls.enabled = false
-        })
-        //During the drag event we apply validations in the position where the object is trying to be placed
-        this.dragControls.addEventListener ( 'drag', event => {
-            //Position in Y axis fixed to object´s initial Y axis position.
-            event.object.position.y = initialYPosition; 
-            //Border conditions (X & Z)
-            /*
-            event.object.position.x = Math.abs(event.object.position.x) >= 2 ? 2 * (event.object.position.x > 0 ? 1 : -1) : event.object.position.x
-            event.object.position.z = Math.abs(event.object.position.z) >= 2 ? 2 * (event.object.position.z > 0 ? 1 : -1) : event.object.position.z
-            */
-        })
-        //On drag event end we enable the orbit controls again
-        this.dragControls.addEventListener('dragend', event => {
-            event.object.material.opacity = 1;
-            if(onDragEnd && typeof(onDragEnd) === 'function')
-                onDragEnd(event);
-            if(orbitControls)
-                orbitControls.enabled = this.enableOrbitControls;
-        })
-
-    }
     /**
      * Method to get camera´s optimal distance, we need to get far enough to get the whole scene, therefore we 
      * take the maximum value between height and width

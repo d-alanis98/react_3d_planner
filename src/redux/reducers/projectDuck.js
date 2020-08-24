@@ -1,22 +1,23 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.2.1
+ * @version 1.3.2
  */
-
+//Classes
 import Requests from "../../classes/Helpers/Requests";
+import ProjectConfiguration from "../../classes/ProjectConfiguration";
 
 //CONSTANTS
 //Action types
 const SET_PROJECT_NAME          = 'SET_PROJECT_NAME';
+const SET_PROJECT_TYPE          = 'SET_PROJECT_TYPE';
 const SET_PROJECT_SCENE         = 'SET_PROJECT_SCENE';
-const SET_PROJECT_VERSION       = 'SET_PROJECT_VERSION';
 const SET_PROJECT_OBJECTS       = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION   = 'SET_PROJECT_DESCRIPTION';
 //Initial state
 const initialState = {
     name: '',
+    type: ProjectConfiguration.KITCHEN_PROJECT,
     scene: {},
-    version: '',
     objects: [],
     description: '',
 }
@@ -32,15 +33,15 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 name: payload,
             };
+        case SET_PROJECT_TYPE:
+            return {
+                ...state,
+                type: payload,
+            };
         case SET_PROJECT_SCENE:
             return {
                 ...state,
                 scene: payload,
-            };
-        case SET_PROJECT_VERSION:
-            return {
-                ...state,
-                version: payload,
             };
         case SET_PROJECT_OBJECTS:
             return {
@@ -93,19 +94,19 @@ export let setProjectSceneAction = projectScene => (dispatch, getState) => {
 }
 
 /**
- * This action sets the dimensions of the 3d scene of the project
+ * This action sets the dimensions of the 2d room of the project
  */
-export let set3DSceneDimensionsAction = (sceneWidth, sceneHeight) => (dispatch, getState) => {
+export let set2DRoomDimensionsAction = (roomWidth, roomHeight) => (dispatch, getState) => {
     let { scene } = { ...getState().project };
-    let tridimensionalSceneParameters = scene['3d'];
-    let newTridimensionalSceneParameters = {
-        ...tridimensionalSceneParameters,
-        sceneWidth,
-        sceneHeight
+    let bidimensionalSceneParameters = scene['2d'];
+    let newBidimensionalSceneParameters = {
+        ...bidimensionalSceneParameters,
+        roomWidth,
+        roomHeight
     };
     let projectSceneParameters = {
         ...scene,
-        '3d': newTridimensionalSceneParameters
+        '2d': newBidimensionalSceneParameters
     };
     dispatch({
         type: SET_PROJECT_SCENE,
@@ -135,11 +136,32 @@ export let set2DSceneDimensionsAction = (sceneWidth, sceneHeight) => (dispatch, 
 }
 
 /**
- * This action sets the version of the project
+ * This action sets the dimensions of the 3d scene of the project
  */
-export let setProjectVersionAction = projectVersion => (dispatch, getState) => {
+export let set3DSceneDimensionsAction = (sceneWidth, sceneHeight) => (dispatch, getState) => {
+    let { scene } = { ...getState().project };
+    let tridimensionalSceneParameters = scene['3d'];
+    let newTridimensionalSceneParameters = {
+        ...tridimensionalSceneParameters,
+        sceneWidth,
+        sceneHeight
+    };
+    let projectSceneParameters = {
+        ...scene,
+        '3d': newTridimensionalSceneParameters
+    };
+    dispatch({
+        type: SET_PROJECT_SCENE,
+        payload: projectSceneParameters,
+    });
+}
+
+/**
+ * This action sets the type of the project
+ */
+export let setProjectTypeAction = projectVersion => (dispatch, getState) => {
     dispatch({ 
-        type: SET_PROJECT_VERSION,
+        type: SET_PROJECT_TYPE,
         payload: projectVersion,
     })
 }
@@ -208,9 +230,9 @@ export let restoreProjectAction = existingProject => (dispatch, getState) => {
     //We get the data from the object
     let { projectData } = existingProject;
     //We get the project properties
-    let { name, version, objects } = projectData;
+    let { name, type, objects } = projectData;
     setProjectNameAction(name)(dispatch, getState);
-    setProjectVersionAction(version)(dispatch, getState);
+    setProjectTypeAction(type)(dispatch, getState);
     setProjectObjectsAction(objects)(dispatch, getState);
 }
 

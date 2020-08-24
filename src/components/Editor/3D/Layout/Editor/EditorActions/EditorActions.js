@@ -1,5 +1,4 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import FlexRow from '../../../../../Layout/Flex/FlexRow';
 import ModelsLibrary from './ModelsLibrary/ModelsLibrary';

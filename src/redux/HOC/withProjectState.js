@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import { 
     saveProjectAction, 
     setProjectNameAction, 
+    setProjectTypeAction,
     setProjectObjectsAction, 
-    setProjectVersionAction, 
     addObjectToProjectAction, 
     updateProjectObjectAction,
-    set3DSceneDimensionsAction,
+    set2DRoomDimensionsAction,
     set2DSceneDimensionsAction,
+    set3DSceneDimensionsAction,
     setProjectDescriptionAction,
     removeObjectFromProjectAction, 
 } from '../reducers/projectDuck';
@@ -20,12 +21,13 @@ const withProjectState = WrappedComponent => {
             project,
             saveProjectAction,
             setProjectNameAction, 
+            setProjectTypeAction,
             setProjectObjectsAction, 
-            setProjectVersionAction,
             addObjectToProjectAction,
             updateProjectObjectAction,
-            set3DSceneDimensionsAction,
+            set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
+            set3DSceneDimensionsAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,
             ...ownProps
@@ -37,8 +39,9 @@ const withProjectState = WrappedComponent => {
             updateObject = { updateProjectObjectAction }
             removeObject = { removeObjectFromProjectAction }
             setProjectName = { setProjectNameAction }
+            setProjectType = { setProjectTypeAction }
             setProjectObjects = { setProjectNameAction }
-            setProjectVersion = { setProjectVersionAction }
+            set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
             set3DSceneDimensions = { set3DSceneDimensionsAction }
             setProjectDescription = { setProjectDescriptionAction }
@@ -58,12 +61,13 @@ const withProjectState = WrappedComponent => {
         { 
             saveProjectAction,
             setProjectNameAction, 
-            setProjectObjectsAction, 
-            setProjectVersionAction,
+            setProjectTypeAction,
+            setProjectObjectsAction,  
             addObjectToProjectAction,
             updateProjectObjectAction,
-            set3DSceneDimensionsAction,
+            set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
+            set3DSceneDimensionsAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,
         }

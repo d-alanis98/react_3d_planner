@@ -1,18 +1,34 @@
+/**
+ * @author Damián Alanís Ramírez
+ * @version 3.4.5
+ * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
+ * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
+ */
+//Libraries
 import Konva from 'konva';
-//Constants
-import { getModel2DUri, getDimensions, TOP } from '../../constants/models/models';
+//Classes
+import PlaneEvents from '../2D/Plane/PlaneEvents';
+import RoomCoordinatesCalculator from '../2D/Room/RoomCoordinatesCalculator';
+import BidimensionalModelFactory from '../2D/Models/BidimensionalModelFactory';
+
 
 export default class BidimensionalRenderer {
     //CONSTANTS
+    //SCENE IDENTIFICATOR
+    static BIDIMENSIONAL_SCENE = '2d';
     //DOM container
     static DOM_CONTAINER_ID = 'bidimensional_renderer';
-
+    //Dimensions
+    static DEFAULT_WIDTH = 5;
+    static DEFAULT_HEIGHT = 5;
+    //Plane
+    static PLANE_PADDING = 10; //10 pixels
     //CONSTRUCTOR
-    constructor(sceneWidth = 100, sceneHeight = 100, enablePlaneControls = false) {
+    constructor(roomWidth = BidimensionalRenderer.DEFAULT_WIDTH, roomHeight = BidimensionalRenderer.DEFAULT_HEIGHT, enablePlaneControls = false) {
         this.objects = [];
-        //Scene dimensions
-        this.sceneWidth = sceneWidth;
-        this.sceneHeight = sceneHeight;
+        //Room dimensions
+        this.roomWidth = roomWidth;
+        this.roomHeight = roomHeight;
         //Plane controls
         this.enablePlaneControls = enablePlaneControls;
         //Container dimensions
@@ -25,6 +41,9 @@ export default class BidimensionalRenderer {
     }
 
     //PRIMARY METHODS
+    /**
+     * This method initializes the scene, setting the stage, the layer and the plane (which includes the room rendering)
+     */
     init(){
         this.setInitialStage();
         this.setInitialLayer();
@@ -33,7 +52,10 @@ export default class BidimensionalRenderer {
         this.render();
     }
 
-
+    /**
+     * This method sets the main stage, which is the canvas that is rendered in the specified container, with the desired
+     * dimensions.
+     */
     setInitialStage(){
         this.stage = new Konva.Stage({
             container: BidimensionalRenderer.DOM_CONTAINER_ID,
@@ -43,40 +65,31 @@ export default class BidimensionalRenderer {
         });
     }
 
+    /**
+     * This method sets the main layer, also, we add the layer to stage and draw it
+     */
     setInitialLayer(){
         this.layer = new Konva.Layer();
         this.addLayerToStage(this.layer);
         this.layer.draw();
     }
 
+    /**
+     * Helper method to add a layer to the stage
+     * @param {object} layer 
+     */
     addLayerToStage(layer){
         this.stage.add(layer);
     }
 
+    /**
+     * 
+     */
     addZoomEventToStage(){
-        let scaleBy = 1.1;
         if(!this.enablePlaneControls)
             return;
-        this.stage.on('wheel', event => {
-            event.evt.preventDefault();
-            let oldScale = this.stage.scaleX();
-            let pointer = this.stage.getPointerPosition();
-    
-            let mousePointTo = {
-              x: (pointer.x - this.stage.x()) / oldScale,
-              y: (pointer.y - this.stage.y()) / oldScale,
-            };
-    
-            let newScale = event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-            this.stage.scale({ x: newScale, y: newScale });
-    
-            let newPosition = {
-              x: pointer.x - mousePointTo.x * newScale,
-              y: pointer.y - mousePointTo.y * newScale,
-            };
-            this.stage.position(newPosition);
-            this.stage.batchDraw();
-          });
+            
+        PlaneEvents.addPlaneZoomEventListener(this.stage);
     }
 
     setPlaneCenter(){
@@ -100,9 +113,8 @@ export default class BidimensionalRenderer {
         this.setPlaneCenter();
         this.layer.add(this.plane)
         this.drawGrid();
+        this.drawRoom()
     }
-
-    
 
     drawGrid(){
         //Internal constants
@@ -133,54 +145,52 @@ export default class BidimensionalRenderer {
         drawLinesInAxis(numberOfCols, COLUMN, this.containerHeight, gridSize);
     }
 
+    drawRoom(){
+        let { roomWidth, roomHeight, containerWidth, containerHeight } = this;
+        //We create a new room coordinates calculator instance, this facade returns the optimal coordinates to get the more portion of the plane in the screen by applying the less scale posible
+        let roomCoordinatesCalculator = new RoomCoordinatesCalculator(roomWidth, roomHeight, containerWidth, containerHeight);
+        //We get the coordinates and the room dimensions in pixels
+        this.roomCoordinates = roomCoordinatesCalculator.calculate();
+        this.roomDimensionInPixels = roomCoordinatesCalculator.getRoomDimensionsInPixels();
+        //We get the necessary data to draw the room
+        const { initialX, initialY } = this.roomCoordinates; //We only need the initial points
+        const { width, height } = this.roomDimensionInPixels;
+        //We add the room to the layer
+        this.layer.add(
+            new Konva.Rect({
+                x: initialX,
+                y: initialY,
+                width: width,
+                height: height,
+                stroke: 'black',
+                opacity: 1,
+                strokeWidth: 1,
+            })
+        );
+    }
+
+    getRoomDimensionInPixels(){
+        return this.roomDimensionInPixels;
+    }
+
     render(){
         requestAnimationFrame(this.render);
         this.stage.batchDraw();
     }
-    
-    loadSVGModel(type, { x, y }, onSuccess, updateCallback){
-        //We load items from catalog
-        let path = getModel2DUri(type, TOP);
-        //We get the dimensions of the object (assuming in a 2D top view the "height" is the depth)
-        const { width, depth: height } = getDimensions(type);
-        //We bind the instance to a variable
-        let self = this;
-        Konva.Image.fromURL(path, imageNode => {
-            imageNode.setAttrs({
-                //If no coordinates were given we place the objects in the middle of the plane
-                x: x || self.containerWidth / 2,
-                y: y || self.containerHeight / 2,
-                type,
-                width,
-                height,
-                //We set the center of the element
-                offsetX: width / 2,
-                offsetY: height / 2,
-                //We enable the drag and drop interaction for this element
-                draggable: 'true',
-                //The function that defines the bound for dragging
-                dragBoundFunc: pos => boundFunction(self, { width, height }, pos)
-            });
-            //We add the drag end event listener, to be able to update item position at project´s level
-            imageNode.on('dragend', updateCallback );
-            //We add the object to the layer
-            this.layer.add(imageNode);
-            //If given, we execute the success callback passing the created object as argument
-            if(onSuccess && typeof(onSuccess) === 'function')
-                onSuccess(imageNode);
-            //We update the layer
-            this.layer.batchDraw();
-        });
 
-        const boundFunction = (self, attrs, pos) => {
-            let { width, height } = attrs;
-            let widthPadding = width / 2;
-            let heightPadding = height / 2;
-            //X axis constraints
-            let x = pos.x - widthPadding <= 0 ? 0 + widthPadding : pos.x + widthPadding >= self.containerWidth ? self.containerWidth - widthPadding : pos.x;
-            //Y axis constraints
-            let y = pos.y - heightPadding <= 0 ? 0 + heightPadding : pos.y + heightPadding >= self.containerHeight ? self.containerHeight - heightPadding : pos.y;
-            return { x, y }
-        }
+    
+    loadSVGModel(type, { x, y }, onSuccess, onUpdate, onSelection){
+        //We bind the instance to a variable
+        let scene = this;
+        //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
+        BidimensionalModelFactory.createModel({
+            x, 
+            y,
+            type,
+            scene, 
+            onUpdate,  
+            onSuccess, 
+            onSelection, 
+        });
     }
 }

@@ -1,84 +1,139 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 //Components
 import FlexRow from '../Layout/Flex/FlexRow';
+import ProjectName from './Details/ProjectName';
 import LabelWithIcon from '../Layout/Labels/LabelWithIcon';
 import ButtonWithIcon from '../Layout/Buttons/ButtonWithIcon';
+import DimensionsSettings from './Dimensions/DimensionsSettings';
+import ProjectDescription from './Details/ProjectDescription';
 //HOC
+import withEditorState from '../../redux/HOC/withEditorState';
 import withProjectState from '../../redux/HOC/withProjectState';
 //Icons
-import { faCogs, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCogs, faSave, faCheckCircle, faCrop  } from '@fortawesome/free-solid-svg-icons';
+import SaveSettingsButton from './SaveSettingsButton';
+import Container from '../Layout/Containers/Container';
+import ProjectType from './Details/ProjectType';
 
 
-const ProjectSettings = ({ project, setProjectName, setProjectDescription }) => {
+
+
+
+
+const ProjectSettings = props => {
     //Props destructuring
-    let { name, description } = project;
-    
+    const { 
+        project: { name, type, description }, 
+        editorState: { editorHeight, editorWidth },
+        setProjectName, 
+        setProjectType,
+        setEditorWidth,
+        setEditorHeight,
+        set3DSceneDimensions,
+        setProjectDescription, 
+    } = props;
+
+    //Initial state
+    const initialState = {
+        projectName: name,
+        projectType: type,
+        editorWidth,
+        editorHeight,
+        projectDescription: description,
+    }
     //HOOKS
     //State
-    const [changesSaved, setChangesSaved] = useState(true);
-    const [newProjectName, setNewProjectName] = useState(name);
-    const [newProjectDescription, setNewProjectDescription] = useState(description);
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [fieldsValidated, setFieldsValidated] = useState(false);
+    const [projectSettings, setProjectSettings] = useState(initialState);
+    
+    //Project settings destructuring
+    const { 
+        projectName, 
+        projectType,
+        editorWidth: projectEditorWidth, 
+        editorHeight: projectEditorHeight, 
+        projectDescription, 
+    } = projectSettings;
+
+    //Effects
+    useEffect(() => {
+        projectName && projectDescription && projectEditorWidth && projectEditorHeight ?
+            setFieldsValidated(true)
+        : setFieldsValidated(false);
+    }, [projectSettings]);
+
+
+
 
     const saveProjectChanges = event => {
         event.preventDefault();
-        setChangesSaved(true);
-        setProjectName(newProjectName);
-        setProjectDescription(newProjectDescription);
+        setUnsavedChanges(false);
+        setProjectName(projectName);
+        setProjectType(projectType);
+        setEditorWidth(projectEditorWidth);
+        setEditorHeight(projectEditorHeight);
+        //Because the 3d scene dimensions don´t deppend on screen size (because they are not set in pixels), we can set them at this point
+        set3DSceneDimensions(projectEditorWidth, projectEditorHeight);
+        setProjectDescription(projectDescription);
     }
 
-    const handleProjectNameChange = event => {
-        setChangesSaved(false);
-        setNewProjectName(event.target.value);
-    }
-
-    const handleProjectDescripctionChange = event => {
-        setChangesSaved(false);
-        setNewProjectDescription(event.target.value);
+    const handleSettingChange = event => {
+        let { target: { name, value } } = event;
+        if(name === 'editorWidth' || name === 'editorHeight')
+            value = Number(value);
+        setProjectSettings({
+            ...projectSettings,
+            [name]: value
+        });
+        setUnsavedChanges(true);
     }
 
     return(
-        <div className='container mt-3 py-3'>
+        <Container
+            className = 'mt-3 py-3'
+        >
             <LabelWithIcon 
                 icon = { faCogs }
                 labelText = 'Ajustes del proyecto'
                 className = 'h4 text-muted'
             />
             <hr />
-            <div className='form-group'>
-                <label>Nombre del proyecto: </label>
-                <input 
-                    type = 'text'
-                    value = { newProjectName }
-                    onChange = { handleProjectNameChange }
-                    className = 'form-control rounded-lg'
-                    placeholder = 'Nombre del proyecto'
-                />
-            </div>
-            <div className='form-group'>
-                <label>Descripción del proyecto: </label>
-                <textarea 
-                    rows = '5'
-                    value = { newProjectDescription }
-                    onChange = { handleProjectDescripctionChange }
-                    className='form-control'
-                />
-            </div>
-            <FlexRow
-                className = 'justify-content-center'
-            >
-                <ButtonWithIcon 
-                    icon = { changesSaved ? faCheckCircle : null }
-                    onClick = { !changesSaved && saveProjectChanges }
-                    className = 'btn btn-success'
-                    buttonText = { changesSaved ? 'Cambios guardados' : 'Guardar cambios' }
-                    disabled = { changesSaved }
-                />
-            </FlexRow>
-        </div>
+            <ProjectType 
+                projectType = { projectType }
+                handleSettingChange = { handleSettingChange }
+            />
+            <ProjectName 
+                projectName = { projectName }
+                handleSettingChange = { handleSettingChange }
+            />
+            <ProjectDescription 
+                projectDescription = { projectDescription }
+                handleSettingChange = { handleSettingChange }
+            />
+            <hr />
+            <LabelWithIcon 
+                icon = { faCrop }
+                labelText = 'Ajustes del editor'
+                className = 'h5 text-muted'
+            />
+            <DimensionsSettings 
+                projectEditorWidth = { projectEditorWidth }
+                projectEditorHeight = { projectEditorHeight }
+                handleSettingChange = { handleSettingChange }
+            />
+            <SaveSettingsButton 
+                unsavedChanges = { unsavedChanges }
+                fieldsValidated = { fieldsValidated }
+                saveProjectChanges = { saveProjectChanges }
+            />
+        </Container>
     );
 }
 
 //We apply the project state HOC
 let WithProjectState = withProjectState(ProjectSettings);
+//We apply the editor state HOC
+let WithEditorState = withEditorState(WithProjectState);
 //We export the decorated component
-export default WithProjectState;
+export default WithEditorState;
