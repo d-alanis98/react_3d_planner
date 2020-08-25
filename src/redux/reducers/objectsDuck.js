@@ -1,18 +1,17 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.0.0
+ * @version 1.1.0
  */
-
-import Requests from "../../classes/Helpers/Requests";
+import Requests from '../../classes/Helpers/Requests';
+import ProjectConfiguration from '../../classes/ProjectConfiguration';
 
 //CONSTANTS
 //Action types
 const GET_OBJECTS           = 'GET_OBJECTS';
 const GET_OBJECTS_ERROR     = 'GET_OBJECTS_ERROR';
 const GET_OBJECTS_SUCCESS   = 'GET_OBJECTS_SUCCESS';
-const ADD_OBJECT_TO_SCENE   = 'ADD_OBJECT_TO_SCENE';
 //Others
-const BASE_ENDPOINT         = '/models';
+const BASE_ENDPOINT         = `${process.env.REACT_APP_API_ENDPOINT}/familias`;
 //Initial state
 const initialState = {
     objects: [],
@@ -81,6 +80,10 @@ const getObjectsError = (errorCode, errorMessage, dispatch) => {
  * This action gets objects from the designed endpoint using the requests facade
  */
 export let getObjectsAction = () => (dispatch, getState) => {
+    let { project: { type } } = { ...getState() };
+    console.log({ type })
+    let familyId = (type === ProjectConfiguration.KITCHEN_PROJECT) ? 3 : 1;
+    let endpoint = `${BASE_ENDPOINT}/${familyId}`
     //We pass dispatch as callback argument to be able to use this method in the callbacks
     let callbackArguments = [dispatch];
     //We dispatch the action to enable the fetching state
@@ -88,5 +91,5 @@ export let getObjectsAction = () => (dispatch, getState) => {
         type: GET_OBJECTS,
     });
     //We make the request using the requests facade
-    Requests.makeRequest(BASE_ENDPOINT, {},  getObjectsSuccess, getObjectsError, ...callbackArguments);
+    Requests.makeRequest(endpoint, {},  getObjectsSuccess, getObjectsError, ...callbackArguments);
 }
