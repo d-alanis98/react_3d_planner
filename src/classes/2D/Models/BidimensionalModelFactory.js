@@ -5,6 +5,7 @@ import RoomBoundDetector from '../Room/RoomBoundDetector';
 import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
 import { TOP, getModel2DUri, getDimensions } from '../../../constants/models/models';
+import CollisionDetector from './CollisionDetector';
 
 
 /**
@@ -56,7 +57,7 @@ export default class BidimensionalModelFactory {
                 //We enable the drag and drop interaction for this element
                 draggable: 'true',
                 //The function that defines the bound for dragging
-                dragBoundFunc: position => RoomBoundDetector.boundDetection(scene, width, height, position)
+                dragBoundFunc: position => RoomBoundDetector.boundDetection(scene, width, height, position),    
             });
             //We add the models event listeners (drag -> onUpdate, right click -> onSelection)
             ModelEvents.addModelBasicEventListeners(imageNode, onUpdate, onSelection);

@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 3.4.5
+ * @version 5.2.3
  * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
  * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
  */
@@ -46,8 +46,9 @@ export default class BidimensionalRenderer {
      */
     init(){
         this.setInitialStage();
-        this.setInitialLayer();
         this.setPlane();
+        this.setInitialLayer();
+        
         this.addZoomEventToStage();
         this.render();
     }
@@ -111,26 +112,36 @@ export default class BidimensionalRenderer {
             strokeWidth: 1,
         });
         this.setPlaneCenter();
-        this.layer.add(this.plane)
+        this.planeLayer = new Konva.Layer();
+        this.addLayerToStage(this.planeLayer);
+        this.planeLayer.add(this.plane);
+        this.drawRoom();
         this.drawGrid();
-        this.drawRoom()
+        
+        this.planeLayer.draw();
     }
 
     drawGrid(){
+        //We get the required values from the current instance
+        const { width: roomWidth, height: roomHeight } = this.roomDimensionInPixels;
+        const { initialX, initialY } = this.roomCoordinates;
         //Internal constants
         const ROW = 'ROW';
         const COLUMN = 'COLUMN';
         //Internal variables
-        let gridSize = 50;
-        let numberOfRows = this.containerHeight / gridSize;
-        let numberOfCols = this.containerWidth / gridSize;
+        //The grid size will represent 1/2 meter.
+        let gridSizeWidth =  (roomWidth / this.roomWidth) / 2;
+        let gridSizeHeight = (roomHeight / this.roomHeight) / 2;
+        //The required number of rows and cols
+        let numberOfRows = (roomWidth / gridSizeWidth) + 1;
+        let numberOfCols = (roomHeight / gridSizeHeight) + 1;
         //Function that draws the requested number of lines, of the requested type ('row' || 'col') with the desired size
-        const drawLinesInAxis = (numberOfLines, type, size, gridSize) => {
+        const drawLinesInAxis = (numberOfLines, type, size, gridSizeWidth, gridSizeHeight) => {
             Array.from(new Array(Math.round(numberOfLines))).forEach((row, index) => {
-                this.layer.add(
+                this.planeLayer.add(
                     new Konva.Rect({
-                        x: type === ROW ? 0 : index * gridSize,
-                        y: type === ROW ? index * gridSize : 0,
+                        x: (type === ROW ? 0 : index * gridSizeHeight) + initialX,
+                        y: (type === ROW ? index * gridSizeWidth : 0) + initialY,
                         width: type === ROW ? size : 0,
                         height: type === ROW ? 0 : size,
                         stroke: 'black',
@@ -141,8 +152,8 @@ export default class BidimensionalRenderer {
             })
         }
         //We generate the grid by drawing the rows and the columns based on the grid size (each square side)
-        drawLinesInAxis(numberOfRows, ROW, this.containerWidth, gridSize);
-        drawLinesInAxis(numberOfCols, COLUMN, this.containerHeight, gridSize);
+        drawLinesInAxis(numberOfRows, ROW, roomWidth, gridSizeWidth, gridSizeHeight);
+        drawLinesInAxis(numberOfCols, COLUMN, roomHeight, gridSizeWidth, gridSizeHeight);
     }
 
     drawRoom(){
@@ -156,7 +167,7 @@ export default class BidimensionalRenderer {
         const { initialX, initialY } = this.roomCoordinates; //We only need the initial points
         const { width, height } = this.roomDimensionInPixels;
         //We add the room to the layer
-        this.layer.add(
+        this.planeLayer.add(
             new Konva.Rect({
                 x: initialX,
                 y: initialY,
@@ -189,8 +200,12 @@ export default class BidimensionalRenderer {
             type,
             scene, 
             onUpdate,  
-            onSuccess, 
+            onSuccess: createdModel => {
+                onSuccess(createdModel);
+                this.objects.push(createdModel)
+            }, 
             onSelection, 
         });
+
     }
 }

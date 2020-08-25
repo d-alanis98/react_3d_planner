@@ -1,13 +1,16 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.0.0
+ * @version 2.1.0
  * @description Facade for adding a set of listeners to the model, with an interface to add any other in the future, the 
  * only requirement is to keep a reference to the model instance and provide a callback function.
  */
 
+import CollisionDetector from "./CollisionDetector";
+
 export default class ModelEvents {
     //Constants
     static DRAG_END_EVENT    = 'dragend';
+    static DRAG_MOVE_EVENT    = 'dragmove';
     static RIGHT_CLICK_EVENT = 'contextmenu';
 
     /**
@@ -39,6 +42,7 @@ export default class ModelEvents {
         });
     }
 
+
     /**
      * This method adds the drag end event listener to the model.
      * @param {object} model 
@@ -52,6 +56,14 @@ export default class ModelEvents {
         addEventListener(model, DRAG_END_EVENT, eventCallback);
     }
 
+    static addDragMoveListener = (model, eventCallback) => {
+        let {
+            addEventListener,
+            DRAG_MOVE_EVENT
+        } = ModelEvents;
+        addEventListener(model, DRAG_MOVE_EVENT, eventCallback);
+    }
+
     /**
      * This method adds the 2 basic event listeners for the model, the drag end (to update its position) and the right
      * click event (to show the contextual menu with the available actions to apply to the model)
@@ -62,9 +74,13 @@ export default class ModelEvents {
     static addModelBasicEventListeners = (model, onUpdate, onSelection) => {
         let {
             addDragEndListener,
+            addDragMoveListener,
             addRightClickListener
         } = ModelEvents;
         addDragEndListener(model, onUpdate);
+        addDragMoveListener(model, event => CollisionDetector.detectCollisions(event, model))
         addRightClickListener(model, onSelection);
     }
+
+
 }
