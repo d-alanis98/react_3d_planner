@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/react_3d_planner/static/css/main.aed6def8.chunk.css",
-    "main.js": "/react_3d_planner/static/js/main.9fa0a1a5.chunk.js",
-    "main.js.map": "/react_3d_planner/static/js/main.9fa0a1a5.chunk.js.map",
-    "runtime-main.js": "/react_3d_planner/static/js/runtime-main.7caace90.js",
-    "runtime-main.js.map": "/react_3d_planner/static/js/runtime-main.7caace90.js.map",
-    "static/css/2.af3c1da9.chunk.css": "/react_3d_planner/static/css/2.af3c1da9.chunk.css",
-    "static/js/2.36d2f1c1.chunk.js": "/react_3d_planner/static/js/2.36d2f1c1.chunk.js",
-    "static/js/2.36d2f1c1.chunk.js.map": "/react_3d_planner/static/js/2.36d2f1c1.chunk.js.map",
-    "index.html": "/react_3d_planner/index.html",
-    "precache-manifest.1181db516859fff1f5e6a3854a67d62d.js": "/react_3d_planner/precache-manifest.1181db516859fff1f5e6a3854a67d62d.js",
-    "service-worker.js": "/react_3d_planner/service-worker.js",
-    "static/css/2.af3c1da9.chunk.css.map": "/react_3d_planner/static/css/2.af3c1da9.chunk.css.map",
-    "static/css/main.aed6def8.chunk.css.map": "/react_3d_planner/static/css/main.aed6def8.chunk.css.map",
-    "static/js/2.36d2f1c1.chunk.js.LICENSE.txt": "/react_3d_planner/static/js/2.36d2f1c1.chunk.js.LICENSE.txt"
+    "main.css": "/fft-react/static/css/main.3308ef5c.chunk.css",
+    "main.js": "/fft-react/static/js/main.fadf6ecd.chunk.js",
+    "main.js.map": "/fft-react/static/js/main.fadf6ecd.chunk.js.map",
+    "runtime-main.js": "/fft-react/static/js/runtime-main.1614657c.js",
+    "runtime-main.js.map": "/fft-react/static/js/runtime-main.1614657c.js.map",
+    "static/css/2.af3c1da9.chunk.css": "/fft-react/static/css/2.af3c1da9.chunk.css",
+    "static/js/2.6e1c4979.chunk.js": "/fft-react/static/js/2.6e1c4979.chunk.js",
+    "static/js/2.6e1c4979.chunk.js.map": "/fft-react/static/js/2.6e1c4979.chunk.js.map",
+    "index.html": "/fft-react/index.html",
+    "precache-manifest.68c16a85e03321d53da5175fd9c5f1de.js": "/fft-react/precache-manifest.68c16a85e03321d53da5175fd9c5f1de.js",
+    "service-worker.js": "/fft-react/service-worker.js",
+    "static/css/2.af3c1da9.chunk.css.map": "/fft-react/static/css/2.af3c1da9.chunk.css.map",
+    "static/css/main.3308ef5c.chunk.css.map": "/fft-react/static/css/main.3308ef5c.chunk.css.map",
+    "static/js/2.6e1c4979.chunk.js.LICENSE.txt": "/fft-react/static/js/2.6e1c4979.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.7caace90.js",
+    "static/js/runtime-main.1614657c.js",
     "static/css/2.af3c1da9.chunk.css",
-    "static/js/2.36d2f1c1.chunk.js",
-    "static/css/main.aed6def8.chunk.css",
-    "static/js/main.9fa0a1a5.chunk.js"
+    "static/js/2.6e1c4979.chunk.js",
+    "static/css/main.3308ef5c.chunk.css",
+    "static/js/main.fadf6ecd.chunk.js"
   ]
 }
