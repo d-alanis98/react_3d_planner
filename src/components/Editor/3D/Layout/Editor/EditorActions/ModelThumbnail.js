@@ -1,11 +1,10 @@
 import React from 'react';
-//Functions
-import { getModelThumbnail } from '../../../../../../constants/models/models';
 //Styles
 import './ModelThumbnail.css';
 
 
 const ModelThumbnail = ({ title, model, onClick, className, modelQuantity, imageClassName }) => {
+
     return(
         <div 
             title = { title }
@@ -15,10 +14,8 @@ const ModelThumbnail = ({ title, model, onClick, className, modelQuantity, image
             data-placement = 'right' 
         >
             <img 
-                src = { getModelThumbnail(model) } 
-                alt = { model }
-                className =  { imageClassName || 'model-thumbnail' }
-                
+                src = {`${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${model.id_lineaProducto}/getPic?small=true`} 
+                className = { imageClassName || 'model-thumbnail' }
             />
             {
                 modelQuantity > 0 && 

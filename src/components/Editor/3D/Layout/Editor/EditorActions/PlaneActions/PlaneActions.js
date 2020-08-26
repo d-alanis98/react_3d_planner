@@ -43,7 +43,7 @@ const PlaneActions = props => {
     
     return(
         <FlexRow
-            className = 'justify-content-start align-items-center'
+            className = 'justify-content-start align-items-center h-100'
         >  
             <CameraPositionMenu 
                 rotateCamera = { rotateCamera }

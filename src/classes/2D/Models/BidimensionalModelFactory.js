@@ -6,6 +6,7 @@ import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
 import { TOP, getModel2DUri, getDimensions } from '../../../constants/models/models';
 import CollisionDetector from './CollisionDetector';
+import DimensionsGetter from '../../Models/DimensionsGetter';
 
 
 /**
@@ -35,11 +36,12 @@ export default class BidimensionalModelFactory {
             onUpdate,
             onSuccess, 
             onSelection,
+            productLine
         } = attributes;
         //We load the path from catalog based on the model type
         let path = getModel2DUri(type, TOP); //We get the TOP view
         //We get the dimensions of the object (assuming in a 2D top view the "height" is the depth)
-        let { width: modelWidth, depth: modelHeight } = getDimensions(type);
+        let { width: modelWidth, depth: modelHeight } = DimensionsGetter.getDimensions(productLine, type);
         //We get the scaled dimensions, making use of the class BidimensionalModelDimensions, which calculates the pixel size of the model based on the ratio (screen dimensions / room dimensions)
         let { width, height } = BidimensionalModelDimensions.calculate(scene, modelWidth, modelHeight);
         Konva.Image.fromURL(path, imageNode => {

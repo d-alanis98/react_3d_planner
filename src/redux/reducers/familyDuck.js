@@ -7,36 +7,36 @@ import ProjectConfiguration from '../../classes/ProjectConfiguration';
 
 //CONSTANTS
 //Action types
-const GET_OBJECTS           = 'GET_OBJECTS';
-const GET_OBJECTS_ERROR     = 'GET_OBJECTS_ERROR';
-const GET_OBJECTS_SUCCESS   = 'GET_OBJECTS_SUCCESS';
+const GET_FAMILY           = 'GET_FAMILY';
+const GET_FAMILY_ERROR     = 'GET_FAMILY_ERROR';
+const GET_FAMILY_SUCCESS   = 'GET_FAMILY_SUCCESS';
 //Others
 const BASE_ENDPOINT         = `${process.env.REACT_APP_API_ENDPOINT}/familias`;
 //Initial state
 const initialState = {
-    objects: [],
-    fetching: false,
+    family: {},
+    fetching: true,
 }
 
 //REDUCER
 const reducer = (state = initialState, action) => {
     let { type, payload } = action;
     switch(type){
-        case GET_OBJECTS:
+        case GET_FAMILY:
             return {
                 ...state,
                 fetching: true,
             };
-        case GET_OBJECTS_ERROR:
+        case GET_FAMILY_ERROR:
             return {
                 ...state,
                 error: payload,
                 fetching: false,
             };
-        case GET_OBJECTS_SUCCESS:
+        case GET_FAMILY_SUCCESS:
             return {
                 ...state,
-                objects: payload,
+                family: payload,
                 fetching: false,
             };
         default:
@@ -48,26 +48,26 @@ export default reducer;
 
 //Helpers
 /**
- * Success callback for getObjectsAction
+ * Success callback for getFamilyAction
  * @param {array} data 
  * @param {function} dispatch 
  */
-const getObjectsSuccess = (data, dispatch) => {
+const getFamilySuccess = (data, dispatch) => {
     dispatch({
-        type: GET_OBJECTS_SUCCESS,
+        type: GET_FAMILY_SUCCESS,
         payload: data,
     });
 }
 
 /**
- * Error callback for getObjectsAction
+ * Error callback for getFamilyAction
  * @param {number} errorCode 
  * @param {string} errorMessage 
  * @param {function} dispatch 
  */
-const getObjectsError = (errorCode, errorMessage, dispatch) => {
+const getFamilyError = (errorCode, errorMessage, dispatch) => {
     dispatch({ 
-        type: GET_OBJECTS_ERROR,
+        type: GET_FAMILY_ERROR,
         payload: errorMessage,
     });
 }
@@ -77,19 +77,18 @@ const getObjectsError = (errorCode, errorMessage, dispatch) => {
 //ACTIONS
 
 /**
- * This action gets objects from the designed endpoint using the requests facade
+ * This action gets family from the designed endpoint using the requests facade
  */
-export let getObjectsAction = () => (dispatch, getState) => {
+export let getFamilyAction = () => (dispatch, getState) => {
     let { project: { type } } = { ...getState() };
-    console.log({ type })
     let familyId = (type === ProjectConfiguration.KITCHEN_PROJECT) ? 3 : 1;
     let endpoint = `${BASE_ENDPOINT}/${familyId}`
     //We pass dispatch as callback argument to be able to use this method in the callbacks
     let callbackArguments = [dispatch];
     //We dispatch the action to enable the fetching state
     dispatch({
-        type: GET_OBJECTS,
+        type: GET_FAMILY,
     });
     //We make the request using the requests facade
-    Requests.makeRequest(endpoint, {},  getObjectsSuccess, getObjectsError, ...callbackArguments);
+    Requests.makeRequest(endpoint, {},  getFamilySuccess, getFamilyError, ...callbackArguments);
 }

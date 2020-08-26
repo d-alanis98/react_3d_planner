@@ -52,7 +52,7 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type } = model;
+                    const { type, productLine } = model;
                     const { coordinates } = model['3d'];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -60,6 +60,7 @@ const with3DRenderer = (WrappedComponent) => {
                     //We create the 3D model
                     sceneInstance.load3DModel(
                         type,
+                        productLine,
                         coordinates,
                         createdModel => { //onSuccess callback
                             const { uuid } = createdModel;
@@ -164,6 +165,9 @@ const with3DRenderer = (WrappedComponent) => {
         }
 
         const updateModel = event => {
+            //To discard the interaction event (double click)
+            if(!event.object)
+                return
             //We get the position and the id of the object
             const { object: { position: { x, y, z }, uuid } } = event;
             setDraggedObject({ x, y, z, uuid });

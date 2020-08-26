@@ -2,7 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 //Redux
 import { 
+    setProjectAction, 
     saveProjectAction, 
+    restoreProjectAction,
     setProjectNameAction, 
     setProjectTypeAction,
     setProjectObjectsAction, 
@@ -12,14 +14,16 @@ import {
     set2DSceneDimensionsAction,
     set3DSceneDimensionsAction,
     setProjectDescriptionAction,
-    removeObjectFromProjectAction, 
+    removeObjectFromProjectAction,
 } from '../reducers/projectDuck';
 
 const withProjectState = WrappedComponent => {
     const WithProjectState = props => {
         let { 
             project,
+            setProjectAction,
             saveProjectAction,
+            restoreProjectAction,
             setProjectNameAction, 
             setProjectTypeAction,
             setProjectObjectsAction, 
@@ -36,11 +40,14 @@ const withProjectState = WrappedComponent => {
         return <WrappedComponent 
             project = { project }
             addObject = { addObjectToProjectAction }
+            setProject = { setProjectAction }
+            saveProject = { saveProjectAction }
             updateObject = { updateProjectObjectAction }
             removeObject = { removeObjectFromProjectAction }
+            restoreProject = { restoreProjectAction }
             setProjectName = { setProjectNameAction }
             setProjectType = { setProjectTypeAction }
-            setProjectObjects = { setProjectNameAction }
+            setProjectObjects = { setProjectObjectsAction }
             set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
             set3DSceneDimensions = { set3DSceneDimensionsAction }
@@ -59,7 +66,9 @@ const withProjectState = WrappedComponent => {
     let WithState = connect(
         mapStateToProps, 
         { 
+            setProjectAction,
             saveProjectAction,
+            restoreProjectAction,
             setProjectNameAction, 
             setProjectTypeAction,
             setProjectObjectsAction,  

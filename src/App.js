@@ -5,6 +5,7 @@ import FlexRow from './components/Layout/Flex/FlexRow';
 import SideBar from './components/Layout/Sidebar/Sidebar';
 import MainSectionRender from './components/SectionRenderer/MainSectionRender';
 import FixedWidthContainer from './components/Layout/Containers/FixedWidthContainer';
+import Notification from './components/Notifications/Notification';
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
         $(() => $('[data-toggle="tooltip"]').tooltip());
     }, [])
 
+
     return (
         <Fragment>
             <FlexRow
@@ -24,6 +26,7 @@ const App = () => {
                 <FixedWidthContainer
                     width = { 95 }
                 >
+                    <Notification />
                     <MainSectionRender />
                 </FixedWidthContainer>
             </FlexRow>

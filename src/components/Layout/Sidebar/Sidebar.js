@@ -2,7 +2,7 @@ import React from 'react';
 //Components
 import FlexColumn from '../Flex/FlexColumn';
 import EditorActions from './Sections/EditorActions';
-import ProjectActions from './Sections/ProjectActions';
+import ProjectActions from './Sections/ProjectActions/ProjectActions';
 //Styles
 import './Sidebar.css';
 import FixedWidthContainer from '../Containers/FixedWidthContainer';

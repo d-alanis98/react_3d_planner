@@ -5,16 +5,16 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Interaction } from 'three.interaction';
 //Classes
 import BoundDetector from '../3D/BoxPositioning/BoundDetector';
+import DimensionsGetter from '../Models/DimensionsGetter';
 import ModelScaleCalculator from '../3D/Models/ModelScaleCalculator';
 //Factories
 import PlaneFactory from '../3D/Plane/PlaneFactory';
-//Functions
-import { getModelUri, getDimensions } from '../../constants/models/models';
+
 
 
 /**
  * @author Damián Alanís Ramírez
- * @version 7.4.1
+ * @version 7.6.4
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -257,10 +257,11 @@ export default class TridimensionalRenderer{
      * @param {object} initialCoordinates 
      * @param {function} onSuccess 
      */
-    load3DModel(type, { x = 0, y = 0, z = 0 }, onSuccess, onSelection){
-        //We get the data of the model based on the type (uri of the model and dimensions)
-        let uri = getModelUri(type);
-        let { width, height, depth } = getDimensions(type);
+    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, onSuccess, onSelection){
+        //We conform the uri of the model
+        let uri = `${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
+        //We get the model dimensions
+        let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
         //We load the model
         let loader = new GLTFLoader();
         loader.load(
@@ -299,7 +300,9 @@ export default class TridimensionalRenderer{
 
                     }
                 }) 
-            }
+            },
+            xhr => console.log( `${( xhr.loaded / xhr.total * 100 )}% loaded` ),
+            error => console.log(error)
         );
     }
 

@@ -7,8 +7,9 @@ import PlaneActions from './PlaneActions/PlaneActions';
 
 const EditorActions = ({ models, addModel, rotateCamera, addTextureToPlane, toggleOrbitControls, orbitControlsEnabled }) => (
     <FlexRow
-        className = 'justify-content-around align-items-center'
+        className = 'justify-content-around align-items-center h-100'
     >
+        {/*
         <FixedWidthContainer
             width = { 75 }
             className = 'overflow-auto h-100'
@@ -18,8 +19,9 @@ const EditorActions = ({ models, addModel, rotateCamera, addTextureToPlane, togg
                 addModel = { addModel }
             />
         </FixedWidthContainer>
+        */}
         <FixedWidthContainer
-            width = { 25 }
+            width = { 70 }
         >
             <PlaneActions 
                 rotateCamera = { rotateCamera }

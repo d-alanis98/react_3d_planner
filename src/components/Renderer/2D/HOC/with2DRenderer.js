@@ -53,13 +53,14 @@ const with2DRenderer = WrappedComponent => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type } = model;
+                    const { type, productLine } = model;
                     const { coordinates } = model[BIDIMENSIONAL];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the SVG model
                     sceneInstance.loadSVGModel(
                         type,
+                        productLine,
                         coordinates,
                         createdModel => { //onSuccess callback
                             let { _id, attrs: { x, y } } = createdModel;
@@ -68,6 +69,10 @@ const with2DRenderer = WrappedComponent => {
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
                                     coordinates: { x, y }
+                                },
+                                [TRIDIMENSIONAL]: {
+                                    uuid: '',
+                                    coordinates: get3DCoordinates(x, y)
                                 }
                             };
                             updateObject(modelWithUpdatedId) //updateCallback

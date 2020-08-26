@@ -1,0 +1,9 @@
+.Notification-container{
+    position: fixed!important;
+    z-index: 1030;
+    width: 100vw;
+}
+.Notification{
+    opacity: 0.9;
+}
+

@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 //Components
-import FlexRow from '../Layout/Flex/FlexRow';
+import Container from '../Layout/Containers/Container';
+import ProjectType from './Details/ProjectType';
 import ProjectName from './Details/ProjectName';
 import LabelWithIcon from '../Layout/Labels/LabelWithIcon';
-import ButtonWithIcon from '../Layout/Buttons/ButtonWithIcon';
 import DimensionsSettings from './Dimensions/DimensionsSettings';
 import ProjectDescription from './Details/ProjectDescription';
+import SaveSettingsButton from './SaveSettingsButton';
 //HOC
 import withEditorState from '../../redux/HOC/withEditorState';
 import withProjectState from '../../redux/HOC/withProjectState';
+import withNotifications from '../Notifications/HOC/withNotifications';
 //Icons
-import { faCogs, faSave, faCheckCircle, faCrop  } from '@fortawesome/free-solid-svg-icons';
-import SaveSettingsButton from './SaveSettingsButton';
-import Container from '../Layout/Containers/Container';
-import ProjectType from './Details/ProjectType';
+import { faCogs, faCrop  } from '@fortawesome/free-solid-svg-icons';
+//Constants
+import { NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
 
 
 
@@ -21,6 +22,8 @@ import ProjectType from './Details/ProjectType';
 
 
 const ProjectSettings = props => {
+    //CONSTANTS
+    const CHANGES_SAVED_SUCCESSFULLY = 'Cambios guardados exitosamente';
     //Props destructuring
     const { 
         project: { name, type, description }, 
@@ -29,6 +32,7 @@ const ProjectSettings = props => {
         setProjectType,
         setEditorWidth,
         setEditorHeight,
+        createNotification,
         set3DSceneDimensions,
         setProjectDescription, 
     } = props;
@@ -76,6 +80,8 @@ const ProjectSettings = props => {
         //Because the 3d scene dimensions don´t deppend on screen size (because they are not set in pixels), we can set them at this point
         set3DSceneDimensions(projectEditorWidth, projectEditorHeight);
         setProjectDescription(projectDescription);
+        //We create a success notification
+        createNotification(CHANGES_SAVED_SUCCESSFULLY, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD);
     }
 
     const handleSettingChange = event => {
@@ -135,5 +141,7 @@ const ProjectSettings = props => {
 let WithProjectState = withProjectState(ProjectSettings);
 //We apply the editor state HOC
 let WithEditorState = withEditorState(WithProjectState);
+
+let WithNotifications = withNotifications(WithEditorState)
 //We export the decorated component
-export default WithEditorState;
+export default WithNotifications;

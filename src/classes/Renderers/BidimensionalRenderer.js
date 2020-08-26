@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 5.2.3
+ * @version 5.3.1
  * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
  * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
  */
@@ -133,8 +133,8 @@ export default class BidimensionalRenderer {
         let gridSizeWidth =  (roomWidth / this.roomWidth) / 2;
         let gridSizeHeight = (roomHeight / this.roomHeight) / 2;
         //The required number of rows and cols
-        let numberOfRows = (roomWidth / gridSizeWidth) + 1;
-        let numberOfCols = (roomHeight / gridSizeHeight) + 1;
+        let numberOfRows = (roomHeight / gridSizeHeight) + 1;
+        let numberOfCols = (roomWidth / gridSizeWidth) + 1;
         //Function that draws the requested number of lines, of the requested type ('row' || 'col') with the desired size
         const drawLinesInAxis = (numberOfLines, type, size, gridSizeWidth, gridSizeHeight) => {
             Array.from(new Array(Math.round(numberOfLines))).forEach((row, index) => {
@@ -190,7 +190,7 @@ export default class BidimensionalRenderer {
     }
 
     
-    loadSVGModel(type, { x, y }, onSuccess, onUpdate, onSelection){
+    loadSVGModel(type, productLine, { x, y }, onSuccess, onUpdate, onSelection){
         //We bind the instance to a variable
         let scene = this;
         //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
@@ -199,12 +199,13 @@ export default class BidimensionalRenderer {
             y,
             type,
             scene, 
-            onUpdate,  
+            onUpdate,      
             onSuccess: createdModel => {
                 onSuccess(createdModel);
                 this.objects.push(createdModel)
             }, 
             onSelection, 
+            productLine,
         });
 
     }

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 //Redux store
-import generateStore from './redux/store';
+import store from './redux/store';
 //Components
 import App from './App';
 //Styles
@@ -13,7 +13,6 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 //Service worker
 import * as serviceWorker from './serviceWorker';
 
-let store = generateStore();
 
 let WithStore = <Provider store = { store }><App /></Provider>
 

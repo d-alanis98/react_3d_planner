@@ -14,7 +14,7 @@ export default class Requests {
                         onSuccess(data, ...callbackArguments);
                 });
             }
-            throw new Error(`${response.status}|${response.statusText}`);
+            else throw new Error(`${response.status}|${response.statusText}`);
         })
         .catch(error => {
             let { message } = error;

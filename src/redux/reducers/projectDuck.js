@@ -3,11 +3,14 @@
  * @version 1.3.2
  */
 //Classes
-import Requests from "../../classes/Helpers/Requests";
-import ProjectConfiguration from "../../classes/ProjectConfiguration";
+import Requests from '../../classes/Helpers/Requests';
+import ProjectConfiguration from '../../classes/ProjectConfiguration';
+import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from './notificationDuck';
+import { setEditorWidthAction, setEditorHeightAction } from './editorDuck';
 
 //CONSTANTS
 //Action types
+const SET_PROJECT               = 'SET_PROJECT';
 const SET_PROJECT_NAME          = 'SET_PROJECT_NAME';
 const SET_PROJECT_TYPE          = 'SET_PROJECT_TYPE';
 const SET_PROJECT_SCENE         = 'SET_PROJECT_SCENE';
@@ -16,18 +19,23 @@ const SET_PROJECT_DESCRIPTION   = 'SET_PROJECT_DESCRIPTION';
 //Initial state
 const initialState = {
     name: '',
-    type: ProjectConfiguration.KITCHEN_PROJECT,
+    type: ProjectConfiguration.CLOSET_PROJECT,
     scene: {},
     objects: [],
     description: '',
 }
 //Others
+export const PROJECT_PROGRESS      = 'PROJECT_PROGRESS';
 const BASE_ENDPOINT         = '/save_project_progress';
 
 //REDUCER
 const reducer = (state = initialState, action) => {
     let { type, payload } = action;
     switch(type){
+        case SET_PROJECT:
+            return {
+                ...payload
+            };
         case SET_PROJECT_NAME:
             return {
                 ...state,
@@ -73,6 +81,13 @@ const saveProgressError = (errorCode, errorMessage) => {
 }
 
 //ACTIONS
+
+export let setProjectAction = project => (dispatch, getState) => {
+    dispatch({
+        type: SET_PROJECT,
+        payload: project
+    });
+}
 /**
  * This action sets the name of the project
  */
@@ -221,23 +236,38 @@ export let removeObjectFromProjectAction = objectToRemove => (dispatch, getState
 
 /**
  * This action restores the project state based on the received project store (which may come serialized in JSON string)
- * @param {string|object} existingProject 
+ * @param {string|object} serializedProject 
  */
-export let restoreProjectAction = existingProject => (dispatch, getState) => {
+export let restoreProjectAction = (serializedProject = null) => (dispatch, getState) => {
+    let existingProject = serializedProject || localStorage.getItem(PROJECT_PROGRESS);
+    if(!existingProject)
+        return;
     //We transform the project data to an object if it comes serialized
     if(typeof(existingProject) === 'string')
         existingProject = JSON.parse(existingProject);
     //We get the data from the object
-    let { projectData } = existingProject;
-    //We get the project properties
-    let { name, type, objects } = projectData;
-    setProjectNameAction(name)(dispatch, getState);
-    setProjectTypeAction(type)(dispatch, getState);
-    setProjectObjectsAction(objects)(dispatch, getState);
+    let { 
+        editor: { editorWidth, editorHeight }, 
+        project,
+    } = existingProject;
+    //Project
+    setProjectAction(project)(dispatch, getState);
+    //Editor
+    setEditorWidthAction(editorWidth)(dispatch, getState);
+    setEditorHeightAction(editorHeight)(dispatch, getState);
 }
 
 export let saveProjectAction = () => (dispatch, getState) => {
-    let { project } = { ...getState() };
+    let { editor, project } = { ...getState() };
+    const projectProgress = {
+        editor, 
+        project
+    }
+
+    let projectProgressSerialized = JSON.stringify(projectProgress);
+    localStorage.setItem(PROJECT_PROGRESS, projectProgressSerialized);
+    createNotificationAction('Progreso guardado', NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+    /*
     let headers = {
         method: 'POST',
         body: project
@@ -248,4 +278,5 @@ export let saveProjectAction = () => (dispatch, getState) => {
         saveProgressSuccess, 
         saveProgressError
     );
+    */
 }
