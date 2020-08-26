@@ -259,7 +259,7 @@ export default class TridimensionalRenderer{
      */
     load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, onSuccess, onSelection){
         //We conform the uri of the model
-        let uri = `${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
         //We load the model
