@@ -1,8 +1,8 @@
 /**
  * @todo Posteriormente esto vendrá de BD
  */
-const WOOD_TEXTURE_URI = '/assets/textures/wood.png';
-const FLOOR_TEXTURE_URI = '/assets/textures/floor.png';
+const WOOD_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/22`;
+const FLOOR_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/9`;
 
 export default class TextureFactory {
     static WOOD_TEXTURE = 'WOOD_TEXTURE';
