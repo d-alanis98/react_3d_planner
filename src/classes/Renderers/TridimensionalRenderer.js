@@ -184,7 +184,7 @@ export default class TridimensionalRenderer{
      * camera´s perspective changes made by the user interaction with mouse/keyboard events
      */
     render(){
-        requestAnimationFrame(this.render);
+        this.requestId = requestAnimationFrame(this.render);
         if(this.renderer && this.scene && this.camera){
             this.renderer.render(this.scene, this.camera);
         }
@@ -257,7 +257,7 @@ export default class TridimensionalRenderer{
      * @param {object} initialCoordinates 
      * @param {function} onSuccess 
      */
-    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, onSuccess, onSelection){
+    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, onSuccess, onSelection){
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
         //We get the model dimensions
@@ -289,6 +289,9 @@ export default class TridimensionalRenderer{
                         //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
                         let yPosition = this.getObjectYInitialPosition(y, object);
                         object.position.set(x, yPosition, z);
+                        if(rotation){
+                            object.rotateY(rotation * Math.PI / 180);
+                        }
                         //We load the default texture to the object if this does not have one already
                         if(!object.material.map)
                             this.addTextureToObject(object, TridimensionalRenderer.DEFAULT_TEXTURE_URI);
@@ -354,4 +357,50 @@ export default class TridimensionalRenderer{
      * take the maximum value between height and width
      */
     getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth)  * 1.15;
+
+    deleteScene = () => {
+        const doDispose = obj => {
+            if (obj !== null){
+                for (let i = 0; i < obj.children.length; i++) {
+                    doDispose(obj.children[i]);
+                }
+                if (obj.geometry) {
+                    obj.geometry.dispose();
+                    obj.geometry = undefined;
+                }
+                if (obj.material) {
+                    if (obj.material.map) {
+                        obj.material.map.dispose();
+                        obj.material.map = undefined;
+                    }
+                    obj.material.dispose();
+                    obj.material = undefined;
+                }
+            }
+            obj = undefined;
+        }
+        for(let iterator = 0; iterator < this.objects.length; iterator++) {
+            doDispose(this.objects[iterator])
+            delete(this.objects[iterator]);
+        }
+
+        while(this.scene.children.length > 0){ 
+            this.scene.remove(this.scene.children[0]); 
+        }
+
+
+
+        this.objects = undefined;
+        this.renderer.forceContextLoss();
+        this.renderer.dispose();
+        this.scene = null
+        this.camera = null
+        this.renderer && this.renderer.renderLists.dispose()
+        this.renderer = null;
+        
+        cancelAnimationFrame(this.requestId);
+        this.plane = null;
+        this.orbitControls = null;
+        this.dragControls = null;
+    }
 }

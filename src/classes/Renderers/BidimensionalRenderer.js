@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 5.3.1
+ * @version 5.4.2
  * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
  * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
  */
@@ -190,7 +190,7 @@ export default class BidimensionalRenderer {
     }
 
     
-    loadSVGModel(type, productLine, { x, y }, onSuccess, onUpdate, onSelection){
+    loadSVGModel(type, productLine, { x, y }, rotation, onSuccess, onUpdate, onSelection){
         //We bind the instance to a variable
         let scene = this;
         //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
@@ -199,6 +199,7 @@ export default class BidimensionalRenderer {
             y,
             type,
             scene, 
+            rotation,
             onUpdate,      
             onSuccess: createdModel => {
                 onSuccess(createdModel);

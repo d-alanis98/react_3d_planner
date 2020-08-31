@@ -52,7 +52,7 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, productLine } = model;
+                    const { type, rotation, productLine } = model;
                     const { coordinates } = model['3d'];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -62,6 +62,7 @@ const with3DRenderer = (WrappedComponent) => {
                         type,
                         productLine,
                         coordinates,
+                        rotation,
                         createdModel => { //onSuccess callback
                             const { uuid } = createdModel;
                             let modelWithUpdatedId = {
@@ -80,7 +81,12 @@ const with3DRenderer = (WrappedComponent) => {
                 setModels(modelsCopy);
             }
             restoreModels();
-            sceneInstance = null;
+
+            //Freeing up memory
+            return () => {
+                sceneInstance.deleteScene()
+                sceneInstance = null;
+            }
         }, []);
 
         useEffect(() => {
@@ -94,7 +100,6 @@ const with3DRenderer = (WrappedComponent) => {
                 console.log('Objeto no encontrado')
                 return;
             }
-
 
             let bidimensionalEditorState = { ...existingObject['2d'] };
             let tridimensionalEditorState = { ...existingObject['3d'] };

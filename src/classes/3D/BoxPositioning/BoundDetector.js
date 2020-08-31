@@ -25,12 +25,15 @@ export default class BoundDetector {
         let { 
             scale: { x: scaleInX, z: scaleInZ },
             position: { x: positionX, z: positionZ },
+            rotation: { _y: rotationInY },
             geometry: { boundingBox: { max: { x: maxPointInX, z: maxPointInZ }, min: { x: minPointInX, z: minPointInZ } } }
         } = this.object;
+
         this.scaleInX = scaleInX;
         this.scaleInZ = scaleInZ;
         this.positionX = positionX;
         this.positionZ = positionZ;
+        this.rotationInY = rotationInY;
         this.maxPointInX = maxPointInX;
         this.maxPointInZ = maxPointInZ;
         this.minPointInX = minPointInX;
@@ -68,6 +71,7 @@ export default class BoundDetector {
             positionZ,
             planeWidth,
             planeHeight,
+            rotationInY,
             maxPointInX,
             maxPointInZ,
             minPointInX,
@@ -79,11 +83,18 @@ export default class BoundDetector {
         //Item dimensions in X and Z axis
         let itemSizeInXAxis = (maxPointInX - minPointInX) * scaleInX;
         let itemSizeInZAxis = (maxPointInZ - minPointInZ) * scaleInZ;
+        //If the object is rotated n*90° with n odd, we swap the sizes along the axis because the object was rotated to the side (right or left) and its now perpendicular to its original position
+        let rotationInDegrees = rotationInY * 180 / Math.PI;
+        if((Math.abs(rotationInDegrees) / 90) % 2 !== 0){
+            let auxiliar = itemSizeInXAxis;
+            itemSizeInXAxis = itemSizeInZAxis;
+            itemSizeInZAxis = auxiliar;
+        }
         //We get the border location in X and Z axis
         let borderXLocation = Math.abs(positionX) + (itemSizeInXAxis / 2); //It´s the absolute value because it can be the left side or the right side which may be touching the border of the plane
         let borderZLocation = Math.abs(positionZ) + (itemSizeInZAxis / 2);
         //Border conditions (X & Z)
-        //If we overflow in x, we go to the end 
+        //If we overflow in x, we go to the end
         if(borderXLocation >= planeBorderX) {
             let newPositionInX = (planeBorderX - (itemSizeInXAxis / 2)) * Math.sign(positionX);
             this.setObjectPositionX(newPositionInX);

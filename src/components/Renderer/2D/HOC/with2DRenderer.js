@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
-//Classes
-import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
+import React, { useState, useEffect, Fragment } from 'react';
+//Components
+import BidimensionalContextMenu from '../../../Editor/2D/ContextMenu/BidimensionalContextMenu';
+//HOC
 import withProjectState from '../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../redux/HOC/withEditorState';
+//Classes
+import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
+import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {
@@ -29,6 +33,9 @@ const with2DRenderer = WrappedComponent => {
         const [models, setModels] = useState({});
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
+        const [contextMenuModel, setContextMenuModel] = useState({});
+        const [displayContextMenu, setDisplayContextMenu] = useState(false);
+        const [contextMenuPosition, setContextMenuPosition] = useState({});
         
 
         //Effects
@@ -53,7 +60,7 @@ const with2DRenderer = WrappedComponent => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, productLine } = model;
+                    const { type, rotation, productLine } = model;
                     const { coordinates } = model[BIDIMENSIONAL];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -62,6 +69,7 @@ const with2DRenderer = WrappedComponent => {
                         type,
                         productLine,
                         coordinates,
+                        rotation,
                         createdModel => { //onSuccess callback
                             let { _id, attrs: { x, y } } = createdModel;
                             let modelWithUpdatedId = {
@@ -77,7 +85,8 @@ const with2DRenderer = WrappedComponent => {
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
-                        updateModel
+                        updateModel, //onUpdate
+                        onSelectedModel,
                     );
                 });
                 setModels(modelsCopy);
@@ -113,6 +122,7 @@ const with2DRenderer = WrappedComponent => {
             };
             updateObject(updatedObject);
         }, [draggedObject]);
+
         /**
          * Success callback for the loadSVGModel method, in this callback we add the created object at project´s level, 
          * generating the id and the 2d and 3d keys, which will contain the id´s and coordinates of the object in the current
@@ -153,6 +163,41 @@ const with2DRenderer = WrappedComponent => {
             setDraggedObject({ x, y, _id });       
         }
 
+        const handleModelRotation = (model, degrees) => {
+            let { _id: modelId } = model;
+            let rotatingModel = sceneInstance.objects.find(object => object._id === modelId);
+            BidimensionalModelRotation.rotate(rotatingModel, degrees, sceneInstance);
+            let modelInState = findObjectBy2DModelId(modelId);
+            //We retrieve the existing rotation in state to add it to the new one
+            let { rotation } = modelInState;
+            let updatedObject = { 
+                ...modelInState,
+                rotation: degrees + rotation || 0,
+            };
+            updateObject(updatedObject);
+        }
+
+
+        const handleModelDeletion = model => {
+            let { _id: modelId } = model;
+            if(!window.confirm('Está seguro de querer eliminar este modelo?'))
+                return;
+            let modelToDelete = sceneInstance.objects.find(object => object._id === modelId);
+            modelToDelete.destroy();
+            let modelInState = findObjectBy2DModelId(modelId);
+            removeObject(modelInState);
+        }
+
+
+        const onSelectedModel = event => {
+            const { evt: { x, y }, currentTarget: model } = event;
+            setContextMenuModel(model);
+            setDisplayContextMenu(true);
+            setContextMenuPosition({ x, y });
+        }
+
+    
+
         /**
          * This method adds a new model of the specified type to the scene
          * @param {string} type 
@@ -185,11 +230,23 @@ const with2DRenderer = WrappedComponent => {
             return coordinatesTransformation.bidimensionalToTridimensionalCoordinates();
         }
 
-        return <WrappedComponent 
-            models = { models }
-            addModel = { addModel }
-            { ...ownProps }
-        />
+        return (
+            <Fragment>
+                <WrappedComponent 
+                    models = { models }
+                    addModel = { addModel }
+                    { ...ownProps }
+                />
+                <BidimensionalContextMenu 
+                    model = { contextMenuModel }
+                    handleModelDeletion = { handleModelDeletion }
+                    handleModelRotation = { handleModelRotation }
+                    displayContextMenu = { displayContextMenu }
+                    contextMenuPositionInX = { contextMenuPosition.x }
+                    contextMenuPositionInY = { contextMenuPosition.y }
+                />
+            </Fragment>
+        );
     }
 
     //We apply the project state HOC

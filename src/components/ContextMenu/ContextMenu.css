@@ -1,0 +1,24 @@
+.custom-cm {
+    display: none;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    width: 20vw;
+    position: absolute;
+    top: 500px;
+    left: 100px;
+    z-index: 10000;
+    border-radius: 3%;
+    list-style: none;
+}
+
+.custom-cm__item {
+    cursor: pointer;
+    padding: 8px 15px;
+}
+
+.custom-cm__item:hover {
+    background-color: #f8f8f8;
+}
+

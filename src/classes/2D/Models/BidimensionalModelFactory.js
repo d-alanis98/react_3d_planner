@@ -7,11 +7,12 @@ import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 import { TOP, getModel2DUri, getDimensions } from '../../../constants/models/models';
 import CollisionDetector from './CollisionDetector';
 import DimensionsGetter from '../../Models/DimensionsGetter';
+import BidimensionalModelRotation from './BidimensionalModelRotation';
 
 
 /**
  * @author Damián Alanís Ramírez
- * @version 2.1.3
+ * @version 3.2.1
  */
 
 export default class BidimensionalModelFactory {
@@ -33,6 +34,7 @@ export default class BidimensionalModelFactory {
             y,
             type,
             scene,
+            rotation,
             onUpdate,
             onSuccess, 
             onSelection,
@@ -65,6 +67,9 @@ export default class BidimensionalModelFactory {
             ModelEvents.addModelBasicEventListeners(imageNode, onUpdate, onSelection);
             //We add the object to the layer
             scene.layer.add(imageNode);
+            //If rotation is not null (or 0) we rotate the model and update the drag bound function
+            if(rotation)
+                BidimensionalModelRotation.rotate(imageNode, rotation, scene);
 
             //If given, we execute the success callback passing the created object as argument
             if(onSuccess && typeof(onSuccess) === 'function')
