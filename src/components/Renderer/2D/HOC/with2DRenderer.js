@@ -86,7 +86,7 @@ const with2DRenderer = WrappedComponent => {
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
                         updateModel, //onUpdate
-                        onSelectedModel,
+                        onSelectedModel, //onSelection
                     );
                 });
                 setModels(modelsCopy);
@@ -188,6 +188,9 @@ const with2DRenderer = WrappedComponent => {
             removeObject(modelInState);
         }
 
+        useEffect(() => {
+            console.log({ displayContextMenu })
+        }, [displayContextMenu])
 
         const onSelectedModel = event => {
             const { evt: { x, y }, currentTarget: model } = event;

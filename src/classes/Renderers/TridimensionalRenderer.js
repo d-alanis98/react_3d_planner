@@ -276,10 +276,14 @@ export default class TridimensionalRenderer{
                 //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
                 gltf.scene.traverse( object => {
                     if(object.isMesh) {
-                        object.on('click', event => {
-                            const { data: { originalEvent: { detail } } } = event;
+                        object.on('click', event => { console.log('click'); event.stopPropagation() })
+                        object.on('pointerdown', event => {
+                            
+                            console.log('pointer down')
+                            const { data: { originalEvent: { cancelable } } } = event;
+                            console.log({ event })
                             //On double click we execute the onSelection callback
-                            if(detail > 1)
+                            //if(detail > 1)
                                 onSelection && typeof(onSelection) === 'function' && onSelection(event);
                         });
                         //We set the proper scale to be accurate between the real dimensions and the dimensions in the 3D scene

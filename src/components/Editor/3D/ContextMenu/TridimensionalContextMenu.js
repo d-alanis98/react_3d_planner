@@ -1,15 +1,13 @@
 import React from 'react';
-//Components
 import ContextMenu from '../../../ContextMenu/ContextMenu';
 import LabelWithIcon from '../../../Layout/Labels/LabelWithIcon';
-//Icons
-import { faUndo, faRedo, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faRedo, faUndo, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-const BidimensionalContextMenu = ({ 
+const TridimensionalContextMenu = ({
     model, 
+    displayContextMenu = false,
     handleModelRotation,
-    handleModelDeletion,
-    displayContextMenu = false, 
+    handleModelDeletion, 
     contextMenuPositionInX, 
     contextMenuPositionInY 
 }) => (
@@ -43,7 +41,8 @@ const BidimensionalContextMenu = ({
                 className = 'text-danger mb-0 cursor-click'
             />
         </li>
+
     </ContextMenu>
 );
 
-export default BidimensionalContextMenu;
+export default TridimensionalContextMenu;

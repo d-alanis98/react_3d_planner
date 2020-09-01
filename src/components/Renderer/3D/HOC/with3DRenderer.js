@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 //Classes
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 //Factories
@@ -8,6 +8,7 @@ import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationF
 import withProjectState from '../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../redux/HOC/withEditorState';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
+import TridimensionalContextMenu from '../../../Editor/3D/ContextMenu/TridimensionalContextMenu';
 
 
 const with3DRenderer = (WrappedComponent) => {
@@ -29,10 +30,17 @@ const with3DRenderer = (WrappedComponent) => {
 
         //HOOKS
         //State
+        //Model, scene and events
         const [models, setModels] = useState({});
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
+        //Context menu
+        const [contextMenuModel, setContextMenuModel] = useState({});
+        const [displayContextMenu, setDisplayContextMenu] = useState(false);
+        const [contextMenuPosition, setContextMenuPosition] = useState({});
+        //Orbit controls
         const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
+
         
 
         //Effects
@@ -75,7 +83,8 @@ const with3DRenderer = (WrappedComponent) => {
                             };
                             updateObject(modelWithUpdatedId);
                         },
-                        updateModel //updateCallback
+                        //updateModel, //updateCallback
+                        onSelectedModel, //onSelection
                     );
                 });
                 setModels(modelsCopy);
@@ -178,6 +187,20 @@ const with3DRenderer = (WrappedComponent) => {
             setDraggedObject({ x, y, z, uuid });
         }
 
+        const onSelectedModel = event => {
+            const { data: { target: model, originalEvent: { x, y } } } = event;
+            console.log({ x, y });
+            
+            setContextMenuModel(model);
+            setDisplayContextMenu(true);
+            setContextMenuPosition({ x, y });
+            
+        }
+
+        useEffect(() => {
+            console.log({ displayContextMenu })
+        }, [displayContextMenu])
+
         /**
          * This method return the complete object based on it´s 3d model id
          * @param {string} id2DModel 
@@ -223,16 +246,29 @@ const with3DRenderer = (WrappedComponent) => {
         
 
 
-        return <WrappedComponent
-            models = { models }
-            addModel = { addModel }
-            rotateCamera = { rotateCamera }
-            addTextureToPlane = { addTextureToPlane }
-            addTextureToObject = { addTextureToObject }
-            toggleOrbitControls = { toggleOrbitControls }
-            orbitControlsEnabled = { orbitControlsEnabled }
-            { ...extraProps }
-        />
+        return (
+            <Fragment>
+                <WrappedComponent
+                    models = { models }
+                    addModel = { addModel }
+                    rotateCamera = { rotateCamera }
+                    addTextureToPlane = { addTextureToPlane }
+                    addTextureToObject = { addTextureToObject }
+                    toggleOrbitControls = { toggleOrbitControls }
+                    orbitControlsEnabled = { orbitControlsEnabled }
+                    { ...extraProps }
+                />
+                <TridimensionalContextMenu 
+                    model = { contextMenuModel }
+                    displayContextMenu = { displayContextMenu }
+                    handleModelRotation = { (model, rotation) => console.log('rotation') }
+                    handleModelDeletion = { (model) => console.log('Deletion') }
+                    contextMenuPositionInX = { contextMenuPosition.x }
+                    contextMenuPositionInY = { contextMenuPosition.y }
+
+                />
+            </Fragment>
+        )
     }
 
     //We apply the project state HOC
