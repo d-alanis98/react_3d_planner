@@ -2,19 +2,19 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Interaction } from 'three.interaction';
 //Classes
 import BoundDetector from '../3D/BoxPositioning/BoundDetector';
+import ModelDecorator from '../3D/Models/ModelDecorator';
 import DimensionsGetter from '../Models/DimensionsGetter';
 import ModelScaleCalculator from '../3D/Models/ModelScaleCalculator';
 //Factories
 import PlaneFactory from '../3D/Plane/PlaneFactory';
-
+import TextureFactory from '../3D/Models/TextureFactory';
 
 
 /**
  * @author Damián Alanís Ramírez
- * @version 7.6.4
+ * @version 8.4.3
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -31,7 +31,7 @@ export default class TridimensionalRenderer{
     static DEFAULT_LIGHT_COLOR = 0xFFFFFF;
     static DEFAULT_LIGHT_INTENSITY = 1;
     //Default texture
-    static DEFAULT_TEXTURE_URI = '/assets/textures/wood.png'
+    static DEFAULT_TEXTURE_URI = TextureFactory.getTextureUri();
 
     //CONSTRUCTOR
     constructor(sceneWidth = PlaneFactory.DEFAULT_SIZE, sceneHeight = PlaneFactory.DEFAULT_SIZE){
@@ -52,6 +52,8 @@ export default class TridimensionalRenderer{
         this.enableOrbitControls = true;
         //Methods linkage
         this.render = this.render.bind(this);
+        //Other methods
+        this.onObjectsUpdate = null;
 
     }
 
@@ -68,7 +70,6 @@ export default class TridimensionalRenderer{
         this.addControls();
         this.addPlane();
         this.addResizeListener();
-        this.addInteractionEvents();
         this.render()
     }
 
@@ -129,12 +130,15 @@ export default class TridimensionalRenderer{
         //During the drag event we apply validations in the position where the object is trying to be placed via the BoundDetector class
         this.dragControls.addEventListener('drag', event => {
             let { sceneHeight, sceneWidth } = this;
+            //We apply the active style while moving (cyan color)
+            ModelDecorator.applyStyle(event.object, ModelDecorator.ACTIVE_STYLE);
             let boundDetector = new BoundDetector(event.object, initialYPosition, sceneWidth, sceneHeight);
             boundDetector.applyBoundDetectionAlgorithm();
         });
         //On drag event end we enable the orbit controls again
         this.dragControls.addEventListener('dragend', event => {
-            event.object.material.opacity = 1;
+            //We restore the original color (rgb(1,1,1)) after dragging
+            ModelDecorator.applyStyle(event.object, ModelDecorator.INACTIVE_STYLE);
             if(this.onDragEnd && typeof(this.onDragEnd) === 'function')
                 this.onDragEnd(event);
             if(this.orbitControls)
@@ -172,19 +176,12 @@ export default class TridimensionalRenderer{
     }
 
     /**
-     * This method adds the interaction capabilities, so we can handle events like click or mouse events in the objects.
-     */
-    addInteractionEvents(){
-        this.interaction = new Interaction(this.renderer, this.scene, this.camera);
-    }
-
-    /**
      * This method conforms the mainloop of the 3d scene, by requesting the animation frame on a recursive way it'll always
      * be executing the render method of the WebGLRenderer. Also, the orbit controls are updated in order to reflect the 
      * camera´s perspective changes made by the user interaction with mouse/keyboard events
      */
     render(){
-        this.requestId = requestAnimationFrame(this.render);
+        this.requestAnimationFrameId = requestAnimationFrame(this.render);
         if(this.renderer && this.scene && this.camera){
             this.renderer.render(this.scene, this.camera);
         }
@@ -204,6 +201,17 @@ export default class TridimensionalRenderer{
             this.onDragEnd = callback;
         //We bind the this context (instance)
         this.onDragEnd = this.onDragEnd.bind(this);
+    }
+
+    /**
+     * This method sets the global callback for the updated objects event
+     * @param {function} callback 
+     */
+    setUpdateObjectsCallback(callback){
+        if(callback && typeof(callback) === 'function')
+            this.onObjectsUpdate = callback;
+        //We bind the this context (instance)
+        this.onObjectsUpdate = this.onObjectsUpdate.bind(this);
     }
 
     /**
@@ -234,21 +242,24 @@ export default class TridimensionalRenderer{
     }
 
     /**
-     * This method adds a single object to the existing array of objects and updates the drag controls in order to be 
-     * able to manipulate the object.
+     * This method adds a single object to the existing array of objects.
      * @param {any} object 
      */
     addObject(object){
         this.objects.push(object);
+        //We notify the object change observers
+        this.onObjectsUpdate(this.objects);
     }
 
     /**
-     * This method sets the object's array with the provided one. Also, as in the addObject method, it updates the drag controls.
+     * This method sets the object's array with the provided one.
      * @param {array} objects 
      */
     setObjects(objects){
         if(Array.isArray(objects))
             this.objects = objects;
+        //We notify the object change observers
+        this.onObjectsUpdate(this.objects);
     }
 
     /**
@@ -257,7 +268,7 @@ export default class TridimensionalRenderer{
      * @param {object} initialCoordinates 
      * @param {function} onSuccess 
      */
-    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, onSuccess, onSelection){
+    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess, onSelection){
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
         //We get the model dimensions
@@ -276,16 +287,6 @@ export default class TridimensionalRenderer{
                 //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
                 gltf.scene.traverse( object => {
                     if(object.isMesh) {
-                        object.on('click', event => { console.log('click'); event.stopPropagation() })
-                        object.on('pointerdown', event => {
-                            
-                            console.log('pointer down')
-                            const { data: { originalEvent: { cancelable } } } = event;
-                            console.log({ event })
-                            //On double click we execute the onSelection callback
-                            //if(detail > 1)
-                                onSelection && typeof(onSelection) === 'function' && onSelection(event);
-                        });
                         //We set the proper scale to be accurate between the real dimensions and the dimensions in the 3D scene
                         let scaleCalculator = new ModelScaleCalculator(object, width, height, depth);
                         let { x: scaleInX, y: scaleInY, z: scaleInZ } = scaleCalculator.calculateScale();
@@ -294,17 +295,17 @@ export default class TridimensionalRenderer{
                         let yPosition = this.getObjectYInitialPosition(y, object);
                         object.position.set(x, yPosition, z);
                         if(rotation){
+                            console.log(`Aplicando rotacion de ${rotation}`)
                             object.rotateY(rotation * Math.PI / 180);
                         }
                         //We load the default texture to the object if this does not have one already
                         if(!object.material.map)
-                            this.addTextureToObject(object, TridimensionalRenderer.DEFAULT_TEXTURE_URI);
+                            this.addTextureToObject(object, TextureFactory.getTextureUriFromId(texture));
                         if(onSuccess && typeof(onSuccess) === 'function')
                             onSuccess(object);
                         
                         //We add the object to the array
                         this.addObject(object);
-
                     }
                 }) 
             },
@@ -332,9 +333,6 @@ export default class TridimensionalRenderer{
     addTextureToObject = (object, textureUri = null) => {
         if(!object.isMesh)
             return;
-        /**
-         * @todo Texture factory
-         */
         //We load the texture 
         let texture = new THREE.TextureLoader().load(textureUri || TridimensionalRenderer.DEFAULT_TEXTURE_URI);
         //Required parameters, specially encoding, which is set to LuminanceFormat
@@ -362,29 +360,41 @@ export default class TridimensionalRenderer{
      */
     getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth)  * 1.15;
 
-    deleteScene = () => {
-        const doDispose = obj => {
-            if (obj !== null){
-                for (let i = 0; i < obj.children.length; i++) {
-                    doDispose(obj.children[i]);
-                }
-                if (obj.geometry) {
-                    obj.geometry.dispose();
-                    obj.geometry = undefined;
-                }
-                if (obj.material) {
-                    if (obj.material.map) {
-                        obj.material.map.dispose();
-                        obj.material.map = undefined;
-                    }
-                    obj.material.dispose();
-                    obj.material = undefined;
-                }
-            }
-            obj = undefined;
+    deleteModelById = modelId => {
+        let modelToDelete = this.objects.find(model => model.uuid === modelId);
+        if(!modelToDelete)
+            return;
+        
+        let filteredObjects = this.objects.filter(model => model.uuid !== modelToDelete.uuid);
+        this.setObjects(filteredObjects);
+        //We free memory
+        let sceneModel = this.scene.getObjectByProperty( 'uuid', modelId )
+        this.disposeObject(sceneModel);
+    }
+
+    disposeObject = object => {
+        //End of recursion, all nodes have been eliminated
+        if(!object)
+            return;
+        object.children.forEach(child => this.disposeObject(child));
+        //Parent removal
+        object.parent.remove(object);
+        //Geometry disposal
+        if(object.geometry) 
+            object.geometry.dispose();
+        //Material disposal
+        if(object.material) {
+            if(object.material.map)
+                object.material.map.dispose();
+            object.material.dispose();
         }
+        object = undefined;
+        this.renderer.renderLists.dispose();
+    }
+
+    deleteScene = () => {
         for(let iterator = 0; iterator < this.objects.length; iterator++) {
-            doDispose(this.objects[iterator])
+            this.disposeObject(this.objects[iterator])
             delete(this.objects[iterator]);
         }
 
@@ -392,17 +402,16 @@ export default class TridimensionalRenderer{
             this.scene.remove(this.scene.children[0]); 
         }
 
-
-
         this.objects = undefined;
+        this.renderer.renderLists.dispose();
         this.renderer.forceContextLoss();
         this.renderer.dispose();
         this.scene = null
         this.camera = null
-        this.renderer && this.renderer.renderLists.dispose()
+        
         this.renderer = null;
         
-        cancelAnimationFrame(this.requestId);
+        cancelAnimationFrame(this.requestAnimationFrameId);
         this.plane = null;
         this.orbitControls = null;
         this.dragControls = null;

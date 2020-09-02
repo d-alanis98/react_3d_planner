@@ -12,7 +12,7 @@ import TridimensionalContextMenu from '../../../Editor/3D/ContextMenu/Tridimensi
 
 
 const with3DRenderer = (WrappedComponent) => {
-
+    let sceneInstanceModels = [];
     const With3DRenderer = props => {
         //PROPS
         //Destructuring
@@ -34,15 +34,9 @@ const with3DRenderer = (WrappedComponent) => {
         const [models, setModels] = useState({});
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
-        //Context menu
-        const [contextMenuModel, setContextMenuModel] = useState({});
-        const [displayContextMenu, setDisplayContextMenu] = useState(false);
-        const [contextMenuPosition, setContextMenuPosition] = useState({});
         //Orbit controls
         const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
-
         
-
         //Effects
         useEffect(() => {
             //We generate a tridimensional renderer instance with the width and height that are currently set in the state
@@ -50,6 +44,7 @@ const with3DRenderer = (WrappedComponent) => {
             //We initialize the scene instance and provide the drag end callback, which is the update model function
             sceneInstance.init();
             sceneInstance.setDragEndCallback(updateModel);
+            sceneInstance.setUpdateObjectsCallback(onObjectsUpdate);
             setSceneInstance(sceneInstance);
             /**
              * This method restores the existing objects in the plane
@@ -60,7 +55,7 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, rotation, productLine } = model;
+                    const { type, rotation, texture, productLine } = model;
                     const { coordinates } = model['3d'];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -71,6 +66,7 @@ const with3DRenderer = (WrappedComponent) => {
                         productLine,
                         coordinates,
                         rotation,
+                        texture,
                         createdModel => { //onSuccess callback
                             const { uuid } = createdModel;
                             let modelWithUpdatedId = {
@@ -90,7 +86,6 @@ const with3DRenderer = (WrappedComponent) => {
                 setModels(modelsCopy);
             }
             restoreModels();
-
             //Freeing up memory
             return () => {
                 sceneInstance.deleteScene()
@@ -187,19 +182,20 @@ const with3DRenderer = (WrappedComponent) => {
             setDraggedObject({ x, y, z, uuid });
         }
 
-        const onSelectedModel = event => {
+        const onObjectsUpdate = models => {
+            sceneInstanceModels = models;
+        }
+
+        const onSelectedModel = event => {/*
             const { data: { target: model, originalEvent: { x, y } } } = event;
             console.log({ x, y });
             
             setContextMenuModel(model);
             setDisplayContextMenu(true);
             setContextMenuPosition({ x, y });
+            */
             
         }
-
-        useEffect(() => {
-            console.log({ displayContextMenu })
-        }, [displayContextMenu])
 
         /**
          * This method return the complete object based on it´s 3d model id
@@ -243,6 +239,13 @@ const with3DRenderer = (WrappedComponent) => {
             let cameraPositionVector = CameraRotationFactory.createCameraRotationVector(view, cameraDistance);
             sceneInstance.camera.position.copy(cameraPositionVector);
         }
+
+        const deleteModelById = modelId => {    
+            const projectObjectToDelete = findObjectBy3DModelId(modelId);
+            sceneInstance.deleteModelById(modelId);      
+            removeObject(projectObjectToDelete);  
+
+        }
         
 
 
@@ -251,21 +254,14 @@ const with3DRenderer = (WrappedComponent) => {
                 <WrappedComponent
                     models = { models }
                     addModel = { addModel }
+                    sceneModels = { sceneInstanceModels }
                     rotateCamera = { rotateCamera }
+                    deleteModelById = { deleteModelById }
                     addTextureToPlane = { addTextureToPlane }
                     addTextureToObject = { addTextureToObject }
                     toggleOrbitControls = { toggleOrbitControls }
                     orbitControlsEnabled = { orbitControlsEnabled }
                     { ...extraProps }
-                />
-                <TridimensionalContextMenu 
-                    model = { contextMenuModel }
-                    displayContextMenu = { displayContextMenu }
-                    handleModelRotation = { (model, rotation) => console.log('rotation') }
-                    handleModelDeletion = { (model) => console.log('Deletion') }
-                    contextMenuPositionInX = { contextMenuPosition.x }
-                    contextMenuPositionInY = { contextMenuPosition.y }
-
                 />
             </Fragment>
         )

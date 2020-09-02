@@ -4,12 +4,14 @@ import thunk from 'redux-thunk';
 import editorReducer from './reducers/editorDuck';
 import familyReducer from './reducers/familyDuck';
 import projectReducer, { restoreProjectAction } from './reducers/projectDuck';
+import texturesReducer, { getTexturesAction } from './reducers/texturesDuck';
 import notificationReducer from './reducers/notificationDuck';
 
 let rootReducer = combineReducers({
     editor: editorReducer,
     family: familyReducer,
     project: projectReducer,
+    textures: texturesReducer,
     notification: notificationReducer,
 });
 
@@ -23,6 +25,7 @@ const generateStore = () => {
     );
     //Restore project action
     restoreProjectAction()(store.dispatch, store.getState);
+    getTexturesAction()(store.dispatch, store.getState);
     return store;
 }
 

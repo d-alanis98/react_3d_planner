@@ -1,0 +1,23 @@
+.models-menu__container {
+    height: 90vh;
+    width: 35vw;
+    position: absolute;
+    z-index: 10000;
+    top: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-radius: 0.3rem;
+    border: 1px solid #6c757d;
+    padding: 0.5rem 0.5rem;
+}
+
+.models-menu__label {
+    height: 7%;
+    color: #6c757d;
+}
+
+
+.models-menu__thumbnail {
+    height: 85px;
+    width: 85px;
+}

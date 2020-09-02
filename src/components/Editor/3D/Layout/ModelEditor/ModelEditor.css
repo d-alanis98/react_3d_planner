@@ -1,0 +1,13 @@
+.model-editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10001;
+    height: 90vh;
+    width: 35vw;
+    background-color: #ffffff;
+    padding: 0.75rem 0.75rem;
+}
+
+
+

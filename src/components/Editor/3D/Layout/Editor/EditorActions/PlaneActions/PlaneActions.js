@@ -9,7 +9,7 @@ import CameraPositionMenu from './CameraPositionMenu';
 import withProjectState from '../../../../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../../../../redux/HOC/withEditorState';
 //Icons
-import { faArrowsAlt, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsAlt, faLock, faLockOpen, faCubes, faBars } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -21,6 +21,9 @@ const PlaneActions = props => {
         editorState, 
         setEditorWidth, 
         setEditorHeight, 
+        //From project state HOC
+        project: { displayModelsMenu },
+        setDisplayModelsMenu,
         //From parent component
         rotateCamera, 
         addTextureToPlane, 
@@ -57,7 +60,6 @@ const PlaneActions = props => {
             />
             <ButtonWithIcon 
                 icon = { orbitControlsEnabled ? faLock : faLockOpen }
-                title = 'Bloquear/desbloquear plano'
                 type = { orbitControlsEnabled ?  'outline-secondary' : 'secondary' }
                 onClick = { toggleOrbitControls }
                 className = 'btn-sm rounded-pill px-3 py-2 mr-2'
@@ -66,9 +68,20 @@ const PlaneActions = props => {
                         icon = { faArrowsAlt }
                     />
                 }
-                data-toggle = 'tooltip' 
-                data-placement = 'top' 
-            />    
+                onHoverText = { orbitControlsEnabled ? 'Bloquear plano' : 'Desbloquear plano' } 
+            />   
+            <ButtonWithIcon 
+                icon = { faBars }
+                type = 'outline-secondary'
+                onClick = { event => setDisplayModelsMenu(!displayModelsMenu) }
+                className = 'btn-sm rounded-pill px-3 py-2 mr-2'
+                buttonText = {
+                    <FontAwesomeIcon 
+                        icon = { faCubes }
+                    />
+                }
+                onHoverText = { displayModelsMenu ? 'Ocultar menu' : 'Mostrar menu' }
+            /> 
         </FlexRow>
     );
 }

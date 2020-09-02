@@ -1,0 +1,28 @@
+.textures-list {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0.75rem 0.25rem;
+}
+
+.textures-list__item {
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    list-style: none;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #9c9c9c;
+    padding: 0.5rem 0.5rem;
+    transition: transform 0.15s;
+}
+
+.textures-list__item:hover {
+    transform: scale(1.02);
+}
+
+.textures-list__item-img {
+    height: 65px;
+    width: 65px;
+    margin-right: 0.5rem;
+}

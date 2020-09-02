@@ -16,6 +16,7 @@ const SET_PROJECT_TYPE          = 'SET_PROJECT_TYPE';
 const SET_PROJECT_SCENE         = 'SET_PROJECT_SCENE';
 const SET_PROJECT_OBJECTS       = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION   = 'SET_PROJECT_DESCRIPTION';
+const SET_DISPLAY_MODELS_MENU   = 'SET_DISPLAY_MODELS_MENU';
 //Initial state
 const initialState = {
     name: '',
@@ -23,6 +24,7 @@ const initialState = {
     scene: {},
     objects: [],
     description: '',
+    displayModelsMenu: false,
 }
 //Others
 export const PROJECT_PROGRESS      = 'PROJECT_PROGRESS';
@@ -60,6 +62,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 description: payload,
+            };
+        case SET_DISPLAY_MODELS_MENU:
+            return {
+                ...state,
+                displayModelsMenu: payload,
             };
         default:
             return state;
@@ -279,4 +286,11 @@ export let saveProjectAction = () => (dispatch, getState) => {
         saveProgressError
     );
     */
+}
+
+export let setDisplayModelsMenuAction = displayModelsMenu => (dispatch, getState) => {
+    dispatch({
+        type: SET_DISPLAY_MODELS_MENU,
+        payload: displayModelsMenu,
+    });
 }

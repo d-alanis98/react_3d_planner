@@ -13,6 +13,7 @@ import {
     set2DRoomDimensionsAction,
     set2DSceneDimensionsAction,
     set3DSceneDimensionsAction,
+    setDisplayModelsMenuAction,
     setProjectDescriptionAction,
     removeObjectFromProjectAction,
 } from '../reducers/projectDuck';
@@ -32,10 +33,13 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
             set3DSceneDimensionsAction,
+            setDisplayModelsMenuAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,
             ...ownProps
         } = props;
+
+        const findObjectBy3DModelId = id3DModel => project.objects.find(object => object['3d'].uuid === id3DModel);
 
         return <WrappedComponent 
             project = { project }
@@ -51,7 +55,9 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
             set3DSceneDimensions = { set3DSceneDimensionsAction }
+            setDisplayModelsMenu = { setDisplayModelsMenuAction }
             setProjectDescription = { setProjectDescriptionAction }
+            findObjectBy3DModelId = { findObjectBy3DModelId }
             { ...ownProps }
         />
     }
@@ -77,6 +83,7 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
             set3DSceneDimensionsAction,
+            setDisplayModelsMenuAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,
         }

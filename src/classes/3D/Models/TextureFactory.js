@@ -1,6 +1,3 @@
-/**
- * @todo Posteriormente esto vendrá de BD
- */
 const WOOD_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/22`;
 const FLOOR_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/9`;
 
@@ -16,7 +13,10 @@ export default class TextureFactory {
             case FLOOR_TEXTURE:
                 return FLOOR_TEXTURE_URI;
             default:
-                return FLOOR_TEXTURE_URI;
+                return WOOD_TEXTURE_URI;
         }
     }
+
+    static getTextureUriFromId = textureId => 
+        textureId ? `${process.env.MIX_APP_API_ENDPOINT}/colors/${textureId}` : WOOD_TEXTURE_URI;
 }

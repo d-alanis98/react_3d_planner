@@ -7,42 +7,21 @@ import TextureFactory from '../../../../../../../../classes/3D/Models/TextureFac
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 
 const PlaneSettings = ({ editorWidth, editorHeight, setEditorHeight, setEditorWidth, handleTextureChange }) => (
-    <div className='dropup'
-        title = 'Ajustes de escena 3D'
-        data-toggle = 'tooltip' 
-        data-placement = 'top' 
-    >
+    <div className='dropup'>
         <div className='dropdown'>
             <ButtonWithIcon 
                 id = '3d_scene_settings'
                 icon = { faCog }
                 type = 'outline-secondary'
-                className = 'rounded-pill pr-1 py-2 mr-2'
-                data-toggle='dropdown' 
-                aria-haspopup='true' 
-                aria-expanded='false'
+                className = 'btn-sm rounded-pill px-2 py-2 mr-2'
+                onHoverText = 'Ajustes'
+                data-toggle = 'dropdown' 
+                aria-haspopup ='true' 
+                aria-expanded = 'false'
+                iconClassName = 'mr-0'
             />
             <div className='dropdown-menu mb-5 px-3 oveflow-auto' aria-labelledby='3d_scene_settings'>
                 <h5>Plane</h5>
-                
-                <div className='form-group'>
-                    <h6>Dimensiones: </h6>
-                    <label>Alto: </label>
-                    <input 
-                        type = 'text' 
-                        value = { editorHeight }
-                        onChange = { event => setEditorHeight(event.target.value) }
-                        className = 'form-control' 
-                    />
-                    <label>Ancho: </label>
-                    <input 
-                        type='text' 
-                        value = { editorWidth }
-                        onChange = { event => setEditorWidth(event.target.value) }
-                        className='form-control' 
-                    />
-                </div>
-                
                 
                 <div className='form-group'>
                     <h6>Textura:</h6>

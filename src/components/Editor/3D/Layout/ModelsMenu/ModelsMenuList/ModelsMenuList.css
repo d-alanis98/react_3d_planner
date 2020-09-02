@@ -1,0 +1,16 @@
+.models-menu-list {
+    height: 93%;
+    overflow-y: auto;
+    width: 100%;
+    padding: 0.75rem 0;
+}
+
+.models-menu-list__item {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    list-style: none;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #9c9c9c;
+    padding: 0.5rem 0.5rem;
+}

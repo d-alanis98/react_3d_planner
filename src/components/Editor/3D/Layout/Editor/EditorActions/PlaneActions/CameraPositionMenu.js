@@ -6,6 +6,7 @@ import LabelWithIcon from '../../../../../../Layout/Labels/LabelWithIcon';
 import { faCrosshairs, faCaretSquareUp, faWindowMaximize, faWindowRestore, faCaretSquareLeft, faCaretSquareRight, faCube } from '@fortawesome/free-solid-svg-icons';
 //Classes
 import CameraRotationFactory from '../../../../../../../classes/3D/Camera/CameraRotationFactory';
+import ButtonWithIcon from '../../../../../../Layout/Buttons/ButtonWithIcon';
 
 
 
@@ -19,13 +20,15 @@ const CameraPositionMenu = ({ rotateCamera }) => {
             data-toggle = 'tooltip' 
             data-placement = 'top' 
         >
-            <LabelWithIcon 
+            <ButtonWithIcon 
                 icon = { faCrosshairs }
-                title = 'Vistas'
-                className = 'cursor-click mb-0 btn btn-outline-secondary rounded-pill pr-1 mr-2 py-2'
+                type = 'outline-secondary'
+                className = 'btn-sm rounded-pill px-2 mr-2 py-2'
+                onHoverText = 'Vistas'
                 data-toggle = 'dropdown' 
                 aria-haspopup = 'true' 
                 aria-expanded = 'false'
+                iconClassName = 'mr-0'
             />
             <div className='dropdown-menu mb-3 px-2 py-2'>
                 <FlexColumn>
