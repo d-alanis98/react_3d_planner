@@ -6,14 +6,13 @@ import ModelsMenuListItem from './ModelsMenuListItem';
 import './ModelsMenuList.css';
 
 
-const ModelsMenuList = ({ editModel, isFocused, focusModel, deleteModel, rotateModel, projectModels }) => (
+const ModelsMenuList = ({ isFocused, focusModel, deleteModel, rotateModel, projectModels }) => (
     <ul className='models-menu-list'>
         {
             projectModels.length > 0 ?
                 projectModels.map(projectModel => (
                     <ModelsMenuListItem 
                         key = { projectModel.id }
-                        editModel = { editModel }
                         isFocused = { isFocused }
                         focusModel = { focusModel }
                         deleteModel = { deleteModel }

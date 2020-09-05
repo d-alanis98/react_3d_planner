@@ -2,9 +2,9 @@ import React from 'react';
 //Styles
 import './Heights.css';
 
-const FixedHeightContainer = ({ height, children, className, ...extraProps }) => (
+const FixedHeightContainer = ({ height, children, relative, className, ...extraProps }) => (
     <div
-        className = {`h-${height} ${className || ''}`}
+        className = {`h-${height}${relative ? '-relative' : ''} ${className || ''}`}
         { ...extraProps }
     >
         { children }

@@ -5,19 +5,36 @@
     z-index: 10000;
     top: 0;
     right: 0;
-    background-color: #ffffff;
+    color: #ececec;
+    background-color: #333333;
     border-radius: 0.3rem;
     border: 1px solid #6c757d;
     padding: 0.5rem 0.5rem;
+    font-size: 0.9rem;
+
+}
+
+.models-menu__container--unmounted {
+    z-index: -1;
+    opacity: 0;
+    transform: translate3d(0,-100px, 0);
+    transition: all 150ms ease-out;
+}
+
+.models-menu__container--mounted {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: all 0.45s ease-out;
 }
 
 .models-menu__label {
-    height: 7%;
-    color: #6c757d;
+    height: 1.4rem;
+    font-size: 1.15rem;
+    color: #ececec;
 }
 
 
 .models-menu__thumbnail {
-    height: 85px;
-    width: 85px;
+    height: 80px;
+    width: 80px;
 }

@@ -72,8 +72,10 @@ const with2DRenderer = WrappedComponent => {
                         rotation,
                         createdModel => { //onSuccess callback
                             let { _id, attrs: { x, y } } = createdModel;
+                            const { id, name } = model;
                             let modelWithUpdatedId = {
                                 ...model,
+                                name: name || `Modelo ${ id }`,
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
                                     coordinates: { x, y }
@@ -133,9 +135,11 @@ const with2DRenderer = WrappedComponent => {
             //We get the id, type and the coordinates of the created model
             let { _id, attrs: { x, y, type } } = createdModel;
             //We generate an object with all the properties needed to keep it in the state
+            const id = projectObjects.length;
             let objectToAdd = {
-                id: projectObjects.length,
+                id,
                 type,
+                name: `Modelo ${ id }`,
                 [BIDIMENSIONAL]: {
                     uuid: _id, //Konva generated ID
                     coordinates: { x, y }

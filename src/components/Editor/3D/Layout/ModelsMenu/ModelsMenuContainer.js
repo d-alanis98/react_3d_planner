@@ -4,7 +4,6 @@ import ModelsMenu from './ModelsMenu';
 //HOC
 import withProjectState from '../../../../../redux/HOC/withProjectState';
 //Classes
-import TridimensionalRenderer from '../../../../../classes/Renderers/TridimensionalRenderer';
 import ModelDecorator from '../../../../../classes/3D/Models/ModelDecorator';
 
 
@@ -14,6 +13,7 @@ const ModelsMenuContainer = ({
     updateObject,
     deleteModelById,
     addTextureToObject,
+    setDisplayModelsMenu,
     findObjectBy3DModelId 
 }) => { 
     //PROPS
@@ -22,7 +22,8 @@ const ModelsMenuContainer = ({
     //State
     const [modelToEdit, setModelToEdit] = useState(null);
     const [modelToFocus, setModelToFocus] = useState(null);
-    const [displayModelEditor, setDisplayModelEditor] = useState(false);
+
+
     
     //Effects
     useEffect(() => {
@@ -36,22 +37,12 @@ const ModelsMenuContainer = ({
 
     useEffect(() => {
         //On menu hide and on editor display we apply the inactive style back
-        if(!displayModelsMenu || displayModelEditor)
+        if(!displayModelsMenu)
             clearAppliedStylesToModels();
-    }, [displayModelsMenu, displayModelEditor]);
+
+    }, [displayModelsMenu]);
     
     //FUNCTIONS
-    const editModel = event => {
-        const { currentTarget: { id: modelId } } = event;
-        let modelToEdit = models.find(model => model.uuid === modelId);
-        setModelToEdit(modelToEdit);
-        setDisplayModelEditor(true);
-    }
-
-    const hideEditorFromState = () => {
-        setDisplayModelEditor(false);
-    }
-
     const focusModel = event => {
         const { currentTarget: { id: modelId } } = event;
         let focusedModel = models.find(model => model.uuid === modelId);
@@ -62,11 +53,13 @@ const ModelsMenuContainer = ({
             if(modelToFocus.model.uuid === modelId)
                 focused = !modelToFocus.focused;
             else clearAppliedStylesToModels();
-        
+        //We set he model as focused
         setModelToFocus({
             model: focusedModel,
             focused
         });
+        //When a model is focused, we enable the edition over it
+        setModelToEdit(focusedModel);
     }
 
     const clearAppliedStylesToModels = () => {
@@ -78,9 +71,9 @@ const ModelsMenuContainer = ({
         );
     }
 
-    const isFocused = model => {
+    const isFocused = modelId => {
         if(!modelToFocus) return false;
-        return modelToFocus.model.uuid === model.uuid && modelToFocus.focused;
+        return modelToFocus.model.uuid === modelId && modelToFocus.focused;
     }
 
     const deleteModel = event => {
@@ -90,10 +83,8 @@ const ModelsMenuContainer = ({
 
     const rotateModel = (modelId, degrees) => {
         let modelToRotate = models.find(model => model.uuid === modelId);
-        if(!modelToRotate){
-            console.log('No se encontro el modelo');
+        if(!modelToRotate)
             return;
-        }
         /**
          * @todo Rotation decorator class and move state logic to the with3Drenderer
          */
@@ -112,20 +103,18 @@ const ModelsMenuContainer = ({
         updateObject(updatedObject);
     }
 
-    if(displayModelsMenu)
-        return <ModelsMenu 
-            editModel = { editModel }
-            isFocused = { isFocused }
-            focusModel = { focusModel }
-            deleteModel = { deleteModel }
-            rotateModel = { rotateModel }
-            modelToEdit = { modelToEdit }
-            projectModels = { projectModels }
-            addTextureToObject = { addTextureToObject }
-            displayModelEditor = { displayModelEditor }
-            hideEditorFromState = { hideEditorFromState }
-        />
-    return null;
+    return <ModelsMenu 
+        isFocused = { isFocused }
+        focusModel = { focusModel }
+        deleteModel = { deleteModel }
+        rotateModel = { rotateModel }
+        modelToEdit = { modelToEdit }
+        projectModels = { projectModels }
+        displayModelsMenu = { displayModelsMenu }
+        addTextureToObject = { addTextureToObject }
+        setDisplayModelsMenu = { setDisplayModelsMenu }
+    />
+  
 }
 
 let WithProjectState = withProjectState(ModelsMenuContainer);

@@ -7,37 +7,43 @@ import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightConta
 import with3DRenderer from '../../../../Renderer/3D/HOC/with3DRenderer';
 
 
-const Editor = ({ models, addModel, sceneModels, rotateCamera, deleteModelById, addTextureToPlane, addTextureToObject, toggleOrbitControls, orbitControlsEnabled }) => {
-    return(
+const Editor = ({ 
+    models, 
+    addModel,
+    sceneModels, 
+    rotateCamera, 
+    deleteModelById, 
+    addTextureToPlane, 
+    addTextureToObject, 
+    toggleOrbitControls, 
+    orbitControlsEnabled 
+}) => (
+    <FixedHeightContainer
+        height = { 100 }
+    > 
         <FixedHeightContainer
-            height = { 100 }
+            height = { 90 }
         >
-            
-            <FixedHeightContainer
-                height = { 90 }
-            >
-                <RendererContainer 
-                    models = { sceneModels }
-                    deleteModelById = { deleteModelById }
-                    addTextureToObject = { addTextureToObject }
-                />
-            </FixedHeightContainer>
-            <FixedHeightContainer
-                height = { 10 }
-            >
-                <EditorActions
-                    models = { models } 
-                    addModel = { addModel }
-                    rotateCamera = { rotateCamera }
-                    addTextureToPlane = { addTextureToPlane }
-                    toggleOrbitControls = { toggleOrbitControls }
-                    orbitControlsEnabled = { orbitControlsEnabled }
-                />
-                
-            </FixedHeightContainer>
+            <RendererContainer 
+                models = { sceneModels }
+                deleteModelById = { deleteModelById }
+                addTextureToObject = { addTextureToObject }
+            />
         </FixedHeightContainer>
-    );
-}
+        <FixedHeightContainer
+            height = { 10 }
+        >
+            <EditorActions
+                models = { models } 
+                addModel = { addModel }
+                rotateCamera = { rotateCamera }
+                addTextureToPlane = { addTextureToPlane }
+                toggleOrbitControls = { toggleOrbitControls }
+                orbitControlsEnabled = { orbitControlsEnabled }
+            />
+        </FixedHeightContainer>
+    </FixedHeightContainer>
+);
 
 export default with3DRenderer(Editor);
 

@@ -1,0 +1,17 @@
+.animation__container { 
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+animation__container--unmounted {
+    opacity: 0;
+    transform: translate3d(0,-100px, 0);
+    transition: all 150ms ease-out;
+}
+
+.animation__container--mounted {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: all 0.45s ease-out;
+}

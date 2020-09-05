@@ -1,0 +1,7 @@
+.editor-section__title_label {
+    height: 1.75rem;
+}
+
+.editor-section__collapsable-content {
+    max-height: calc(100% - 2rem);
+}

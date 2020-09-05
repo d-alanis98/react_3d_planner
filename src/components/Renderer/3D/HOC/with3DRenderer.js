@@ -1,14 +1,13 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
+//HOC
+import withProjectState from '../../../../redux/HOC/withProjectState';
+import withEditorState from '../../../../redux/HOC/withEditorState';
 //Classes
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
+import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 //Factories
 import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
-//Functions
-import withProjectState from '../../../../redux/HOC/withProjectState';
-import withEditorState from '../../../../redux/HOC/withEditorState';
-import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
-import TridimensionalContextMenu from '../../../Editor/3D/ContextMenu/TridimensionalContextMenu';
 
 
 const with3DRenderer = (WrappedComponent) => {
@@ -59,7 +58,6 @@ const with3DRenderer = (WrappedComponent) => {
                     const { coordinates } = model['3d'];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
-                    
                     //We create the 3D model
                     sceneInstance.load3DModel(
                         type,
@@ -67,20 +65,7 @@ const with3DRenderer = (WrappedComponent) => {
                         coordinates,
                         rotation,
                         texture,
-                        createdModel => { //onSuccess callback
-                            const { uuid } = createdModel;
-                            let modelWithUpdatedId = {
-                                ...model,
-                                '3d': {
-                                    uuid: uuid,
-                                    container: getBoxBound(createdModel),
-                                    coordinates,
-                                }
-                            };
-                            updateObject(modelWithUpdatedId);
-                        },
-                        //updateModel, //updateCallback
-                        onSelectedModel, //onSelection
+                        createdModel => onCreationSuccess(createdModel)(model, coordinates), //onSuccess
                     );
                 });
                 setModels(modelsCopy);
@@ -96,15 +81,13 @@ const with3DRenderer = (WrappedComponent) => {
         useEffect(() => {
             if(!draggedObject)
                 return;
+            //We get the id and coordinates
             let { uuid, x, y, z } = draggedObject;
+            //We find the object in the porject state by its id
             let existingObject = findObjectBy3DModelId(uuid);
-
-
-            if(!existingObject){
-                console.log('Objeto no encontrado')
+            if(!existingObject)
                 return;
-            }
-
+            //We update the model's coordinates in both planes, and the uuid of the 3d editor
             let bidimensionalEditorState = { ...existingObject['2d'] };
             let tridimensionalEditorState = { ...existingObject['3d'] };
             let updatedObject = {
@@ -124,9 +107,8 @@ const with3DRenderer = (WrappedComponent) => {
         }, [draggedObject]);
 
         useEffect(() => {
-            if(sceneInstance){
+            if(sceneInstance)
                 sceneInstance.setOrbitControlsEnabled(orbitControlsEnabled);
-            }
         }, [orbitControlsEnabled]);
 
         /**
@@ -135,32 +117,28 @@ const with3DRenderer = (WrappedComponent) => {
          * project.
          * @param {object} createdModel 
          */
-        const onCreationSuccess = (createdModel, type) => {
-            //We get the id, type and the coordinates of the created model
-            const { uuid, position: { x, y, z } } = createdModel;
-            //We generate an object with all the properties needed to keep it in the state
-            let objectToAdd = {
-                id: projectObjects.length,
-                type,
-                '2d': {
-                    uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
-                    coordinates: get2DCoordinates(x, y, z)
-                },
+        const onCreationSuccess = createdModel => (projectModelData, coordinates) => {
+            const { uuid } = createdModel;
+            const { id, name } = projectModelData;
+            let modelWithUpdatedId = {
+                ...projectModelData,
+                name: name || `Modelo ${ id }`,
                 '3d': {
-                    uuid: uuid, //THREE.js generated ID 
+                    uuid: uuid,
                     container: getBoxBound(createdModel),
-                    coordinates: { x, y: 0, z }
+                    coordinates,
                 }
-            }
-            //We add the object at project´s level
-            addObject(objectToAdd);
-        }
-        const addModel = type => {
-            increaseModelQuantity(type);
-            sceneInstance.load3DModel(type, {x: 0, y: 0, z: 0}, model => onCreationSuccess(model, type));
+            };
+            updateObject(modelWithUpdatedId);
         }
 
+        /**
+         * This function calculates the bounding box (in depth and width), according to the maximum and minimum points in Z and X axis,
+         * respectively.
+         * @param {object} object 
+         */
         const getBoxBound = object => {
+            //We use object destructuring to get the required parameters from the object data
             const { 
                 scale: { x: scaleX, z: scaleZ },
                 geometry: { boundingBox: { min: { x: minimumX, z: minimumZ }, max: { x: maximumX, z: maximumZ }} },
@@ -173,29 +151,28 @@ const with3DRenderer = (WrappedComponent) => {
             }
         }
 
+        /**
+         * This function is the callback for the drag end event of an object. Every time an object is moved this function is executed.
+         * Maintains the local state according to the new position of the object, in order to raise that change to the global state.
+         * @param {object} event 
+         */
         const updateModel = event => {
             //To discard the interaction event (double click)
             if(!event.object)
                 return
             //We get the position and the id of the object
             const { object: { position: { x, y, z }, uuid } } = event;
+            //This will trigger the effect that listens on changes on the draggedObject, and this will update objects position in the 
+            //global state, also, the new 2d coordinates will be calculated to get a smooth transition. 
             setDraggedObject({ x, y, z, uuid });
         }
 
-        const onObjectsUpdate = models => {
-            sceneInstanceModels = models;
-        }
-
-        const onSelectedModel = event => {/*
-            const { data: { target: model, originalEvent: { x, y } } } = event;
-            console.log({ x, y });
-            
-            setContextMenuModel(model);
-            setDisplayContextMenu(true);
-            setContextMenuPosition({ x, y });
-            */
-            
-        }
+        /**
+         * This function is the callback for the objects update of the scene instance. This way we can get the real reference to the
+         * objects in the local state.
+         * @param {array} models 
+         */
+        const onObjectsUpdate = models => sceneInstanceModels = models;
 
         /**
          * This method return the complete object based on it´s 3d model id
@@ -216,55 +193,62 @@ const with3DRenderer = (WrappedComponent) => {
             return coordinatesTransformation.tridimensionalToBidimensionalCoordinates();
         }
 
+        /**
+         * Toggles the state of the orbit controls.
+         */
         const toggleOrbitControls = () => {
             setOrbitControlsEnabled(!orbitControlsEnabled);
         }
 
-        const increaseModelQuantity = type => {
-            let modelsCopy = { ...models };
-            modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
-            setModels(modelsCopy);
-        }
-
+        /**
+         * Loads a new texture to the provided object, making use of the addTextureObject from the TridimensionalRenderer instance.
+         * @param {object} object 
+         * @param {string} textureUri 
+         */
         const addTextureToObject = (object, textureUri) => sceneInstance.addTextureToObject(object, textureUri);
 
-        const addTextureToPlane = texture => {
-            let textureUri = TextureFactory.getTextureUri(texture);
+        /**
+         * 
+         * @param {string|number} texture 
+         */
+        const addTextureToPlane = textureId => {
+            let textureUri = TextureFactory.getTextureUri(textureId);
             sceneInstance.addTextureToObject(sceneInstance.plane, textureUri);
         }
 
+        /**
+         * This method moves the camera to the desired point of view.
+         * @param {string} view 
+         */
         const rotateCamera = (view = CameraRotationFactory.TOP_VIEW) => {
             let cameraDistance = sceneInstance.getOptimalCameraDistance();
-            //We get the available views
             let cameraPositionVector = CameraRotationFactory.createCameraRotationVector(view, cameraDistance);
             sceneInstance.camera.position.copy(cameraPositionVector);
         }
 
+        /**
+         * This method deletes a model from the scene and from the project.
+         * @param {string} modelId 
+         */
         const deleteModelById = modelId => {    
             const projectObjectToDelete = findObjectBy3DModelId(modelId);
             sceneInstance.deleteModelById(modelId);      
             removeObject(projectObjectToDelete);  
-
         }
         
 
 
-        return (
-            <Fragment>
-                <WrappedComponent
-                    models = { models }
-                    addModel = { addModel }
-                    sceneModels = { sceneInstanceModels }
-                    rotateCamera = { rotateCamera }
-                    deleteModelById = { deleteModelById }
-                    addTextureToPlane = { addTextureToPlane }
-                    addTextureToObject = { addTextureToObject }
-                    toggleOrbitControls = { toggleOrbitControls }
-                    orbitControlsEnabled = { orbitControlsEnabled }
-                    { ...extraProps }
-                />
-            </Fragment>
-        )
+        return <WrappedComponent
+            models = { models }
+            sceneModels = { sceneInstanceModels }
+            rotateCamera = { rotateCamera }
+            deleteModelById = { deleteModelById }
+            addTextureToPlane = { addTextureToPlane }
+            addTextureToObject = { addTextureToObject }
+            toggleOrbitControls = { toggleOrbitControls }
+            orbitControlsEnabled = { orbitControlsEnabled }
+            { ...extraProps }
+        />
     }
 
     //We apply the project state HOC

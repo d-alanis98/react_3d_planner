@@ -14,7 +14,7 @@ import TextureFactory from '../3D/Models/TextureFactory';
 
 /**
  * @author Damián Alanís Ramírez
- * @version 8.4.3
+ * @version 8.5.3
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -78,7 +78,7 @@ export default class TridimensionalRenderer{
      */
     setInitialScene(){
         this.scene = new THREE.Scene();
-        this.addLight();
+        this.addLights();
     }
 
     /**
@@ -223,13 +223,28 @@ export default class TridimensionalRenderer{
     }
 
     /**
-     * Light creation and incorporation to the scene
+     * Lights creation and incorporation to the scene. We create 3 lights from 3 different views, isometric opposites and
+     * the top view.
      */
-    addLight(){
-        let light = new THREE.AmbientLight(TridimensionalRenderer.DEFAULT_LIGHT_COLOR, TridimensionalRenderer.DEFAULT_LIGHT_INTENSITY)
-        light.position.set(0, 0, 0);
-        this.addToScene(light);
-       
+    addLights(){
+        //We get the lights parameters, color, intensity and we calculate the distance based on the optimal camera distance increased 1.75 times
+        const { DEFAULT_LIGHT_COLOR, DEFAULT_LIGHT_INTENSITY } = TridimensionalRenderer;
+        const optimalLightDistance = this.getOptimalCameraDistance() * 1.75;
+        //Isometric view light
+        const directionalLightIsometric = new THREE.DirectionalLight(DEFAULT_LIGHT_COLOR, DEFAULT_LIGHT_INTENSITY);
+        directionalLightIsometric.position.set(optimalLightDistance, optimalLightDistance / 2, optimalLightDistance);
+        directionalLightIsometric.target.position.set(optimalLightDistance, optimalLightDistance / 2, optimalLightDistance);
+        this.addToScene(directionalLightIsometric);
+        //Isometric opposite view
+        const directionalLightIsometricOpposite = new THREE.DirectionalLight(DEFAULT_LIGHT_COLOR, DEFAULT_LIGHT_INTENSITY);
+        directionalLightIsometricOpposite.position.set(-optimalLightDistance, optimalLightDistance / 2, -optimalLightDistance);
+        directionalLightIsometricOpposite.target.position.set(-optimalLightDistance, optimalLightDistance / 2, -optimalLightDistance);
+        this.addToScene(directionalLightIsometricOpposite);
+        //Top view
+        const directionalLightTop = new THREE.DirectionalLight(DEFAULT_LIGHT_COLOR, DEFAULT_LIGHT_INTENSITY / 2);
+        directionalLightTop.position.set(0, optimalLightDistance * 3, 0);
+        directionalLightTop.target.position.set(0, optimalLightDistance * 3, 0);
+        this.addToScene(directionalLightTop);
     }
 
     /**
@@ -264,11 +279,14 @@ export default class TridimensionalRenderer{
 
     /**
      * This method loads a 3D model of the specified type and in the provided coordinates to the scene.
-     * @param {string} type 
+     * @param {string|number} type 
+     * @param {string} productLine 
      * @param {object} initialCoordinates 
+     * @param {number} rotation 
+     * @param {string|number} texture 
      * @param {function} onSuccess 
      */
-    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess, onSelection){
+    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess){
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
         //We get the model dimensions
@@ -294,10 +312,8 @@ export default class TridimensionalRenderer{
                         //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
                         let yPosition = this.getObjectYInitialPosition(y, object);
                         object.position.set(x, yPosition, z);
-                        if(rotation){
-                            console.log(`Aplicando rotacion de ${rotation}`)
+                        if(rotation)
                             object.rotateY(rotation * Math.PI / 180);
-                        }
                         //We load the default texture to the object if this does not have one already
                         if(!object.material.map)
                             this.addTextureToObject(object, TextureFactory.getTextureUriFromId(texture));
@@ -309,8 +325,6 @@ export default class TridimensionalRenderer{
                     }
                 }) 
             },
-            xhr => console.log( `${( xhr.loaded / xhr.total * 100 )}% loaded` ),
-            error => console.log(error)
         );
     }
 
@@ -338,6 +352,8 @@ export default class TridimensionalRenderer{
         //Required parameters, specially encoding, which is set to LuminanceFormat
         texture.encoding = THREE.LuminanceFormat;
         texture.flipY = false;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
         //We add the texture in the material property of the object
         object.material = new THREE.MeshPhongMaterial({
             map: texture,

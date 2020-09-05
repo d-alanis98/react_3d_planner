@@ -10,8 +10,24 @@
     height: 15vh;
 }
 
+.h-15-relative{
+    height: 15%;
+}
+
 .h-20{
     height: 20vh;
+}
+
+.h-40{
+    height: 40vh;
+}
+
+.h-40-relative{
+    height: 40%;
+}
+
+.h-60-relative{
+    height: 60%;
 }
 
 .h-75{
@@ -24,6 +40,10 @@
 
 .h-85{
     height: 85vh;
+}
+
+.h-85-relative{
+    height: 85%;
 }
 
 .h-90{
