@@ -14,7 +14,7 @@ import TextureFactory from '../3D/Models/TextureFactory';
 
 /**
  * @author Damián Alanís Ramírez
- * @version 8.5.3
+ * @version 8.6.1
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -310,7 +310,7 @@ export default class TridimensionalRenderer{
                         let { x: scaleInX, y: scaleInY, z: scaleInZ } = scaleCalculator.calculateScale();
                         object.scale.set(scaleInX, scaleInY, scaleInZ)
                         //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
-                        let yPosition = this.getObjectYInitialPosition(y, object);
+                        let yPosition = y === 0 ? this.getObjectYInitialPosition(y, object) : y; //Only on creation y will be exactly 0, then the position will be the exact one
                         object.position.set(x, yPosition, z);
                         if(rotation)
                             object.rotateY(rotation * Math.PI / 180);
@@ -350,12 +350,19 @@ export default class TridimensionalRenderer{
         //We load the texture 
         let texture = new THREE.TextureLoader().load(textureUri || TridimensionalRenderer.DEFAULT_TEXTURE_URI);
         //Required parameters, specially encoding, which is set to LuminanceFormat
-        texture.encoding = THREE.LuminanceFormat;
+        texture.encoding = THREE.RGBAFormat;
         texture.flipY = false;
+        /**
+         * @todo Scale textures to bigger resolution to avoid repeating the texture image
+         */
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
+        const timesToRepeatHorizontally = 5;
+        const timesToRepeatVertically = 5;
+        texture.repeat.set(timesToRepeatHorizontally, timesToRepeatVertically);
+        //END OF TEXTURE REPEAT
         //We add the texture in the material property of the object
-        object.material = new THREE.MeshPhongMaterial({
+        object.material = new THREE.MeshStandardMaterial({
             map: texture,
         });
         object.material.side = THREE.DoubleSide;

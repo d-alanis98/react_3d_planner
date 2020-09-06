@@ -1,3 +1,7 @@
+:root {
+    --item-border-color: 
+}
+
 .models-menu-list {
     height: calc(100% - 1.8rem);
     overflow-y: auto;
@@ -13,6 +17,12 @@
     border-radius: 0.5rem;
     background-color: rgba(255, 255, 255, 0.15);
     padding: 0.5rem 0.5rem;
+}
+
+
+.active {
+    border: 1px solid rgba(255,255,255,0.45);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .models-menu-list__item:hover {

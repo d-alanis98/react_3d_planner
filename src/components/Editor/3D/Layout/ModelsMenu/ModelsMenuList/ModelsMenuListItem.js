@@ -18,9 +18,9 @@ const ModelsMenuListItem = ({ isFocused, focusModel, deleteModel, rotateModel, p
 
     return (
         <li 
-            id = { project3DModel.uuid }
+            id = { modelId }
             onClick = { focusModel }
-            className = 'models-menu-list__item shadow'
+            className = { `models-menu-list__item ${ isFocused(modelId) ? 'active' : ''} shadow `}
         >
             <ModelSelector 
                 modelId = { modelId }

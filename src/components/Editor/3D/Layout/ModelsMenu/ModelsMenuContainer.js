@@ -5,24 +5,28 @@ import ModelsMenu from './ModelsMenu';
 import withProjectState from '../../../../../redux/HOC/withProjectState';
 //Classes
 import ModelDecorator from '../../../../../classes/3D/Models/ModelDecorator';
+import with3DRendererContextConsumer from '../../../../Renderer/3D/HOC/with3DRendererContextConsumer';
 
 
 const ModelsMenuContainer = ({ 
-    models, 
     project: { displayModelsMenu, objects: projectModels },
     updateObject,
-    deleteModelById,
-    addTextureToObject,
+    rendererState,
     setDisplayModelsMenu,
     findObjectBy3DModelId 
 }) => { 
-    //PROPS
+    //CONSTANTS
     const { ACTIVE_STYLE, INACTIVE_STYLE } = ModelDecorator;
+    //PROPS DESTRUCTURING
+    const { 
+        deleteModelById,
+        sceneInstanceModels: models 
+    } = rendererState;
+    
     //HOOKS
     //State
     const [modelToEdit, setModelToEdit] = useState(null);
     const [modelToFocus, setModelToFocus] = useState(null);
-
 
     
     //Effects
@@ -63,6 +67,7 @@ const ModelsMenuContainer = ({
     }
 
     const clearAppliedStylesToModels = () => {
+        if(models && models.length > 0)
         models.forEach(model => 
             ModelDecorator.applyStyle(
                 model,
@@ -79,6 +84,8 @@ const ModelsMenuContainer = ({
     const deleteModel = event => {
         const { currentTarget: { id: modelId } } = event;
         deleteModelById(modelId);
+        setModelToFocus(null);
+        setModelToEdit(null);
     }
 
     const rotateModel = (modelId, degrees) => {
@@ -111,11 +118,11 @@ const ModelsMenuContainer = ({
         modelToEdit = { modelToEdit }
         projectModels = { projectModels }
         displayModelsMenu = { displayModelsMenu }
-        addTextureToObject = { addTextureToObject }
         setDisplayModelsMenu = { setDisplayModelsMenu }
     />
   
 }
 
 let WithProjectState = withProjectState(ModelsMenuContainer);
-export default WithProjectState;
+let With3dRendererContextConsumer = with3DRendererContextConsumer(WithProjectState);
+export default With3dRendererContextConsumer;

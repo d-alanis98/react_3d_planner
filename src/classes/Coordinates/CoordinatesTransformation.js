@@ -112,7 +112,6 @@ export default class CoordinatesTransformation {
         let yRatio = tridimensionalSceneHeight / bidimensionalRoomHeight;
         return {
             x:  -1 * originX * xRatio,
-            y: 0,
             z: -1 * originY * yRatio
         }
     }

@@ -268,7 +268,10 @@ export let saveProjectAction = () => (dispatch, getState) => {
     let { editor, project } = { ...getState() };
     const projectProgress = {
         editor, 
-        project
+        project: {
+            ...project,
+            displayModelsMenu: false //By default we hide the models menu
+        }
     }
 
     let projectProgressSerialized = JSON.stringify(projectProgress);

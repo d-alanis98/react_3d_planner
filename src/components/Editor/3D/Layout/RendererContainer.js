@@ -3,17 +3,13 @@ import React, { Fragment } from 'react';
 import ModelsMenuContainer from './ModelsMenu/ModelsMenuContainer';
 import FixedHeightContainer from '../../../Layout/Containers/FixedHeightContainer';
 
-const RendererContainer = ({ models, addTextureToObject, deleteModelById }) => (
+const RendererContainer = ( ) => (
     <Fragment>
         <FixedHeightContainer
             id = 'tridimensional_renderer'
             height = { 100 }
         />
-        <ModelsMenuContainer 
-            models = { models }
-            deleteModelById = { deleteModelById }
-            addTextureToObject = { addTextureToObject }
-        />
+        <ModelsMenuContainer />
     </Fragment>
 );
 

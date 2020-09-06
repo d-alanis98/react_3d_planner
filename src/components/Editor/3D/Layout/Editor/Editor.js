@@ -24,11 +24,7 @@ const Editor = ({
         <FixedHeightContainer
             height = { 90 }
         >
-            <RendererContainer 
-                models = { sceneModels }
-                deleteModelById = { deleteModelById }
-                addTextureToObject = { addTextureToObject }
-            />
+            <RendererContainer />
         </FixedHeightContainer>
         <FixedHeightContainer
             height = { 10 }

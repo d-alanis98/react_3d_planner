@@ -12,7 +12,7 @@ const ModelsMenuList = ({ isFocused, focusModel, deleteModel, rotateModel, proje
             projectModels.length > 0 ?
                 projectModels.map(projectModel => (
                     <ModelsMenuListItem 
-                        key = { projectModel.id }
+                        key = { `menu_item_${projectModel.id}` }
                         isFocused = { isFocused }
                         focusModel = { focusModel }
                         deleteModel = { deleteModel }

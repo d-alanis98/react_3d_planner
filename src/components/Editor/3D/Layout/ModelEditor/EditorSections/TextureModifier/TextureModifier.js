@@ -11,6 +11,7 @@ import TextureFactory from '../../../../../../../classes/3D/Models/TextureFactor
 import { faEyeDropper } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './TextureModifier.css';
+import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/with3DRendererContextConsumer';
 
 
 
@@ -18,15 +19,15 @@ const TextureModifier = ({
     textures, 
     modelToEdit,
     updateObject,
-    addTextureToObject,
+    rendererState,
     findObjectBy3DModelId,
 }) => {
 
     const onTextureChange = event => {
         const { currentTarget: { id: textureId } } = event;
         const textureUri = TextureFactory.getTextureUriFromId(textureId);
-         //We add the texture
-        addTextureToObject(modelToEdit, textureUri);
+        //We add the texture
+        rendererState.sceneInstance.addTextureToObject(modelToEdit, textureUri);
         //We update it in the global state
         updateTextureInState(textureId);
     }
@@ -63,4 +64,5 @@ const mapStateToProps = (state, ownProps) => {
 
 let WithTextures = connect(mapStateToProps)(TextureModifier);
 let WithProjectState = withProjectState(WithTextures);
-export default WithProjectState;
+let With3DRendererContextConsumer = with3DRendererContextConsumer(WithProjectState);
+export default With3DRendererContextConsumer;

@@ -5,7 +5,7 @@ import LabelWithIcon from '../Labels/LabelWithIcon';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 
 const CollapseController = ({ expanded, targetId, className, dropupIcon, dropdownIcon, ...extraProps }) => {
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(!expanded);
 
     const handleCollapse = event => {
         event.stopPropagation();

@@ -62,6 +62,7 @@ const with2DRenderer = WrappedComponent => {
                     //We get the type and the coordinates (of the 2d key)
                     const { type, rotation, productLine } = model;
                     const { coordinates } = model[BIDIMENSIONAL];
+                    const { coordinates: tridimensionalCoordinates } = model[TRIDIMENSIONAL];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the SVG model
@@ -82,7 +83,10 @@ const with2DRenderer = WrappedComponent => {
                                 },
                                 [TRIDIMENSIONAL]: {
                                     uuid: '',
-                                    coordinates: get3DCoordinates(x, y)
+                                    coordinates: {
+                                        ...tridimensionalCoordinates,
+                                        ...get3DCoordinates(x, y) 
+                                    }
                                 }
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
@@ -111,6 +115,7 @@ const with2DRenderer = WrappedComponent => {
             if(!existingObject)
                 return;
             let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
+            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
             let updatedObject = { 
                 ...existingObject,
                 [BIDIMENSIONAL]: {
@@ -119,39 +124,15 @@ const with2DRenderer = WrappedComponent => {
                 },
                 [TRIDIMENSIONAL]: {
                     ...tridimensionalEditorState,
-                    coordinates: get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
+                    coordinates: {
+                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
+                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
+                    }    
                 }
             };
             updateObject(updatedObject);
         }, [draggedObject]);
 
-        /**
-         * Success callback for the loadSVGModel method, in this callback we add the created object at project´s level, 
-         * generating the id and the 2d and 3d keys, which will contain the id´s and coordinates of the object in the current
-         * project.
-         * @param {object} createdModel 
-         */
-        const onCreationSuccess = createdModel => {
-            //We get the id, type and the coordinates of the created model
-            let { _id, attrs: { x, y, type } } = createdModel;
-            //We generate an object with all the properties needed to keep it in the state
-            const id = projectObjects.length;
-            let objectToAdd = {
-                id,
-                type,
-                name: `Modelo ${ id }`,
-                [BIDIMENSIONAL]: {
-                    uuid: _id, //Konva generated ID
-                    coordinates: { x, y }
-                },
-                [TRIDIMENSIONAL]: {
-                    uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
-                    coordinates: { x: 0, y: 0, z: 0 }
-                }
-            }
-            //We add the object at project´s level
-            addObject(objectToAdd);
-        }
 
         /**
          * This method return the complete object based on it´s 2d model id
@@ -192,10 +173,6 @@ const with2DRenderer = WrappedComponent => {
             removeObject(modelInState);
         }
 
-        useEffect(() => {
-            console.log({ displayContextMenu })
-        }, [displayContextMenu])
-
         const onSelectedModel = event => {
             const { evt: { x, y }, currentTarget: model } = event;
             setContextMenuModel(model);
@@ -205,15 +182,6 @@ const with2DRenderer = WrappedComponent => {
 
     
 
-        /**
-         * This method adds a new model of the specified type to the scene
-         * @param {string} type 
-         */
-        const addModel = (type, coordinates = { }) => {
-            increaseModelQuantity(type);
-            //We provide the success callback to add the object at project´s level
-            sceneInstance.loadSVGModel(type, coordinates, onCreationSuccess, updateModel);
-        }
 
         /**
          * This method increases the quantity of the specified model
@@ -241,7 +209,6 @@ const with2DRenderer = WrappedComponent => {
             <Fragment>
                 <WrappedComponent 
                     models = { models }
-                    addModel = { addModel }
                     { ...ownProps }
                 />
                 <BidimensionalContextMenu 

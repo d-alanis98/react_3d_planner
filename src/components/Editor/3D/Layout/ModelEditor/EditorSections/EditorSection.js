@@ -12,15 +12,17 @@ const EditorSection = ({
     children, 
     targetId, 
     sectionIcon, 
-    sectionName 
+    sectionName,
+    defaultExpanded 
 }) =>  (
     <Fragment>
         <FlexRow
             className = 'editor-section__title_label'
         >
             <CollapseController 
+                expanded = { defaultExpanded }
                 targetId = { targetId }
-                className = 'mr-2'
+                className = 'cursor-click mr-2'
             />
             <LabelWithIcon 
                 icon = { sectionIcon }
@@ -30,7 +32,6 @@ const EditorSection = ({
         </FlexRow>
         <CollapsableContent
             id = { targetId }
-            className = 'editor-section__collapsable-content'
         >
             { children }
         </CollapsableContent>

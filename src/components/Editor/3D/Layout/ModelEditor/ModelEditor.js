@@ -8,10 +8,7 @@ import './ModelEditor.css';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 
-const ModelEditor = ({ 
-    modelToEdit, 
-    addTextureToObject, 
-}) => (
+const ModelEditor = ({ modelToEdit }) => (
     <div 
         className = 'model-editor'
     >
@@ -22,7 +19,6 @@ const ModelEditor = ({
         />
         <EditorSectionRenderer 
             modelToEdit = { modelToEdit }
-            addTextureToObject = { addTextureToObject }
         />
     </div>
 );

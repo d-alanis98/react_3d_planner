@@ -19,7 +19,6 @@ const ModelsMenu = ({
     modelToEdit, 
     projectModels, 
     displayModelsMenu,
-    addTextureToObject, 
     setDisplayModelsMenu
 }) => {
     const modelsMenuContainer = useRef();
@@ -70,7 +69,6 @@ const ModelsMenu = ({
                 >
                     <ModelEditor 
                         modelToEdit = { modelToEdit }
-                        addTextureToObject = { addTextureToObject }
                     />
                 </FixedHeightContainer>
             </FixedHeightContainer>

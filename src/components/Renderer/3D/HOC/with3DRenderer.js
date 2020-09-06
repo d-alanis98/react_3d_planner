@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 //HOC
 import withProjectState from '../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../redux/HOC/withEditorState';
+import with3DRendererContextConsumer from './with3DRendererContextConsumer';
 //Classes
+import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 //Factories
 import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
+
 
 
 const with3DRenderer = (WrappedComponent) => {
@@ -16,17 +19,26 @@ const with3DRenderer = (WrappedComponent) => {
         //PROPS
         //Destructuring
         const { 
+            //From project HOC
             project, 
             addObject,
             editorState: { editorWidth, editorHeight },
             updateObject, 
             removeObject, 
+            //From 3d renderer context consumer HOC
+            rendererState,
+            setRendererState,
+            //From editor HOC
             set2DSceneDimensions, 
             set3DSceneDimensions, 
             ...extraProps
         } = props;
         const { objects: projectObjects } = project;
 
+        //CONSTANTS
+        const { BIDIMENSIONAL_SCENE } = BidimensionalRenderer;
+        const { TRIDIMENSIONAL_SCENE } = TridimensionalRenderer;
+    
         //HOOKS
         //State
         //Model, scene and events
@@ -55,7 +67,7 @@ const with3DRenderer = (WrappedComponent) => {
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
                     const { type, rotation, texture, productLine } = model;
-                    const { coordinates } = model['3d'];
+                    const { coordinates } = model[TRIDIMENSIONAL_SCENE];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the 3D model
@@ -79,32 +91,78 @@ const with3DRenderer = (WrappedComponent) => {
         }, []);
 
         useEffect(() => {
+            if(sceneInstance)
+                setRendererState({
+                    ...rendererState,
+                    sceneInstance,
+                    deleteModelById,
+                    updateModelPosition,
+                    sceneInstanceModels,
+                });
+        }, [
+            sceneInstance, 
+            projectObjects, 
+            sceneInstanceModels
+        ]);
+
+
+        useEffect(() => {
             if(!draggedObject)
                 return;
             //We get the id and coordinates
             let { uuid, x, y, z } = draggedObject;
+            updateModelPosition(uuid, { x, y, z });
+            /*
             //We find the object in the porject state by its id
             let existingObject = findObjectBy3DModelId(uuid);
             if(!existingObject)
                 return;
             //We update the model's coordinates in both planes, and the uuid of the 3d editor
-            let bidimensionalEditorState = { ...existingObject['2d'] };
-            let tridimensionalEditorState = { ...existingObject['3d'] };
+            let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL_SCENE] };
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL_SCENE] };
             let updatedObject = {
                 ...existingObject,
-                '2d': {
+                [BIDIMENSIONAL_SCENE]: {
                     ...bidimensionalEditorState,
                     coordinates: get2DCoordinates(x, y, z)
                 },
-                '3d': {
+                [TRIDIMENSIONAL_SCENE]: {
                     ...tridimensionalEditorState,
                     uuid,
                     coordinates: { x, y: 0, z }
                 }
             }
             updateObject(updatedObject);
+            */
             
         }, [draggedObject]);
+
+        const updateModelPosition = (modelId, { x, y, z }) => {
+            //We find the object in the porject state by its id
+            let existingObject = findObjectBy3DModelId(modelId);
+            if(!existingObject)
+                return;
+            //We update the model's coordinates in both planes, and the uuid of the 3d editor
+            let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL_SCENE] };
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL_SCENE] };
+            let updatedObject = {
+                ...existingObject,
+                [BIDIMENSIONAL_SCENE]: {
+                    ...bidimensionalEditorState,
+                    coordinates: get2DCoordinates(x, y, z)
+                },
+                [TRIDIMENSIONAL_SCENE]: {
+                    ...tridimensionalEditorState,
+                    uuid: modelId,
+                    coordinates: { 
+                        x, 
+                        y, 
+                        z 
+                    }
+                }
+            }
+            updateObject(updatedObject);
+        }
 
         useEffect(() => {
             if(sceneInstance)
@@ -232,10 +290,10 @@ const with3DRenderer = (WrappedComponent) => {
          */
         const deleteModelById = modelId => {    
             const projectObjectToDelete = findObjectBy3DModelId(modelId);
-            sceneInstance.deleteModelById(modelId);      
+            sceneInstance.deleteModelById(modelId);  
             removeObject(projectObjectToDelete);  
         }
-        
+
 
 
         return <WrappedComponent
@@ -255,8 +313,10 @@ const with3DRenderer = (WrappedComponent) => {
     let WithProjectState = withProjectState(With3DRenderer);
     //We apply the editor state HOC
     let WithEditorState = withEditorState(WithProjectState);
+    //We apply the 3d renderer context consumer HOC
+    let With3DRendererContextConsumer = with3DRendererContextConsumer(WithEditorState);
     //We return the decorated component
-    return WithEditorState;
+    return With3DRendererContextConsumer;
 }
 
 export default with3DRenderer;

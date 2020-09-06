@@ -1,11 +1,13 @@
 import React from 'react';
 
-const AxisModifier = ({ value, onChange, axisLabel }) => (
-    <div className='mb-2'>
+const AxisModifier = ({ id, value, onChange, axisLabel }) => (
+    <div>
         <label className='mr-2'>{ axisLabel }</label>
         <input 
+            id = { id }
             type = 'number'
-            value = { value }
+            step = '0.025'
+            defaultValue = { value }
             onChange = { onChange }
             className = 'position-modifier__input'
         />

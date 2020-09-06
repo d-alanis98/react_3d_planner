@@ -7,10 +7,7 @@ import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightConta
 import SelectModelWarning from './SelectModelWarning';
 
 
-const EditorSectionRenderer = ({
-    modelToEdit,
-    addTextureToObject
-}) => {
+const EditorSectionRenderer = ({ modelToEdit }) => {
     if(modelToEdit)
         return (
             <FixedHeightContainer
@@ -22,11 +19,10 @@ const EditorSectionRenderer = ({
                     modelToEdit = { modelToEdit }
                 />
                 <PositionModifier 
-                
+                    modelToEdit = { modelToEdit }
                 />
                 <TextureModifier
                     modelToEdit = { modelToEdit }
-                    addTextureToObject = { addTextureToObject }
                 />
             </FixedHeightContainer>
         );

@@ -7,6 +7,8 @@ import EditorSection from '../EditorSection';
 import withProjectState from '../../../../../../../redux/HOC/withProjectState';
 //Icons
 import { faFont } from '@fortawesome/free-solid-svg-icons';
+//Styles
+import './NameChanger.css';
 
 const NameModifier = ({
     modelToEdit,
@@ -35,7 +37,8 @@ const NameModifier = ({
     }, [modelToEdit]);
 
     useEffect(() => {
-        modelNameInput.current.value = projectModelData.name;
+        if(projectModelData)
+            modelNameInput.current.value = projectModelData.name;
     }, [projectModelData])
 
     const handleNameChange = event => {
@@ -47,26 +50,26 @@ const NameModifier = ({
         updateObject(updatedModelData);
     }
     
-    const { name: modelName } = projectModelData;
-
+    
     return (
         <EditorSection
             targetId = 'name_modifier'
             sectionIcon = { faFont }
             sectionName = 'Modificar nombre'
+            defaultExpanded
         >
             <Container>
                 <input 
                     ref = { modelNameInput }
                     type = 'text'
-                    defaultValue = { modelName }
+                    defaultValue = { projectModelData ? projectModelData.name : '' }
                     onChange = { handleNameChange }
-                    className = 'form-control mb-3'
+                    className = 'name-changer__input mb-3'
                     placeholder = 'Nombre...'
                 />
             </Container>
         </EditorSection>
-    )
+    );
 }
 
 let WithProjectState = withProjectState(NameModifier);

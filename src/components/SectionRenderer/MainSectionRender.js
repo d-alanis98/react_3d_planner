@@ -8,6 +8,7 @@ import withFamilyState from '../../redux/HOC/withFamilyState';
 import withProjectState from '../../redux/HOC/withProjectState';
 //Constants
 import { SectionComponentToRender } from '../../constants/sections/sections';
+import with3DRendererContextProvider from '../Renderer/3D/HOC/with3DRendererContextProvider';
 
 const MainSectionRender = props => {
     //PROPS
@@ -47,5 +48,7 @@ let WithEditorState = withEditorState(MainSectionRender);
 let WithProjectState = withProjectState(WithEditorState);
 //We apply the family state HOC
 let WithFamilyState = withFamilyState(WithProjectState);
+//We apply the 3d renderer context provider
+let With3DRendererContextProvider = with3DRendererContextProvider(WithFamilyState);
 //We export the decorated component
-export default WithFamilyState;
+export default With3DRendererContextProvider;
