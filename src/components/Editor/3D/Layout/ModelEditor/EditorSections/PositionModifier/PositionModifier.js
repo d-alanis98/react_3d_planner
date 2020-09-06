@@ -2,21 +2,24 @@ import React from 'react';
 //Components
 import Container from '../../../../../../Layout/Containers/Container';
 import AxisModifier from './AxisModifier';
+import AxisReference from '../../../../../../Miscelaneous/AxisReference/AxisReference';
 import EditorSection from '../EditorSection';
+import AxisDescription from './AxisDescription';
 //HOC
 import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/with3DRendererContextConsumer';
 //Icons
 import { faCrosshairs, faArrowsAltH, faArrowsAltV, faArrowsAlt, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './PositionModifier.css';
-import AxisDescription from './AxisDescription';
-import AxisReference from '../../../../../../Miscelaneous/AxisReference/AxisReference';
+
+
 
 
 const PositionModifier = ({ modelToEdit, rendererState }) => {
-
+    //PROPS DESTRUCTURING
     const { updateModelPosition } = rendererState;
 
+    //HANDLERS
     const handlePositionChange = event => {
         const { target: { id: axis, value } } = event;
         

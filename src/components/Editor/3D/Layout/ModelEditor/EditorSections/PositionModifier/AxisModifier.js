@@ -7,7 +7,7 @@ const AxisModifier = ({ id, value, onChange, axisLabel }) => (
             id = { id }
             type = 'number'
             step = '0.025'
-            defaultValue = { value }
+            value = { value }
             onChange = { onChange }
             className = 'position-modifier__input'
         />
