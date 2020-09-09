@@ -7,8 +7,11 @@ import ModelThumbnail from '../../../../../Editor/3D/Layout/Editor/EditorActions
 //HOC
 import withFamilyState from '../../../../../../redux/HOC/withFamilyState';
 import withProjectState from '../../../../../../redux/HOC/withProjectState';
+import withEditorState from '../../../../../../redux/HOC/withEditorState';
+//Constants
+import { TRIDIMENSIONAL_EDITOR } from '../../../../../../constants/sections/sections';
 
-const Products = ({ project, products, addObject }) => {
+const Products = ({ project, products, addObject, setEditorType }) => {
     //PROPS
     //Destructuring
     const { objects: projectObjects } = project;
@@ -45,7 +48,10 @@ const Products = ({ project, products, addObject }) => {
         addObject(objectToAdd);
         let existingModels = { ...models };
         existingModels[type] ? existingModels[type].quantity++ : existingModels[type] = { quantity: 1 };
-        setModels(existingModels)
+        setModels(existingModels);
+        //We redirect to the 3D editor
+        setEditorType(TRIDIMENSIONAL_EDITOR);
+
     }
 
     if(!products || products.length === 0)
@@ -76,7 +82,8 @@ const Products = ({ project, products, addObject }) => {
 }
 
 //HOCS
-let WithProjectState = withProjectState(Products);
-let WithFamilyState = withFamilyState(WithProjectState)
+let WithEditorState = withEditorState(Products);
+let WithProjectState = withProjectState(WithEditorState);
+let WithFamilyState = withFamilyState(WithProjectState);
 //Decorated component
 export default WithFamilyState;

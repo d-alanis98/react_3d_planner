@@ -6,9 +6,10 @@ import ProjectSettings from '../ProjectSettings/ProjectSettings';
 import withEditorState from '../../redux/HOC/withEditorState';
 import withFamilyState from '../../redux/HOC/withFamilyState';
 import withProjectState from '../../redux/HOC/withProjectState';
+import with3DRendererContextProvider from '../Renderer/3D/HOC/with3DRendererContextProvider';
 //Constants
 import { SectionComponentToRender } from '../../constants/sections/sections';
-import with3DRendererContextProvider from '../Renderer/3D/HOC/with3DRendererContextProvider';
+
 
 const MainSectionRender = props => {
     //PROPS

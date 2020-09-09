@@ -1,13 +1,13 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.0.0
+ * @version 2.3.1
  */
 
 
 //CONSTANTS
 //Action types
 const SET_EDITOR_TYPE   = 'SET_EDITOR_TYPE';
-const SET_EDITOR_DEPTH  = 'SET_eDITOR_DEPTH';
+const SET_EDITOR_DEPTH  = 'SET_EDITOR_DEPTH';
 const SET_EDITOR_WIDTH  = 'SET_EDITOR_WIDTH';
 const SET_EDITOR_HEIGHT = 'SET_EDITOR_HEIGHT';
 //Others
