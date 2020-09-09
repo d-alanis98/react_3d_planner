@@ -21,7 +21,7 @@ const DimensionInput = ({ icon, name, value, labelText, handleInputChange }) => 
                 className = 'form-control'
                 defaultValue = { value }
             />
-            <span className='ml-2'>metros</span>
+            <span className='ml-2'>cm</span>
         </FlexRow>
     </div>
 );

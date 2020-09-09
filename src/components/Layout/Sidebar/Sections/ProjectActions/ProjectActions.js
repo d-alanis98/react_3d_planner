@@ -1,14 +1,16 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import FlexColumn from '../../../Flex/FlexColumn';
 import LabelWithIcon from '../../../Labels/LabelWithIcon';
 import LoadProjectAction from './LoadProjectAction';
-//Icons
-import { faSave, faDownload, faFolderOpen,} from '@fortawesome/free-solid-svg-icons';
+//HOC
 import withProjectState from '../../../../../redux/HOC/withProjectState';
+//Icons
+import { faSave, faDownload } from '@fortawesome/free-solid-svg-icons';
+//Constants
 import { PROJECT_PROGRESS } from '../../../../../redux/reducers/projectDuck';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import FlexRow from '../../../Flex/FlexRow';
+
 
 const ProjectActions = ({ project, className, saveProject }) => {
     //PROPS
@@ -32,7 +34,7 @@ const ProjectActions = ({ project, className, saveProject }) => {
 
 
 
-        {
+        { 
             projectName &&
                 <a 
                     href = { `data:text/json;charset=utf-8,${encodeURIComponent(localStorage.getItem(PROJECT_PROGRESS))}`}
@@ -46,6 +48,7 @@ const ProjectActions = ({ project, className, saveProject }) => {
                         data-placement = 'right' 
                     />
                 </a>
+                
         }
         </FlexColumn>
     );

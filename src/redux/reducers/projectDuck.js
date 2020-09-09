@@ -1,12 +1,17 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.3.2
+ * @version 3.2.5
  */
+//Actions
+import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
+import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction } from './editorDuck';
 //Classes
 import Requests from '../../classes/Helpers/Requests';
 import ProjectConfiguration from '../../classes/ProjectConfiguration';
-import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from './notificationDuck';
-import { setEditorWidthAction, setEditorHeightAction } from './editorDuck';
+import BidimensionalRenderer from '../../classes/Renderers/BidimensionalRenderer';
+import TridimensionalRenderer from '../../classes/Renderers/TridimensionalRenderer';
+//Constants
+import { TOP } from '../../constants/models/models';
 
 //CONSTANTS
 //Action types
@@ -18,17 +23,25 @@ const SET_PROJECT_OBJECTS       = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION   = 'SET_PROJECT_DESCRIPTION';
 const SET_DISPLAY_MODELS_MENU   = 'SET_DISPLAY_MODELS_MENU';
 //Initial state
+const initialScene = {
+    [BidimensionalRenderer.BIDIMENSIONAL_SCENE]: {
+        view: TOP,
+    },
+    [TridimensionalRenderer.TRIDIMENSIONAL_SCENE]: {}
+}
 const initialState = {
     name: '',
     type: ProjectConfiguration.CLOSET_PROJECT,
-    scene: {},
+    scene: initialScene,
     objects: [],
     description: '',
     displayModelsMenu: false,
 }
 //Others
-export const PROJECT_PROGRESS      = 'PROJECT_PROGRESS';
-const BASE_ENDPOINT         = '/save_project_progress';
+const PROJECT_ID              = 'PROJECT_ID';
+const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
+const BASE_ENDPOINT           = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
+export const PROJECT_PROGRESS = 'PROJECT_PROGRESS';
 
 //REDUCER
 const reducer = (state = initialState, action) => {
@@ -76,19 +89,159 @@ const reducer = (state = initialState, action) => {
 export default reducer;
 
 //Helpers
-const saveProgressSuccess = successMessage => {
+/**
+ * Success callback for the saveProjectAction request method
+ * @param {object} createdDesign 
+ */
+const saveProgressSuccess = (createdDesign) => {
     //Create notification with successMessage
-    console.log(successMessage)
+    const { id_disenhio: designId } = createdDesign;
+    localStorage.setItem(PROJECT_ID, designId.toString());
     
 }
 
+
+/**
+ * Error callback for the saveProjectAction request method
+ * @param {number} errorCode 
+ * @param {string} errorMessage 
+ */
 const saveProgressError = (errorCode, errorMessage) => {
     //Create notification with errorMessage
     console.log(`[${errorCode}]: ${errorMessage}`)
 }
 
+/**
+ * Success callback for the saveProgressInDatabaseAction
+ * @param {string} data 
+ * @param {function} dispatch 
+ * @param {function} getState 
+ */
+const saveProgressInDatabaseSuccess = (data, dispatch, getState) => {
+    createNotificationAction(PROJECT_SAVED_MESSAGE, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+}
+
+/**
+ * Error callback for the saveProgressInDatabaseAction
+ * @param {number} errorCode 
+ * @param {string} errorMessage 
+ * @param {function} dispatch 
+ * @param {function} getState 
+ */
+const saveProgressInDatabaseError = (errorCode, errorMessage, dispatch, getState) => {
+    createNotificationAction(`[${errorCode}]: ${errorMessage}`, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+}
+
+/**
+ * Success callback for the restoreProjectAction, it parses the serialized data and sets the project and editor parameters
+ * that are necessary to restore a project.
+ * @param {string} serializedProjectData 
+ * @param {function} dispatch 
+ * @param {function} getState 
+ */
+const restoreProjectSuccess = (serializedProjectData, dispatch, getState) => {
+    //We transform the serialized project data to an object
+    let projectData = JSON.parse(serializedProjectData);
+    //We get the data from the object
+    let { 
+        editor: { editorDepth, editorWidth, editorHeight }, 
+        project,
+    } = projectData;
+    //Project
+    setProjectAction(project)(dispatch, getState);
+    //Editor
+    setEditorDepthAction(editorDepth)(dispatch, getState);
+    setEditorWidthAction(editorWidth)(dispatch, getState);
+    setEditorHeightAction(editorHeight)(dispatch, getState);
+    createNotificationAction('Proyecto restaurado con éxito desde el servidor', NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+} 
+
+/**
+ * Error callback for the restoreProjectAction.
+ * @param {number} errorCode 
+ * @param {string} errorMessage 
+ * @param {function} dispatch 
+ * @param {function} getState 
+ */
+const restoreProjectError = (errorCode, errorMessage, dispatch, getState) => {
+    createNotificationAction(`[${errorCode}]: ${errorMessage}`, NOTIFICATION_DANGER, NOTIFICATION_TIME_MD)(dispatch, getState);
+}
+
+/**
+ * Gets the existing project design id from the local storage
+ * @todo this will later come from a data attribute in the root div container, with the id of the project
+ */
+const getExistingProjectId = () => localStorage.getItem(PROJECT_ID);
+
+
+/**
+ * Converts the required parameters from project state to form data type.
+ * @param {function} getState 
+ */
+const getProjectStateAsFormData = (getState) => {
+    //We get the required parameters from state
+    let { 
+        editor: { editorDepth, editorWidth, editorHeight },
+        family: { family: { id_familiaProducto } },
+        project: { name, description },
+    } = { ...getState() };
+    //We prepare them in an object
+    let data = {
+        alto: editorDepth * 100,
+        ancho: editorWidth * 100,
+        fondo: editorHeight * 100,
+        nombre: name,
+        descripcion: description,
+        id_familiaProducto,
+    }
+    //We create and return the form data using the formDataFromObject method of the Requests class
+    return Requests.getFormDataFromObject(data);
+}
+
+/**
+ * This function gets the endpoint of the save progress request based on the existance or inexistance of the projectProgressId
+ * @todo get from root div dataset and not from local storage
+ */
+const getSaveProgressEndpoint = () => {
+    let endpoint = `${BASE_ENDPOINT}/`;
+    let projectProgressId = getExistingProjectId();
+    //Endpoint based on the existance of project id (if it doesn´t exist a new design is created, if it exists the id is used to update the data of the existing design)
+    return endpoint += projectProgressId ? projectProgressId : 'new';
+}
+
+/**
+ * This function returns the necessary headers for the save progress request
+ * @param {object} formData 
+ */
+const getSaveProgressHeaders = formData => ({
+    method: 'POST',
+    body: formData
+});
+
+/**
+ * Returns an object with the necessary data from the state to reconstruct the project at any time.
+ * @param {function} getState 
+ */
+const getProgressDataFromState = getState => {
+    const { 
+        editor, 
+        project, 
+    } = { ...getState() };
+    return {
+        editor, 
+        project: {
+            ...project,
+            displayModelsMenu: false //By default we hide the models menu
+        }
+    }
+}
+
 //ACTIONS
 
+/**
+ * This action sets the whole project object
+ * @param {object} project 
+ */
 export let setProjectAction = project => (dispatch, getState) => {
     dispatch({
         type: SET_PROJECT,
@@ -241,54 +394,66 @@ export let removeObjectFromProjectAction = objectToRemove => (dispatch, getState
     setProjectObjectsAction(newProjectObjects)(dispatch, getState);
 }
 
+
 /**
  * This action restores the project state based on the received project store (which may come serialized in JSON string)
  * @param {string|object} serializedProject 
  */
 export let restoreProjectAction = (serializedProject = null) => (dispatch, getState) => {
-    let existingProject = serializedProject || localStorage.getItem(PROJECT_PROGRESS);
-    if(!existingProject)
+    let projectProgressId = getExistingProjectId();
+    if(!projectProgressId)
         return;
-    //We transform the project data to an object if it comes serialized
-    if(typeof(existingProject) === 'string')
-        existingProject = JSON.parse(existingProject);
-    //We get the data from the object
-    let { 
-        editor: { editorWidth, editorHeight }, 
-        project,
-    } = existingProject;
-    //Project
-    setProjectAction(project)(dispatch, getState);
-    //Editor
-    setEditorWidthAction(editorWidth)(dispatch, getState);
-    setEditorHeightAction(editorHeight)(dispatch, getState);
+    //The endpoint to load the existing project
+    let endpoint = `${BASE_ENDPOINT}/${projectProgressId}/load`;
+    const callbackArguments = [dispatch, getState];
+    //We make the request
+    Requests.makeRequest(
+        endpoint,
+        { },
+        restoreProjectSuccess,
+        restoreProjectError,
+        ...callbackArguments
+    );
 }
 
-export let saveProjectAction = () => (dispatch, getState) => {
-    let { editor, project } = { ...getState() };
-    const projectProgress = {
-        editor, 
-        project: {
-            ...project,
-            displayModelsMenu: false //By default we hide the models menu
-        }
-    }
 
-    let projectProgressSerialized = JSON.stringify(projectProgress);
-    localStorage.setItem(PROJECT_PROGRESS, projectProgressSerialized);
-    createNotificationAction('Progreso guardado', NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
-    /*
-    let headers = {
-        method: 'POST',
-        body: project
-    }
+/**
+ * This action saves the project's progress data in the database.
+ */
+const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
+    let projectProgressId = getExistingProjectId();
+    if(!projectProgressId)
+        return;
+    let endpoint = `${BASE_ENDPOINT}/${projectProgressId}/save`;
+    let formData = Requests.getFormDataFromObject({ 
+        data: JSON.stringify(getProgressDataFromState(getState))
+    });
+    let headers = getSaveProgressHeaders(formData);
+    const callbackArguments = [dispatch, getState];
     Requests.makeRequest(
-        BASE_ENDPOINT, 
+        endpoint,
+        headers,
+        saveProgressInDatabaseSuccess,
+        saveProgressInDatabaseError,
+        ...callbackArguments
+    );
+}
+
+
+export let saveProjectAction = () => (dispatch, getState) => {
+    //SAVE IN SERVER
+    //Endpoint and headers for the request
+    let endpoint = getSaveProgressEndpoint();
+    let formData = getProjectStateAsFormData(getState);
+    let headers = getSaveProgressHeaders(formData);
+    //We make the request
+    Requests.makeRequest(
+        endpoint, 
         headers, 
         saveProgressSuccess, 
         saveProgressError
     );
-    */
+    saveProgressDataInDatabaseAction()(dispatch, getState);
 }
 
 export let setDisplayModelsMenuAction = displayModelsMenu => (dispatch, getState) => {

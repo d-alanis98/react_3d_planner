@@ -7,6 +7,7 @@
 //CONSTANTS
 //Action types
 const SET_EDITOR_TYPE   = 'SET_EDITOR_TYPE';
+const SET_EDITOR_DEPTH  = 'SET_eDITOR_DEPTH';
 const SET_EDITOR_WIDTH  = 'SET_EDITOR_WIDTH';
 const SET_EDITOR_HEIGHT = 'SET_EDITOR_HEIGHT';
 //Others
@@ -16,6 +17,7 @@ const initialState = {
     editorType: BIDIMENSIONAL_EDITOR,
     editorWidth: 0,
     editorHeight: 0,
+    editorDepth: 0,
 }
 
 //REDUCER
@@ -26,6 +28,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 editorType: payload,
+            };
+        case SET_EDITOR_DEPTH:
+            return {
+                ...state,
+                editorDepth: payload,
             };
         case SET_EDITOR_WIDTH:
             return {
@@ -53,6 +60,13 @@ export let setEditorTypeAction = editorType => (dispatch, getState) => {
     dispatch({
         type: SET_EDITOR_TYPE,
         payload: editorType,
+    });
+}
+
+export let setEditorDepthAction = depth => (dispatch, getState) => {
+    dispatch({
+        type: SET_EDITOR_DEPTH,
+        payload: depth,
     });
 }
 

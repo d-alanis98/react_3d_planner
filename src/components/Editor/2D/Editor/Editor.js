@@ -6,7 +6,7 @@ import with2DRenderer from '../../../Renderer/2D/HOC/with2DRenderer';
 import EditorActions from '../../2D/Editor/EditorActions/EditorActions';
 
 
-const Editor = ({ models, addModel }) => {
+const Editor = ({ models }) => {
     return (
         <FixedHeightContainer
             height = { 100 }
@@ -22,11 +22,11 @@ const Editor = ({ models, addModel }) => {
             >
                 <EditorActions 
                     models = { models }
-                    addModel = { addModel }
                 />
             </FixedHeightContainer>
         </FixedHeightContainer>
     )
 }
 
-export default with2DRenderer(Editor);
+let With2DRenderer = with2DRenderer(Editor);
+export default With2DRenderer;

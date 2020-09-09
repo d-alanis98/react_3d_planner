@@ -7,6 +7,7 @@ import {
     restoreProjectAction,
     setProjectNameAction, 
     setProjectTypeAction,
+    setProjectSceneAction,
     setProjectObjectsAction, 
     addObjectToProjectAction, 
     updateProjectObjectAction,
@@ -27,6 +28,7 @@ const withProjectState = WrappedComponent => {
             restoreProjectAction,
             setProjectNameAction, 
             setProjectTypeAction,
+            setProjectSceneAction,
             setProjectObjectsAction, 
             addObjectToProjectAction,
             updateProjectObjectAction,
@@ -51,6 +53,7 @@ const withProjectState = WrappedComponent => {
             restoreProject = { restoreProjectAction }
             setProjectName = { setProjectNameAction }
             setProjectType = { setProjectTypeAction }
+            setProjectScene = { setProjectSceneAction }
             setProjectObjects = { setProjectObjectsAction }
             set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
@@ -77,6 +80,7 @@ const withProjectState = WrappedComponent => {
             restoreProjectAction,
             setProjectNameAction, 
             setProjectTypeAction,
+            setProjectSceneAction,
             setProjectObjectsAction,  
             addObjectToProjectAction,
             updateProjectObjectAction,

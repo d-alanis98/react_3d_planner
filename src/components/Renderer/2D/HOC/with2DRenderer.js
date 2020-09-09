@@ -9,6 +9,8 @@ import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRe
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
+import { TOP } from '../../../../constants/models/models';
+import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {
@@ -20,14 +22,22 @@ const with2DRenderer = WrappedComponent => {
         const { 
             project,
             addObject, 
-            editorState: { editorWidth, editorHeight },
+            editorState: { editorDepth, editorWidth, editorHeight },
             updateObject, 
             removeObject, 
             set2DRoomDimensions,
             set2DSceneDimensions, 
             ...ownProps 
         } = props;
-        const { objects: projectObjects } = project;
+        //Project
+        const { 
+            scene: projectScene,
+            objects: projectObjects, 
+        } = project;
+        //Project scene
+        const bidimensionalScene = projectScene[BIDIMENSIONAL];
+        //Editor view (needed to get the context of the plane and the models)
+        const { view: editorView } = bidimensionalScene;
         //HOOKS
         //State
         const [models, setModels] = useState({});
@@ -39,9 +49,50 @@ const with2DRenderer = WrappedComponent => {
         
 
         //Effects
+        /**
+         * On mount and on every view type change (top or front view), we initialize the scene with the data from project state.
+         */
         useEffect(() => {
+            initialize();
+        }, [editorView])
+
+
+        /**
+         * Effect used to update the dragged object
+         */
+        useEffect(() => {
+            if(!draggedObject)
+                return;
+            //We get the id and the coordinates from the dragged object
+            const { _id, x, y } = draggedObject
+            
+            let existingObject = findObjectBy2DModelId(_id);
+            if(!existingObject)
+                return;
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
+            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
+            let updatedObject = { 
+                ...existingObject,
+                [BIDIMENSIONAL]: {
+                    uuid: _id,
+                    coordinates: { x, y }
+                },
+                [TRIDIMENSIONAL]: {
+                    ...tridimensionalEditorState,
+                    coordinates: {
+                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
+                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
+                    }    
+                }
+            };
+            updateObject(updatedObject);
+        }, [draggedObject]);
+
+        const initialize = () => {
+            //The editorYAxis is the parameter that is going to be considered the y in canvas, the height (which actually is the depth) or the depth (which actually is the height)
+            let editorYAxis = BidimensionalSceneHelper.getYAxis(editorView, editorHeight, editorDepth);
             //We set the scene instance
-            let sceneInstance = new BidimensionalRenderer(editorWidth, editorHeight);
+            let sceneInstance = new BidimensionalRenderer(editorWidth, editorYAxis);
             sceneInstance.init();
             setSceneInstance(sceneInstance);
             //We set the container dimensions
@@ -98,40 +149,7 @@ const with2DRenderer = WrappedComponent => {
                 setModels(modelsCopy);
             }
             restoreModels();
-            
-        }, []);
-
-
-        /**
-         * Effect used to update the dragged object
-         */
-        useEffect(() => {
-            if(!draggedObject)
-                return;
-            //We get the id and the coordinates from the dragged object
-            const { _id, x, y } = draggedObject
-            
-            let existingObject = findObjectBy2DModelId(_id);
-            if(!existingObject)
-                return;
-            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
-            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
-            let updatedObject = { 
-                ...existingObject,
-                [BIDIMENSIONAL]: {
-                    uuid: _id,
-                    coordinates: { x, y }
-                },
-                [TRIDIMENSIONAL]: {
-                    ...tridimensionalEditorState,
-                    coordinates: {
-                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
-                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
-                    }    
-                }
-            };
-            updateObject(updatedObject);
-        }, [draggedObject]);
+        }
 
 
         /**

@@ -27,9 +27,11 @@ const ProjectSettings = props => {
     //Props destructuring
     const { 
         project: { name, type, description }, 
-        editorState: { editorHeight, editorWidth },
+        editorState: { editorDepth, editorHeight, editorWidth },
+        saveProject,
         setProjectName, 
         setProjectType,
+        setEditorDepth,
         setEditorWidth,
         setEditorHeight,
         createNotification,
@@ -37,10 +39,13 @@ const ProjectSettings = props => {
         setProjectDescription, 
     } = props;
 
+
+    console.log({ editorDepth })
     //Initial state
     const initialState = {
         projectName: name,
         projectType: type,
+        editorDepth,
         editorWidth,
         editorHeight,
         projectDescription: description,
@@ -55,6 +60,7 @@ const ProjectSettings = props => {
     const { 
         projectName, 
         projectType,
+        editorDepth: projectEditorDepth,
         editorWidth: projectEditorWidth, 
         editorHeight: projectEditorHeight, 
         projectDescription, 
@@ -75,19 +81,23 @@ const ProjectSettings = props => {
         setUnsavedChanges(false);
         setProjectName(projectName);
         setProjectType(projectType);
+        //Editor dimensions
+        setEditorDepth(projectEditorDepth);
         setEditorWidth(projectEditorWidth);
         setEditorHeight(projectEditorHeight);
         //Because the 3d scene dimensions don´t deppend on screen size (because they are not set in pixels), we can set them at this point
         set3DSceneDimensions(projectEditorWidth, projectEditorHeight);
         setProjectDescription(projectDescription);
+        //We save the changes in the server
+        saveProject();
         //We create a success notification
         createNotification(CHANGES_SAVED_SUCCESSFULLY, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD);
     }
 
     const handleSettingChange = event => {
         let { target: { name, value } } = event;
-        if(name === 'editorWidth' || name === 'editorHeight')
-            value = Number(value);
+        if(name === 'editorWidth' || name === 'editorHeight' || name === 'editorDepth')
+            value = Number(value) / 100;
         setProjectSettings({
             ...projectSettings,
             [name]: value
@@ -124,6 +134,7 @@ const ProjectSettings = props => {
                 className = 'h5 text-muted'
             />
             <DimensionsSettings 
+                projectEditorDepth = { projectEditorDepth }
                 projectEditorWidth = { projectEditorWidth }
                 projectEditorHeight = { projectEditorHeight }
                 handleSettingChange = { handleSettingChange }

@@ -1,25 +1,22 @@
 import React from 'react';
 //Components
 import FlexRow from '../../../../Layout/Flex/FlexRow';
-import FixedWidthContainer from '../../../../Layout/Containers/FixedWidthContainer';
-import ModelsLibrary from '../../../3D/Layout/Editor/EditorActions/ModelsLibrary/ModelsLibrary';
+import EditorView from './EditorView/EditorView';
+//Clases
+import BidimensionalRenderer from '../../../../../classes/Renderers/BidimensionalRenderer';
+import withProjectState from '../../../../../redux/HOC/withProjectState';
 
-const EditorActions = ({ models, addModel }) => (
-    <FlexRow>
-        {/*
-        <FixedWidthContainer
-            width = { 75 }
-            className = 'overflow-auto h-100'
+const EditorActions = ({ project: projectState, setProjectScene }) => {
+    return (
+        <FlexRow
+            className = 'justify-content-start align-items-center px-3 h-100'
         >
-            
-            <ModelsLibrary 
-                models = { models }
-                addModel = { addModel }
-            />
-        </FixedWidthContainer>
-        */}
+            <EditorView />
 
-    </FlexRow>
-);
+        </FlexRow>
+    );
+}
 
-export default EditorActions;
+let WithProjectState = withProjectState(EditorActions);
+
+export default WithProjectState;

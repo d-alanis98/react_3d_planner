@@ -1,13 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 //Redux
-import { setEditorTypeAction, setEditorWidthAction, setEditorHeightAction } from '../reducers/editorDuck';
+import { 
+    setEditorTypeAction, 
+    setEditorDepthAction, 
+    setEditorWidthAction, 
+    setEditorHeightAction 
+} from '../reducers/editorDuck';
 
 const withEditorState = WrappedComponent => {
     const WithEditorState = props => {
         let {
             editor,
             setEditorTypeAction, 
+            setEditorDepthAction,
             setEditorWidthAction, 
             setEditorHeightAction,
             ...ownProps
@@ -16,6 +22,7 @@ const withEditorState = WrappedComponent => {
         return <WrappedComponent 
             editorState = { editor }
             setEditorType = { setEditorTypeAction }
+            setEditorDepth = { setEditorDepthAction }
             setEditorWidth = { setEditorWidthAction }
             setEditorHeight = { setEditorHeightAction }
             { ...ownProps }
@@ -33,6 +40,7 @@ const withEditorState = WrappedComponent => {
         mapStateToProps, 
         { 
             setEditorTypeAction, 
+            setEditorDepthAction,
             setEditorWidthAction, 
             setEditorHeightAction 
         }
