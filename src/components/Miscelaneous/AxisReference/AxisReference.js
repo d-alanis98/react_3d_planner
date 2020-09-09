@@ -9,7 +9,7 @@ const AxisReference = ({ containerStyle }) => (
             className = { containerStyle || 'axis-reference__container' }
         >
             <img 
-                src = 'assets/position-reference.png' 
+                src = '/storage/assets/position-reference.png' 
                 className = 'axis-reference__image' 
             />
         </div>
