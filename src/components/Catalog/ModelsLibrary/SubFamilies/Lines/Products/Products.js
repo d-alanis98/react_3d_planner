@@ -42,7 +42,7 @@ const Products = ({ project, products, addObject, setEditorType }) => {
             },
             '3d': {
                 uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
-                coordinates: { x: 0, y: 0, z: 0 }
+                coordinates: { x: 0, y: 0, z: 0 },
             }
         }
         addObject(objectToAdd);

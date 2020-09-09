@@ -9,7 +9,7 @@ import Catalog from '../../components/Catalog/Catalog';
 //Sections
 export const CATALOG                = 'CATALOG';    
 export const PROJECT_SETTINGS       = 'PROJECT_SETTINGS';
-export const BIDIMENSIONAL_EDITOR   = 'BIDIMENSIONAL EDITOR';
+export const BIDIMENSIONAL_EDITOR   = 'BIDIMENSIONAL_EDITOR';
 export const TRIDIMENSIONAL_EDITOR  = 'TRIDIMENSIONAL_EDITOR';
 
 

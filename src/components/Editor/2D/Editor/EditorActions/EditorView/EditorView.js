@@ -42,7 +42,7 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
 
     return (
         <FlexRow
-            className = 'h6 align-items-center'
+            className = 'h6 align-items-center m-0 p-0'
         >
             <Dropup
                 togglerText = { 

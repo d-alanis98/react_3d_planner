@@ -11,6 +11,7 @@ import CoordinatesTransformation from '../../../../classes/Coordinates/Coordinat
 import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
 import { TOP } from '../../../../constants/models/models';
 import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
+import RoomCoordinatesCalculator from '../../../../classes/2D/Room/RoomCoordinatesCalculator';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {
@@ -48,13 +49,15 @@ const with2DRenderer = WrappedComponent => {
         const [contextMenuPosition, setContextMenuPosition] = useState({});
         
 
+
         //Effects
+
         /**
          * On mount and on every view type change (top or front view), we initialize the scene with the data from project state.
          */
         useEffect(() => {
             initialize();
-        }, [editorView])
+        }, [editorView]);
 
 
         /**
@@ -101,6 +104,26 @@ const with2DRenderer = WrappedComponent => {
             //We set the room dimensions 
             const { width: roomWidth, height: roomHeight } = sceneInstance.getRoomDimensionInPixels();
             set2DRoomDimensions(roomWidth, roomHeight);
+            const scene = { 
+                ...projectScene,
+                [BIDIMENSIONAL]: {
+                    ...bidimensionalScene,
+                    roomWidth,
+                    roomHeight,
+                    sceneWidth: containerWidth,
+                    sceneHeight: containerHeight,
+                }
+            }
+
+            /**
+             * Returns the 2D coordinates based on the 3D ones as the only source of truth
+             * @param {object} model 
+             */
+            const get2DCoordinatesFrom3DState = model => {
+                const { coordinates: tridimensionalCoordinates } = model[TRIDIMENSIONAL];
+                const { x, y, z } = tridimensionalCoordinates;
+                return new CoordinatesTransformation(scene, x, y, z).tridimensionalToBidimensionalCoordinates();
+            }
 
             /**
              * This method restores the existing objects in the plane
@@ -108,12 +131,15 @@ const with2DRenderer = WrappedComponent => {
             const restoreModels = () => {
                 //We retrieve the existing models in state
                 let modelsCopy = { ...models };
+                console.log({ unsorted: projectObjects })
+                const projectObjectsByLayer = [ ...projectObjects ]
+                projectObjectsByLayer.sort((a, b) => a[TRIDIMENSIONAL].maxPointInY > b[TRIDIMENSIONAL].maxPointInY ? 1 : -1);
                 //We iterate over the existing models and create the 2d model
-                projectObjects.forEach(model => {
+                projectObjectsByLayer.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
                     const { type, rotation, productLine } = model;
-                    const { coordinates } = model[BIDIMENSIONAL];
-                    const { coordinates: tridimensionalCoordinates } = model[TRIDIMENSIONAL];
+                    //We get the coordinates from the calculation of them based on the existing 3d coordinates
+                    let coordinates = get2DCoordinatesFrom3DState(model);
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the SVG model
@@ -132,13 +158,6 @@ const with2DRenderer = WrappedComponent => {
                                     uuid: _id,
                                     coordinates: { x, y }
                                 },
-                                [TRIDIMENSIONAL]: {
-                                    uuid: '',
-                                    coordinates: {
-                                        ...tridimensionalCoordinates,
-                                        ...get3DCoordinates(x, y) 
-                                    }
-                                }
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
                         },

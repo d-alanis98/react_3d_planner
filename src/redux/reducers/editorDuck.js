@@ -11,10 +11,10 @@ const SET_EDITOR_DEPTH  = 'SET_EDITOR_DEPTH';
 const SET_EDITOR_WIDTH  = 'SET_EDITOR_WIDTH';
 const SET_EDITOR_HEIGHT = 'SET_EDITOR_HEIGHT';
 //Others
-const BIDIMENSIONAL_EDITOR = 'BIDIMENSIONAL EDITOR';
+const TRIDIMENSIONAL_EDITOR = 'TRIDIMENSIONAL_EDITOR';
 //Initial state
 const initialState = {
-    editorType: BIDIMENSIONAL_EDITOR,
+    editorType: TRIDIMENSIONAL_EDITOR,
     editorWidth: 0,
     editorHeight: 0,
     editorDepth: 0,

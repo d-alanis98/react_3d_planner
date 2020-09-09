@@ -11,24 +11,36 @@ import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/wit
 import { faCrosshairs, faArrowsAltH, faArrowsAltV, faArrowsAlt, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './PositionModifier.css';
+import ModelPositionCalculator from '../../../../../../../classes/3D/Models/ModelPositionCalculator';
 
 
 
 
 const PositionModifier = ({ modelToEdit, rendererState }) => {
     //PROPS DESTRUCTURING
-    const { updateModelPosition } = rendererState;
+    const { updateModelPosition, updateModelMaxPointInY } = rendererState;
 
     //HANDLERS
     const handlePositionChange = event => {
         const { target: { id: axis, value } } = event;
-        
+        //We get a shallow copy of the position
         const modelPosition = { ...modelToEdit.position };
+        //We delete the previous position in the current axis
         delete modelPosition[axis];
+        //We update this axis with the value obtained from the event
         modelPosition[axis] = Number(value);
-        modelToEdit.position.set(modelPosition.x, modelPosition.y, modelPosition.z);
+        //We set the position to the new coordinates
+        const { x, y, z } = modelPosition;
+        modelToEdit.position.set(x, y, z);
+        //We update the model position
         if(updateModelPosition)
             updateModelPosition(modelToEdit.uuid, modelPosition);
+        //We also get the new maximum point in the y axis (for the 2D layer reconstruction) and we update it in the state
+        const maxPointInY = ModelPositionCalculator.getMaximumPointInY(modelToEdit);
+        //@todo Temporal fix = passing the modelPosition, but it breaks single responsinility principle. FIX
+        if(updateModelMaxPointInY)
+            updateModelMaxPointInY(modelToEdit.uuid, maxPointInY, modelPosition);
+        //FIX = updateModelPositionParameters(uuid, modelPosition, maxPointInY)
     }
     return (
         <EditorSection

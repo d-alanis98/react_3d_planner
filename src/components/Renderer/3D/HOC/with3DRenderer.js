@@ -6,7 +6,7 @@ import with3DRendererContextConsumer from './with3DRendererContextConsumer';
 //Classes
 import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
-import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
+import ModelPositionCalculator from '../../../../classes/3D/Models/ModelPositionCalculator';
 //Factories
 import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
@@ -98,6 +98,7 @@ const with3DRenderer = (WrappedComponent) => {
                     deleteModelById,
                     updateModelPosition,
                     sceneInstanceModels,
+                    updateModelMaxPointInY,
                 });
         }, [
             sceneInstance, 
@@ -105,39 +106,26 @@ const with3DRenderer = (WrappedComponent) => {
             sceneInstanceModels
         ]);
 
-
         useEffect(() => {
             if(!draggedObject)
                 return;
             //We get the id and coordinates
             let { uuid, x, y, z } = draggedObject;
-            updateModelPosition(uuid, { x, y, z });
-            /*
-            //We find the object in the porject state by its id
-            let existingObject = findObjectBy3DModelId(uuid);
-            if(!existingObject)
-                return;
-            //We update the model's coordinates in both planes, and the uuid of the 3d editor
-            let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL_SCENE] };
-            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL_SCENE] };
-            let updatedObject = {
-                ...existingObject,
-                [BIDIMENSIONAL_SCENE]: {
-                    ...bidimensionalEditorState,
-                    coordinates: get2DCoordinates(x, y, z)
-                },
-                [TRIDIMENSIONAL_SCENE]: {
-                    ...tridimensionalEditorState,
-                    uuid,
-                    coordinates: { x, y: 0, z }
-                }
-            }
-            updateObject(updatedObject);
-            */
-            
+            updateModelPosition(uuid, { x, y, z });  
         }, [draggedObject]);
 
-        const updateModelPosition = (modelId, { x, y, z }) => {
+        useEffect(() => {
+            if(sceneInstance)
+                sceneInstance.setOrbitControlsEnabled(orbitControlsEnabled);
+        }, [orbitControlsEnabled]);
+
+        /**
+         * A template of an updated object, which accepts the 2d and 3d key properties to be updated in that specific model.
+         * @param {string} modelId 
+         * @param {object} bidimensionalEditorParameters 
+         * @param {object} tridimensionalEditorParameters 
+         */
+        const getUpdatedModelTemplate = (modelId, bidimensionalEditorParameters, tridimensionalEditorParameters) => {
             //We find the object in the porject state by its id
             let existingObject = findObjectBy3DModelId(modelId);
             if(!existingObject)
@@ -145,29 +133,63 @@ const with3DRenderer = (WrappedComponent) => {
             //We update the model's coordinates in both planes, and the uuid of the 3d editor
             let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL_SCENE] };
             let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL_SCENE] };
-            let updatedObject = {
+            return {
                 ...existingObject,
                 [BIDIMENSIONAL_SCENE]: {
                     ...bidimensionalEditorState,
-                    coordinates: get2DCoordinates(x, y, z)
+                    ...bidimensionalEditorParameters
                 },
                 [TRIDIMENSIONAL_SCENE]: {
-                    ...tridimensionalEditorState,
                     uuid: modelId,
-                    coordinates: { 
-                        x, 
-                        y, 
-                        z 
-                    }
+                    ...tridimensionalEditorState,
+                    ...tridimensionalEditorParameters
                 }
             }
-            updateObject(updatedObject);
         }
 
-        useEffect(() => {
-            if(sceneInstance)
-                sceneInstance.setOrbitControlsEnabled(orbitControlsEnabled);
-        }, [orbitControlsEnabled]);
+        /**
+         * Updates the model position in the global state.
+         * @param {string} modelId 
+         * @param {object} position 
+         */
+        const updateModelPosition = (modelId, { x, y, z }) => {
+            //We don't need to update any parameter of the 2D key
+            let bidimensionalEditorParameters = { }
+            //We are going to update the coordinates
+            let tridimensionalEditorParameters = {
+                coordinates: {
+                    x, y, z
+                }
+            }
+            let updatedModel = getUpdatedModelTemplate(modelId, bidimensionalEditorParameters, tridimensionalEditorParameters);
+            if(!updatedModel){
+                console.log('Sin modelo')
+                return;
+            }
+            updateObject(updatedModel);
+        }
+
+        /**
+         * Updates the model's maximum point on the Y axis in the global state.
+         * @param {string} modelId 
+         * @param {number} maxPointInY 
+         */
+        const updateModelMaxPointInY = (modelId, maxPointInY, coordinates = {} ) => {
+            //We don't need to update any parameter of the 2D key
+            let bidimensionalEditorParameters = { }
+            //We are going to update the maxPointInY parameter of the model
+            let tridimensionalEditorParameters = {
+                maxPointInY,
+                coordinates: {
+                    ...coordinates
+                }
+            }
+            let updatedModel = getUpdatedModelTemplate(modelId, bidimensionalEditorParameters, tridimensionalEditorParameters);
+            if(!updatedModel)
+                return;
+            updateObject(updatedModel);
+
+        }
 
         /**
          * Success callback for the load3DModel method, in this callback we add the created object at project´s level, 
@@ -178,13 +200,17 @@ const with3DRenderer = (WrappedComponent) => {
         const onCreationSuccess = createdModel => (projectModelData, coordinates) => {
             const { uuid } = createdModel;
             const { id, name } = projectModelData;
+            //We calculate the model max point in y, to be able to render models by layers in 2D editor
+            let maxPointInY =  ModelPositionCalculator.getMaximumPointInY(createdModel);
+            //We create the updated model object
             let modelWithUpdatedId = {
                 ...projectModelData,
                 name: name || `Modelo ${ id }`,
-                '3d': {
+                [TRIDIMENSIONAL_SCENE]: {
                     uuid: uuid,
                     container: getBoxBound(createdModel),
                     coordinates,
+                    maxPointInY
                 }
             };
             updateObject(modelWithUpdatedId);
@@ -237,19 +263,6 @@ const with3DRenderer = (WrappedComponent) => {
          * @param {string} id2DModel 
          */
         const findObjectBy3DModelId = id3DModel => projectObjects.find(object => object['3d'].uuid === id3DModel);
-        
-        /**
-         * This method transforms the 3D coordinates to the corresponding 2D ones, to get the object placed in the same
-         * way between both editors, making use of the class CoordinatesTransformation.
-         * @param {number} x 
-         * @param {number} y 
-         * @param {number} z
-         */
-        const get2DCoordinates = (x, y, z) => {
-            const { scene } = project;
-            let coordinatesTransformation = new CoordinatesTransformation(scene, x, y, z);
-            return coordinatesTransformation.tridimensionalToBidimensionalCoordinates();
-        }
 
         /**
          * Toggles the state of the orbit controls.
