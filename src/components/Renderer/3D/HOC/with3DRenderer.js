@@ -96,9 +96,8 @@ const with3DRenderer = (WrappedComponent) => {
                     ...rendererState,
                     sceneInstance,
                     deleteModelById,
-                    updateModelPosition,
                     sceneInstanceModels,
-                    updateModelMaxPointInY,
+                    updateModelPositionParameters,
                 });
         }, [
             sceneInstance, 
@@ -153,33 +152,38 @@ const with3DRenderer = (WrappedComponent) => {
          * @param {object} position 
          */
         const updateModelPosition = (modelId, { x, y, z }) => {
+            let model = sceneInstance.objects.find(model => model.uuid === modelId);
             //We don't need to update any parameter of the 2D key
             let bidimensionalEditorParameters = { }
             //We are going to update the coordinates
             let tridimensionalEditorParameters = {
                 coordinates: {
                     x, y, z
-                }
+                },
+                maxPointInZ: ModelPositionCalculator.getMaximumPointInZ(model)
             }
             let updatedModel = getUpdatedModelTemplate(modelId, bidimensionalEditorParameters, tridimensionalEditorParameters);
-            if(!updatedModel){
-                console.log('Sin modelo')
+            if(!updatedModel)
                 return;
-            }
             updateObject(updatedModel);
         }
 
         /**
-         * Updates the model's maximum point on the Y axis in the global state.
+         * Updates the model's coordinates and maximum point on the Y axis in the global state.
+         * @note Main difference between this method and updateModelPosition is that the last one only updates model
+         * coordinates, while updateModelPositionParameters also updates the maxPointInY. Also, this method was created 
+         * mainly for the PositionModifier component, and updateModelPosition is for internal use (in this HOC), intended
+         * to be fired on every object's drag end event.
          * @param {string} modelId 
          * @param {number} maxPointInY 
          */
-        const updateModelMaxPointInY = (modelId, maxPointInY, coordinates = {} ) => {
+        const updateModelPositionParameters = (modelId, coordinates = { }, maxPointInY, maxPointInZ) => {
             //We don't need to update any parameter of the 2D key
             let bidimensionalEditorParameters = { }
             //We are going to update the maxPointInY parameter of the model
             let tridimensionalEditorParameters = {
                 maxPointInY,
+                maxPointInZ,
                 coordinates: {
                     ...coordinates
                 }
@@ -188,7 +192,6 @@ const with3DRenderer = (WrappedComponent) => {
             if(!updatedModel)
                 return;
             updateObject(updatedModel);
-
         }
 
         /**
@@ -201,7 +204,8 @@ const with3DRenderer = (WrappedComponent) => {
             const { uuid } = createdModel;
             const { id, name } = projectModelData;
             //We calculate the model max point in y, to be able to render models by layers in 2D editor
-            let maxPointInY =  ModelPositionCalculator.getMaximumPointInY(createdModel);
+            const maxPointInY =  ModelPositionCalculator.getMaximumPointInY(createdModel);
+            const maxPointInZ = ModelPositionCalculator.getMaximumPointInZ(createdModel);
             //We create the updated model object
             let modelWithUpdatedId = {
                 ...projectModelData,
@@ -210,7 +214,8 @@ const with3DRenderer = (WrappedComponent) => {
                     uuid: uuid,
                     container: getBoxBound(createdModel),
                     coordinates,
-                    maxPointInY
+                    maxPointInY,
+                    maxPointInZ
                 }
             };
             updateObject(modelWithUpdatedId);

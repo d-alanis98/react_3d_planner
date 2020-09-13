@@ -1,18 +1,18 @@
 //Dependencies
 import Konva from 'konva';
+//Classes
 import ModelEvents from './ModelEvents';
 import RoomBoundDetector from '../Room/RoomBoundDetector';
+import CollisionDetector from './CollisionDetector';
+import BidimensionalModelRotation from './BidimensionalModelRotation';
 import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
-import { TOP, getModel2DUri, getDimensions } from '../../../constants/models/models';
-import CollisionDetector from './CollisionDetector';
-import DimensionsGetter from '../../Models/DimensionsGetter';
-import BidimensionalModelRotation from './BidimensionalModelRotation';
+import { TOP, getModel2DUri } from '../../../constants/models/models';
 
 
 /**
  * @author Damián Alanís Ramírez
- * @version 3.2.1
+ * @version 3.4.2
  */
 
 export default class BidimensionalModelFactory {
@@ -35,6 +35,7 @@ export default class BidimensionalModelFactory {
             type,
             scene,
             rotation,
+            editorView,
             onUpdate,
             onSuccess, 
             onSelection,
@@ -42,10 +43,11 @@ export default class BidimensionalModelFactory {
         } = attributes;
         //We load the path from catalog based on the model type
         let path = getModel2DUri(type, TOP); //We get the TOP view
-        //We get the dimensions of the object (assuming in a 2D top view the "height" is the depth)
-        let { width: modelWidth, depth: modelHeight } = DimensionsGetter.getDimensions(productLine, type);
+        //We get the dimensions of the object based on the current view and rotation
+        let { width: modelWidth, height: modelHeight } = BidimensionalModelDimensions.getDimensionsBasedOnViewAndRotation(editorView, rotation, productLine, type);
         //We get the scaled dimensions, making use of the class BidimensionalModelDimensions, which calculates the pixel size of the model based on the ratio (screen dimensions / room dimensions)
         let { width, height } = BidimensionalModelDimensions.calculate(scene, modelWidth, modelHeight);
+        
         Konva.Image.fromURL(path, imageNode => {
             let { containerWidth, containerHeight } = scene;
             imageNode.setAttrs({

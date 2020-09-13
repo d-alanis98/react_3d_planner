@@ -12,6 +12,7 @@ import BidimensionalModelRotation from '../../../../classes/2D/Models/Bidimensio
 import { TOP } from '../../../../constants/models/models';
 import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
 import RoomCoordinatesCalculator from '../../../../classes/2D/Room/RoomCoordinatesCalculator';
+import BidimensionalModelLayerManager from '../../../../classes/2D/Models/BidimensionalModelLayerManager';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {
@@ -122,7 +123,8 @@ const with2DRenderer = WrappedComponent => {
             const get2DCoordinatesFrom3DState = model => {
                 const { coordinates: tridimensionalCoordinates } = model[TRIDIMENSIONAL];
                 const { x, y, z } = tridimensionalCoordinates;
-                return new CoordinatesTransformation(scene, x, y, z).tridimensionalToBidimensionalCoordinates();
+                let roomHeight = editorDepth;
+                return new CoordinatesTransformation(scene, x, y, z).tridimensionalToBidimensionalCoordinates(editorView, roomHeight);
             }
 
             /**
@@ -131,9 +133,8 @@ const with2DRenderer = WrappedComponent => {
             const restoreModels = () => {
                 //We retrieve the existing models in state
                 let modelsCopy = { ...models };
-                console.log({ unsorted: projectObjects })
-                const projectObjectsByLayer = [ ...projectObjects ]
-                projectObjectsByLayer.sort((a, b) => a[TRIDIMENSIONAL].maxPointInY > b[TRIDIMENSIONAL].maxPointInY ? 1 : -1);
+                //We get the objects array ordered in a suitable way to get the correct "layers" according to the view
+                const projectObjectsByLayer = BidimensionalModelLayerManager.getModelsArrayOrderedByLayers(projectObjects, editorView);
                 //We iterate over the existing models and create the 2d model
                 projectObjectsByLayer.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
@@ -148,6 +149,7 @@ const with2DRenderer = WrappedComponent => {
                         productLine,
                         coordinates,
                         rotation,
+                        editorView,
                         createdModel => { //onSuccess callback
                             let { _id, attrs: { x, y } } = createdModel;
                             const { id, name } = model;
@@ -217,8 +219,6 @@ const with2DRenderer = WrappedComponent => {
             setContextMenuPosition({ x, y });
         }
 
-    
-
 
         /**
          * This method increases the quantity of the specified model
@@ -239,7 +239,9 @@ const with2DRenderer = WrappedComponent => {
         const get3DCoordinates = (x, y) => {
             const { scene } = project;
             let coordinatesTransformation = new CoordinatesTransformation(scene, x, y);
-            return coordinatesTransformation.bidimensionalToTridimensionalCoordinates();
+            //The height of the room in a 3D plane is actually what we called editorDepth, and we keep that name to avoid bugs that may appear in the renaming process
+            let roomHeight = editorDepth;
+            return coordinatesTransformation.bidimensionalToTridimensionalCoordinates(editorView, roomHeight);
         }
 
         return (

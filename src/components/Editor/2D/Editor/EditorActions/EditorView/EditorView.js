@@ -10,11 +10,9 @@ import withProjectState from '../../../../../../redux/HOC/withProjectState';
 //Classes
 import BidimensionalRenderer from '../../../../../../classes/Renderers/BidimensionalRenderer';
 //Icons
-import { faVideo, faCaretSquareUp, faWindowMaximize, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faVideo, faCaretSquareUp, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 //Constants
 import { TOP, FRONT } from '../../../../../../constants/models/models';
-import FlexColumn from '../../../../../Layout/Flex/FlexColumn';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 
@@ -51,18 +49,9 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
                             type = 'outline-secondary'
                             className = 'btn-sm rounded-pill px-2 py-2'
                             buttonText = { 
-                                <FlexColumn>
-                                    <CurrentViewLabel 
-                                        editorView = { editorView }
-                                    />
-                                    <small className='text-primary'>
-                                        <FontAwesomeIcon 
-                                            icon = { faInfoCircle }
-                                            className = 'mr-1'
-                                        />
-                                        En desarrollo
-                                    </small>
-                                </FlexColumn>
+                                <CurrentViewLabel 
+                                    editorView = { editorView }
+                                />
                             } 
                             iconClassName = 'mr-2'
                         />

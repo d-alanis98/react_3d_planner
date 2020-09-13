@@ -15,7 +15,7 @@ export default class BidimensionalModelRotation {
     }
 
     static setNewDragBoundFunction = (model, scene) => {
-        let { attrs: { width, height, rotation } } = model
+        let { attrs: { width, height, rotation } } = model;
         //If the angle is npi/2, with n odd
         if((Math.abs(rotation) / 90) % 2 !== 0)
             model.dragBoundFunc(position => RoomBoundDetector.boundDetection(scene, height, width, position));

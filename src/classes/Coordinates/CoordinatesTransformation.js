@@ -1,10 +1,12 @@
 //Dependencies
 import BidimensionalRenderer from '../Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../Renderers/TridimensionalRenderer';
+//Constants (views)
+import { TOP, FRONT } from '../../constants/models/models';
 
 /**
  * @author Damián Alanís Ramírez
- * @version 3.2.4
+ * @version 4.1.1
  * @description Facade for coordinates transformation, it provides methods to pass from 2D to 3D coordinates and vice versa.
  * This way we keep a consistent state between both editors and we can calculate the coordinates that will be applied to a modified 
  * object in a certain editor to the other.
@@ -73,11 +75,12 @@ export default class CoordinatesTransformation {
     /**
      * This method calculates the coordinates regarding the origin of the bidimensional plane (the center).
      */
-    originBidimensionalPlaneCoordinates = () => {
+    originBidimensionalPlaneCoordinates = editorView => {
         //We obtain the required variable from the current instance in a local scope
         let { 
             x, 
             y, 
+            bidimensionalRoomHeight,
             bidimensionalSceneWidth, 
             bidimensionalSceneHeight,
         } = this;
@@ -86,17 +89,28 @@ export default class CoordinatesTransformation {
         let planeCenterX = bidimensionalSceneWidth / 2;
         let planeCenterY = bidimensionalSceneHeight / 2;
 
-        return {
-            x: planeCenterX - x,
-            y: planeCenterY - y,
-        };
+        switch(editorView) {
+            case TOP:
+                return {
+                    x: planeCenterX - x,
+                    y: planeCenterY - y,
+                };
+            case FRONT:
+                let heightPadding = (bidimensionalSceneHeight - bidimensionalRoomHeight) / 2;
+                return {
+                    x: planeCenterX - x,
+                    y: -1 * ((bidimensionalSceneHeight - heightPadding) - y),
+                };
+        }
     }
 
     /**
-    * This method transforms the 2D coordinates to the corresponding 3D ones, to get the object placed in the same
-    * way between both scenes.
+     * This method transforms the 2D coordinates to the corresponding 3D ones, to get the object placed in the same 
+     * way between both scenes. It receives the current editor view as parameter to make the swap on the axis that it affects
+     * in the tridimensional coordinates.
+     * @param {string} editorView 
      */
-    bidimensionalToTridimensionalCoordinates = () => {
+    bidimensionalToTridimensionalCoordinates = (editorView, roomAltitude) => {
         //We obtain the required variable from the current instance in a local scope
         let { 
             bidimensionalRoomWidth, 
@@ -106,14 +120,29 @@ export default class CoordinatesTransformation {
             originBidimensionalPlaneCoordinates
         } = this;
         //We get the coordinates from the origin of the bidimensional plane (centroid)
-        let { x: originX, y: originY } = originBidimensionalPlaneCoordinates();
+        let { x: originX, y: originY } = originBidimensionalPlaneCoordinates(editorView);
         //We get the ratio between the two scenes dimensions (being in the bidimensional scene, the width and height of the room, which may not be the whole screen)
         let xRatio = tridimensionalSceneWidth / bidimensionalRoomWidth;
         let yRatio = tridimensionalSceneHeight / bidimensionalRoomHeight;
-        return {
-            x:  -1 * originX * xRatio,
-            z: -1 * originY * yRatio
+        switch(editorView) {
+            case TOP:
+                return {
+                    x:  -1 * originX * xRatio,
+                    z: -1 * originY * yRatio
+                }
+            case FRONT:
+                yRatio = roomAltitude / bidimensionalRoomHeight;
+                return {
+                    x:  -1 * originX * xRatio,
+                    y: -1 * originY * yRatio
+                }
+            default:
+                return {
+                    x:  -1 * originX * xRatio,
+                    z: -1 * originY * yRatio
+                }
         }
+
     }
 
     /**
@@ -132,9 +161,10 @@ export default class CoordinatesTransformation {
      * @param {number} x 
      * @param {number} y 
      */
-    originTridimensionalPlaneCoordinates = (x, y) => {
+    originTridimensionalPlaneCoordinates = (x, y, editorView) => {
         //We obtain the required variable from the current instance in a local scope
         let { 
+            bidimensionalRoomHeight,
             bidimensionalSceneWidth, 
             bidimensionalSceneHeight,
         } = this;
@@ -143,17 +173,30 @@ export default class CoordinatesTransformation {
         let planeCenterX = bidimensionalSceneWidth / 2;
         let planeCenterY = bidimensionalSceneHeight / 2;
 
-        return {
-            x: planeCenterX + x,
-            y: planeCenterY + y,
-        };
+        //We handle the difference between the current bidimensional editor view
+        switch(editorView) {
+            case TOP:
+                return {
+                    x: planeCenterX + x,
+                    y: planeCenterY + y,
+                };
+            case FRONT:
+                let heightPadding = (bidimensionalSceneHeight - bidimensionalRoomHeight) / 2;
+                return {
+                    x: planeCenterX + x,
+                    y: (bidimensionalSceneHeight - heightPadding) - y,
+                };
+        }
+
     }
 
     /**
-    * This method transforms the 3D coordinates to the corresponding 2D ones, to get the object placed in the same
-    * way between both scenes.
+     * This method transforms the 3D coordinates to the corresponding 2D ones, to reconstruct the 2D scene based on the 3D
+     * coordinates. It receives the current editor view as parameter to make the swap on the 3D axis that affects the Y axis 
+     * on the 2D view.
+     * @param {string} bidimensionalEditorView 
      */
-    tridimensionalToBidimensionalCoordinates = () => {
+    tridimensionalToBidimensionalCoordinates = (bidimensionalEditorView, roomAltitude) => {
         let { 
             x,
             y,
@@ -167,7 +210,17 @@ export default class CoordinatesTransformation {
         //We get the ratio between the two scenes dimensions
         let xRatio = bidimensionalRoomWidth / tridimensionalSceneWidth;
         let yRatio = bidimensionalRoomHeight / tridimensionalSceneHeight;
-        //Remembering that z (depth) in 3D editor is y in 2D editor (TOP_VIEW), and that they are inverted
-        return originTridimensionalPlaneCoordinates(x * xRatio, z * yRatio);
+        //We handle which 3D axis will affect the 2D Y axis according to the bidimensional editor current view.
+        switch(bidimensionalEditorView) {
+            case TOP:
+                return originTridimensionalPlaneCoordinates(x * xRatio, z * yRatio, bidimensionalEditorView);
+            case FRONT:
+                //If we have the front view, we recalculate the yRatio, because the bidimensionalSceneHeight is the Z axis of the room, and we need the height or altitude (Y axis)
+                yRatio = bidimensionalRoomHeight / roomAltitude;
+                return originTridimensionalPlaneCoordinates(x * xRatio, y * yRatio, bidimensionalEditorView);
+            default:
+                return originTridimensionalPlaneCoordinates(x * xRatio, z * yRatio);
+        }
+        
     }
 }
