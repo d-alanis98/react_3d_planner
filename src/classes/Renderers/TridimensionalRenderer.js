@@ -99,7 +99,7 @@ export default class TridimensionalRenderer{
      * to the dom container.
      */
     setInitialRenderer(){
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
         //Renderer settings
         this.renderer.setClearColor('#e5e5e5');
         this.renderer.setSize(this.containerWidth, this.containerHeight);

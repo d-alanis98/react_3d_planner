@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Styles
 import './CircularIcon.css';
 
-const CircularIcon = ({ icon, onClick, className, ...attrs }) => (
+const CircularIcon = ({ icon, onClick, className, iconClassName, ...attrs }) => (
     <div
         onClick = { onClick }
         className = { `circular-icon__container ${className || '' }` }
@@ -11,7 +11,7 @@ const CircularIcon = ({ icon, onClick, className, ...attrs }) => (
     >
         <FontAwesomeIcon 
             icon = { icon }
-            className = 'circular-icon__icon'
+            className = { iconClassName || 'circular-icon__icon' }
         />
     </div>
 );

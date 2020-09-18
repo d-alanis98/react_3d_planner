@@ -32,7 +32,6 @@ export default class ModelPositionCalculator {
         let height = this.getHeightBasedOnModelRotation(model);
         let heightPadding = height / 2;
         let maxPointInZAxis = z + heightPadding;
-        console.log({ maxPointInZAxis })
         return maxPointInZAxis;
     }
 

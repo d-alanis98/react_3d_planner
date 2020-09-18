@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 3.2.5
+ * @version 3.3.5
  */
 //Actions
 import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
@@ -15,13 +15,16 @@ import { TOP } from '../../constants/models/models';
 
 //CONSTANTS
 //Action types
-const SET_PROJECT               = 'SET_PROJECT';
-const SET_PROJECT_NAME          = 'SET_PROJECT_NAME';
-const SET_PROJECT_TYPE          = 'SET_PROJECT_TYPE';
-const SET_PROJECT_SCENE         = 'SET_PROJECT_SCENE';
-const SET_PROJECT_OBJECTS       = 'SET_PROJECT_OBJECTS';
-const SET_PROJECT_DESCRIPTION   = 'SET_PROJECT_DESCRIPTION';
-const SET_DISPLAY_MODELS_MENU   = 'SET_DISPLAY_MODELS_MENU';
+const SET_PROJECT                   = 'SET_PROJECT';
+const SET_PROJECT_NAME              = 'SET_PROJECT_NAME';
+const SET_PROJECT_TYPE              = 'SET_PROJECT_TYPE';
+const SET_PROJECT_SCENE             = 'SET_PROJECT_SCENE';
+const SET_PROJECT_OBJECTS           = 'SET_PROJECT_OBJECTS';
+const SET_PROJECT_DESCRIPTION       = 'SET_PROJECT_DESCRIPTION';
+const SET_DISPLAY_MODELS_MENU       = 'SET_DISPLAY_MODELS_MENU';
+const SET_PROJECT_TO_PDF_ITEMS      = 'SET_PROJECT_TO_PDF_ITEMS';
+const SET_PROJECT_TO_PDF_PAGES      = 'SET_PROJECT_TO_PDF_PAGES';
+const SET_EXPORTING_PROJECT_TO_PDF  = 'SET_EXPORTING_PROJECT_TO_PDF';
 //Initial state
 const initialScene = {
     [BidimensionalRenderer.BIDIMENSIONAL_SCENE]: {
@@ -29,6 +32,7 @@ const initialScene = {
     },
     [TridimensionalRenderer.TRIDIMENSIONAL_SCENE]: {}
 }
+
 const initialState = {
     name: '',
     type: ProjectConfiguration.CLOSET_PROJECT,
@@ -36,11 +40,14 @@ const initialState = {
     objects: [],
     description: '',
     displayModelsMenu: false,
+    projectToPDFItems: [],
+    projectToPDFPages: [],
+    exportingProjectToPDF: false,
 }
 //Others
 const PROJECT_ID              = 'PROJECT_ID';
-const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
 const BASE_ENDPOINT           = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
+const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
 export const PROJECT_PROGRESS = 'PROJECT_PROGRESS';
 
 //REDUCER
@@ -81,6 +88,21 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 displayModelsMenu: payload,
             };
+        case SET_PROJECT_TO_PDF_ITEMS:
+            return {
+                ...state,
+                projectToPDFItems: payload,
+            };
+        case SET_PROJECT_TO_PDF_PAGES:
+            return {
+                ...state,
+                projectToPDFPages: payload,
+            };
+        case SET_EXPORTING_PROJECT_TO_PDF:
+            return {
+                ...state,
+                exportingProjectToPDF: payload,
+            }
         default:
             return state;
     }
@@ -243,9 +265,14 @@ const getProgressDataFromState = getState => {
  * @param {object} project 
  */
 export let setProjectAction = project => (dispatch, getState) => {
+    const { project: existingProjectState } = { ...getState() };
+    let projectState = { 
+        ...existingProjectState,
+        ...project
+    };
     dispatch({
         type: SET_PROJECT,
-        payload: project
+        payload: projectState
     });
 }
 /**
@@ -460,5 +487,48 @@ export let setDisplayModelsMenuAction = displayModelsMenu => (dispatch, getState
     dispatch({
         type: SET_DISPLAY_MODELS_MENU,
         payload: displayModelsMenu,
+    });
+}
+
+
+export let startProjectPDFExportAction = () => (dispatch, getState) => {
+    dispatch({
+        type: SET_EXPORTING_PROJECT_TO_PDF,
+        payload: true
+    });
+}
+
+export let stopProjectPDFExportAction = () => (dispatch, getState) => {
+    dispatch({
+        type: SET_EXPORTING_PROJECT_TO_PDF,
+        payload: false
+    });
+}
+
+export let setProjectToPDFItemsAction = items => (dispatch, getState) => {
+    dispatch({
+        type: SET_PROJECT_TO_PDF_ITEMS,
+        payload: items
+    });
+}
+
+export let addItemToPDFAction = item => (dispatch, getState) => {
+    const { projectToPDFItems: existingItems } = { ...getState().project };
+    
+    let updatedItems = existingItems.concat(item);
+    setProjectToPDFItemsAction(updatedItems)(dispatch, getState);
+}
+
+export let removeItemFromPDFAction = itemToRemove => (dispatch, getState) => {
+    const { projectToPDFItems: existingItems } = { ...getState().project };
+
+    let updatedItems = existingItems.filter(item => item.id !== itemToRemove.id);
+    setProjectToPDFItemsAction(updatedItems)(dispatch, getState);
+}
+
+export let setProjectPDFPagesAction = pages => (dispatch, getState) => {
+    dispatch({
+        type: SET_PROJECT_TO_PDF_PAGES,
+        payload: pages,
     });
 }

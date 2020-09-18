@@ -1,15 +1,16 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.0.0
+ * @version 2.2.0
  */
 
 //CONSTANTS
 //Notification types
+export const NOTIFICATION_INFO      = 'info';
 export const NOTIFICATION_DANGER    = 'danger';
 export const NOTIFICATION_SUCCESS   = 'success'
 export const NOTIFICATION_WARNING   = 'warning';
 //Notification times
-export const NOTIFICATION_TIME_SM   = 1000;
+export const NOTIFICATION_TIME_SM   = 2000;
 export const NOTIFICATION_TIME_MD   = 3000;
 export const NOTIFICATION_TIME_LG   = 5000;
 //Action types

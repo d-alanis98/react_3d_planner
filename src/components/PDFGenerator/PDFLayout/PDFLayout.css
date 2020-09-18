@@ -1,0 +1,47 @@
+.pdf-layout__container {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0.5rem 0.5rem;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.pdf-layout__sm-section,
+.pdf-layout__md-section,
+.pdf-layout__lg-section,
+.pdf-layout__xl-section {
+    display: flex;
+    height: 50%;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.25rem;
+}
+
+.pdf-layout__sm-section {
+    width: 25%;
+}
+
+.pdf-layout__md-section {
+    width: 50%;
+}
+
+.pdf-layout__lg-section {
+    width: 75%;
+}
+
+.pdf-layout__xl-section {
+    width: 100%;
+}
+
+.pdf-layout__image {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.pdf-layout__image-thumbnail {
+    font-size: 400%;
+}

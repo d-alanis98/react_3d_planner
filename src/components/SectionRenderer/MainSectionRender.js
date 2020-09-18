@@ -9,6 +9,7 @@ import withProjectState from '../../redux/HOC/withProjectState';
 import with3DRendererContextProvider from '../Renderer/3D/HOC/with3DRendererContextProvider';
 //Constants
 import { SectionComponentToRender } from '../../constants/sections/sections';
+import withPDFGenerationControls from '../PDFGenerator/HOC/withPDFGenerationControls';
 
 
 const MainSectionRender = props => {
@@ -37,7 +38,7 @@ const MainSectionRender = props => {
         />
     
     
-    else return(
+    else return (
         editorWidth && editorHeight ?
             SectionComponentToRender[editorType]
         : <ProjectSettings />
@@ -49,7 +50,7 @@ let WithEditorState = withEditorState(MainSectionRender);
 let WithProjectState = withProjectState(WithEditorState);
 //We apply the family state HOC
 let WithFamilyState = withFamilyState(WithProjectState);
-//We apply the 3d renderer context provider
-let With3DRendererContextProvider = with3DRendererContextProvider(WithFamilyState);
+//We apply the PDF generation controls HOC
+let WithPDFGenerationControls = withPDFGenerationControls(WithFamilyState);
 //We export the decorated component
-export default With3DRendererContextProvider;
+export default WithPDFGenerationControls;

@@ -1,0 +1,23 @@
+.page-builder {
+    position: relative;
+    height: 80%;
+    background-color: rgba(0,0,0,0.05);
+    margin-bottom: 0.75rem;
+    padding: 0 0.5rem;
+}
+
+.page-builder__header {
+    height: 5%;
+    padding: 0.25rem 0.25rem;
+}
+
+.page-builder__content {
+    height: 95%;
+}
+
+.page-builder__print-icon {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 1.5rem;
+}

@@ -5,9 +5,9 @@ import LabelWithIcon from '../../Labels/LabelWithIcon';
 //HOC
 import withEditorState from '../../../../redux/HOC/withEditorState';
 //Icons
-import { faToolbox, faObjectGroup, faCube, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faToolbox, faObjectGroup, faCube, faCog, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 //Constants
-import { CATALOG, TRIDIMENSIONAL_EDITOR, BIDIMENSIONAL_EDITOR, PROJECT_SETTINGS } from '../../../../constants/sections/sections';
+import { CATALOG, TRIDIMENSIONAL_EDITOR, BIDIMENSIONAL_EDITOR, PROJECT_SETTINGS, PDF_GENERATION } from '../../../../constants/sections/sections';
 
 
 const EditorActions = ({ setEditorType }) => {
@@ -44,9 +44,17 @@ const EditorActions = ({ setEditorType }) => {
                 icon = { faCog }
                 title = 'Ajustes del proyecto'
                 onClick = { event => setEditorType(PROJECT_SETTINGS) }
-                className = 'text-sidebar-icon cursor-click'
+                className = 'text-sidebar-icon cursor-click mb-3'
                 data-toggle = 'tooltip' 
                 data-placement = 'right' 
+            />
+            <LabelWithIcon 
+                icon = { faFilePdf }
+                title = 'Generar PDF'
+                onClick = { event => setEditorType(PDF_GENERATION) }
+                className = 'text-sidebar-icon cursor-click'
+                data-toggle = 'tooltip' 
+                data-placement = 'right'
             />
 
         </FlexColumn>

@@ -9,7 +9,8 @@ import {
     setProjectTypeAction,
     setProjectSceneAction,
     setProjectObjectsAction, 
-    addObjectToProjectAction, 
+    addObjectToProjectAction,
+    setProjectPDFPagesAction, 
     updateProjectObjectAction,
     set2DRoomDimensionsAction,
     set2DSceneDimensionsAction,
@@ -31,6 +32,7 @@ const withProjectState = WrappedComponent => {
             setProjectSceneAction,
             setProjectObjectsAction, 
             addObjectToProjectAction,
+            setProjectPDFPagesAction,
             updateProjectObjectAction,
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
@@ -55,6 +57,7 @@ const withProjectState = WrappedComponent => {
             setProjectType = { setProjectTypeAction }
             setProjectScene = { setProjectSceneAction }
             setProjectObjects = { setProjectObjectsAction }
+            setProjectPDFPages = { setProjectPDFPagesAction }
             set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
             set3DSceneDimensions = { set3DSceneDimensionsAction }
@@ -83,6 +86,7 @@ const withProjectState = WrappedComponent => {
             setProjectSceneAction,
             setProjectObjectsAction,  
             addObjectToProjectAction,
+            setProjectPDFPagesAction,
             updateProjectObjectAction,
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,

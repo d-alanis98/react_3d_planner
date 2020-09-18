@@ -6,6 +6,7 @@ import SideBar from './components/Layout/Sidebar/Sidebar';
 import MainSectionRender from './components/SectionRenderer/MainSectionRender';
 import FixedWidthContainer from './components/Layout/Containers/FixedWidthContainer';
 import Notification from './components/Notifications/Notification';
+import with3DRendererContextProvider from './components/Renderer/3D/HOC/with3DRendererContextProvider';
 
 
 const App = () => {
@@ -34,4 +35,4 @@ const App = () => {
     );
 }
 
-export default App;
+export default with3DRendererContextProvider(App);
