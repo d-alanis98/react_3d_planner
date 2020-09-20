@@ -5,7 +5,14 @@ import ModelsLibrary from './ModelsLibrary/ModelsLibrary';
 import FixedWidthContainer from '../../../../../Layout/Containers/FixedWidthContainer';
 import PlaneActions from './PlaneActions/PlaneActions';
 
-const EditorActions = ({ models, addModel, rotateCamera, addTextureToPlane, toggleOrbitControls, orbitControlsEnabled }) => (
+const EditorActions = ({ 
+    rotateCamera, 
+    displayWalls,
+    addTextureToPlane, 
+    toggleOrbitControls, 
+    orbitControlsEnabled ,
+    toggleWallsVisibility
+}) => (
     <FlexRow
         className = 'justify-content-around align-items-center h-100'
     >
@@ -25,9 +32,11 @@ const EditorActions = ({ models, addModel, rotateCamera, addTextureToPlane, togg
         >
             <PlaneActions 
                 rotateCamera = { rotateCamera }
+                displayWalls = { displayWalls }
                 addTextureToPlane = { addTextureToPlane }
                 toggleOrbitControls = { toggleOrbitControls }
                 orbitControlsEnabled = { orbitControlsEnabled }
+                toggleWallsVisibility = { toggleWallsVisibility }
             />
         </FixedWidthContainer>
 

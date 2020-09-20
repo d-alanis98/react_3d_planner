@@ -4,7 +4,6 @@ import FlexRow from '../../../../../Layout/Flex/FlexRow';
 import CollapseController from '../../../../../Layout/Collapsable/CollapseController';
 import LabelWithIcon from '../../../../../Layout/Labels/LabelWithIcon';
 import CollapsableContent from '../../../../../Layout/Collapsable/CollapsableContent';
-import FixedHeightContainer from '../../../../../Layout/Containers/FixedHeightContainer';
 //Styles
 import './EditorSection.css';
 
@@ -13,8 +12,9 @@ const EditorSection = ({
     targetId, 
     sectionIcon, 
     sectionName,
-    defaultExpanded 
-}) =>  (
+    defaultExpanded
+}) =>  {
+    return (
     <Fragment>
         <FlexRow
             className = 'editor-section__title_label'
@@ -37,5 +37,6 @@ const EditorSection = ({
         </CollapsableContent>
     </Fragment>
 );
+    }
 
 export default EditorSection;

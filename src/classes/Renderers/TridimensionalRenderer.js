@@ -6,15 +6,16 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import BoundDetector from '../3D/BoxPositioning/BoundDetector';
 import ModelDecorator from '../3D/Models/ModelDecorator';
 import DimensionsGetter from '../Models/DimensionsGetter';
+import PlaneTextureHelper from '../3D/Plane/PlaneTextureHelper';
 import ModelScaleCalculator from '../3D/Models/ModelScaleCalculator';
 //Factories
 import PlaneFactory from '../3D/Plane/PlaneFactory';
 import TextureFactory from '../3D/Models/TextureFactory';
-
+import WallFactory from '../3D/Walls/WallFactory';
 
 /**
  * @author Damián Alanís Ramírez
- * @version 8.6.1
+ * @version 8.8.3
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -34,11 +35,13 @@ export default class TridimensionalRenderer{
     static DEFAULT_TEXTURE_URI = TextureFactory.getTextureUri();
 
     //CONSTRUCTOR
-    constructor(sceneWidth = PlaneFactory.DEFAULT_SIZE, sceneHeight = PlaneFactory.DEFAULT_SIZE){
+    constructor(sceneWidth = PlaneFactory.DEFAULT_SIZE, sceneHeight = PlaneFactory.DEFAULT_SIZE, roomHeight){
         this.objects = [];
         //Scene dimensions
         this.sceneWidth = sceneWidth;
         this.sceneHeight = sceneHeight;
+        //Room height
+        this.roomHeight = roomHeight;
         //Container dimensions
         this.domContainer = document.getElementById(TridimensionalRenderer.DOM_CONTAINER_ID);
         this.containerWidth = this.domContainer.clientWidth;
@@ -46,6 +49,10 @@ export default class TridimensionalRenderer{
         this.containerAspectRatio = this.containerWidth / this.containerHeight;
         //Plane
         this.plane = null;
+        this.planeTexture = null;
+        //Walls
+        this.walls = [];
+        this.wallsColor = WallFactory.DEFAULT_COLOR;
         //Controls
         this.orbitControls = null;
         this.dragControls = null;
@@ -69,6 +76,7 @@ export default class TridimensionalRenderer{
         this.setInitialRenderer();
         this.addControls();
         this.addPlane();
+        this.addWalls();
         this.addResizeListener();
         this.render()
     }
@@ -147,6 +155,13 @@ export default class TridimensionalRenderer{
 
         
     }
+    /**
+     * Setter for the plane texture property
+     * @param {string|number} planeTexture 
+     */
+    setPlaneTexture(planeTexture) {
+        this.planeTexture = planeTexture;
+    }
 
     /**
      * This method creates a plane and adds it to the scene
@@ -158,7 +173,11 @@ export default class TridimensionalRenderer{
         //Main plane (which can be personalized with different textures)
         this.plane = PlaneFactory.create(PlaneFactory.MESH_PLANE, this.sceneWidth, this.sceneHeight);
         this.addToScene(this.plane);  
+        //We apply the texture that we have in the global state
+        let planeTextureHelper = new PlaneTextureHelper(this.plane, this);
+        planeTextureHelper.applyTexture(this.planeTexture);
     }
+
 
     /**
      * This method adds a listener to the window resize event, in order to change the renderer dimensions to make it
@@ -270,11 +289,36 @@ export default class TridimensionalRenderer{
      * This method sets the object's array with the provided one.
      * @param {array} objects 
      */
-    setObjects(objects){
+    setObjects(objects) {
         if(Array.isArray(objects))
             this.objects = objects;
         //We notify the object change observers
         this.onObjectsUpdate(this.objects);
+    }
+
+    /**
+     * Setter for the wall's color property.
+     * @param {string|number} wallsColor 
+     */
+    setWallsColor(wallsColor) {
+        this.wallsColor = wallsColor;
+    }
+
+    /**
+     * We add the walls to the scene
+     */
+    addWalls(){
+        let sceneInstance = this;
+        let wallFactory = new WallFactory(
+            this.sceneWidth, 
+            this.roomHeight, 
+            this.sceneHeight,
+            WallFactory.WALL_DEPTH, 
+            sceneInstance,
+            this.wallsColor
+        );
+        wallFactory.createAllWalls()
+            .then(createdWalls => sceneInstance.walls = createdWalls); //We store the created walls in the current instance, in the walls property
     }
 
     /**
@@ -288,7 +332,7 @@ export default class TridimensionalRenderer{
      */
     load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess){
         //We conform the uri of the model
-        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
+        let uri = `${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
         //We load the model

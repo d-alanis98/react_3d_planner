@@ -13,7 +13,7 @@ const TexturesList = ({ textures, onTextureChange }) => (
                     className = 'textures-list__item'
                 >
                     <img 
-                        src = { `${process.env.MIX_APP_API_ENDPOINT}/colors/${texture.id_color}` }
+                        src = { `${process.env.REACT_APP_API_ENDPOINT}/colors/${texture.id_color}` }
                         className = 'textures-list__item-img'
                     />
                     { texture.nombre_es }

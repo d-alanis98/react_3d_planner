@@ -1,10 +1,10 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 3.3.5
+ * @version 4.3.5
  */
 //Actions
 import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
-import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction } from './editorDuck';
+import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction, setEditorTypeAction, TRIDIMENSIONAL_EDITOR } from './editorDuck';
 //Classes
 import Requests from '../../classes/Helpers/Requests';
 import ProjectConfiguration from '../../classes/ProjectConfiguration';
@@ -46,7 +46,7 @@ const initialState = {
 }
 //Others
 const PROJECT_ID              = 'PROJECT_ID';
-const BASE_ENDPOINT           = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
+const BASE_ENDPOINT           = `${process.env.REACT_APP_API_ENDPOINT}/disenhios3D`;
 const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
 export const PROJECT_PROGRESS = 'PROJECT_PROGRESS';
 
@@ -175,6 +175,7 @@ const restoreProjectSuccess = (serializedProjectData, dispatch, getState) => {
     setEditorDepthAction(editorDepth)(dispatch, getState);
     setEditorWidthAction(editorWidth)(dispatch, getState);
     setEditorHeightAction(editorHeight)(dispatch, getState);
+    setEditorTypeAction(TRIDIMENSIONAL_EDITOR)(dispatch, getState);
     createNotificationAction('Proyecto restaurado con éxito desde el servidor', NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
 } 
 

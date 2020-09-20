@@ -1,6 +1,7 @@
 import { compose, createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 //Reducers
+import planeReducer from './reducers/planeDuck';
 import editorReducer from './reducers/editorDuck';
 import familyReducer from './reducers/familyDuck';
 import projectReducer, { restoreProjectAction } from './reducers/projectDuck';
@@ -8,6 +9,7 @@ import texturesReducer, { getTexturesAction } from './reducers/texturesDuck';
 import notificationReducer from './reducers/notificationDuck';
 
 let rootReducer = combineReducers({
+    plane: planeReducer,
     editor: editorReducer,
     family: familyReducer,
     project: projectReducer,

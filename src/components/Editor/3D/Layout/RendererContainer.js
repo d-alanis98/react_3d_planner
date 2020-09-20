@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 //Components
 import ModelsMenuContainer from './ModelsMenu/ModelsMenuContainer';
 import FixedHeightContainer from '../../../Layout/Containers/FixedHeightContainer';
+import PlaneSettingsContainer from './PlaneSettings/PlaneSettingsContainer';
 
 const RendererContainer = ( ) => (
     <Fragment>
@@ -10,6 +11,7 @@ const RendererContainer = ( ) => (
             height = { 100 }
         />
         <ModelsMenuContainer />
+        <PlaneSettingsContainer />
     </Fragment>
 );
 

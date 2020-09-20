@@ -2,6 +2,10 @@
     height: 5vh;
 }
 
+.h-5-relative {
+    height: 5%;
+}
+
 .h-10{
     height: 10vh;
 }
@@ -48,4 +52,8 @@
 
 .h-90{
     height: 90vh;
+}
+
+.h-95-relative {
+    height: 95%;
 }

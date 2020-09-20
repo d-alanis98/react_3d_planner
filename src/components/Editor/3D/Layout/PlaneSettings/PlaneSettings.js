@@ -1,12 +1,69 @@
 import React from 'react';
 //Components
+import LabelWithIcon from '../../../../Layout/Labels/LabelWithIcon';
+import PropertyHeader from '../ModelEditor/PropertyHeader/PropertyHeader';
+import WallsColorModifier from './Settings/WallsColorModifier/WallsColorModifier';
+import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightContainer';
+import PlaneTextureModifier from './Settings/PlaneTextureModifier/PlaneTextureModifier';
+//Icons
+import { faCog } from '@fortawesome/free-solid-svg-icons';
+//Styles
+import './PlaneSettings.css';
+
+
+
+const PlaneSettings = ({ 
+    containerRef,
+    setDisplayPlaneSettings,
+}) => (
+    <div
+        ref = { containerRef }
+        className = 'plane-settings__container plane-settings__container--unmounted'
+    >
+        <FixedHeightContainer
+            height = { 100 }
+        >
+            <FixedHeightContainer
+                height = { 5 }
+                relative
+            >
+                <PropertyHeader
+                    onIconClick = { event => setDisplayPlaneSettings(false) }
+                >
+                    <LabelWithIcon 
+                            icon = { faCog }
+                            className = 'plane-settings__label'
+                            labelText = 'Ajustes del plano'
+                    />
+                </PropertyHeader>
+            </FixedHeightContainer>
+            <FixedHeightContainer
+                height = { 95 }
+                relative
+                className = 'py-3 overflow-auto'
+            >
+                <PlaneTextureModifier />
+                <WallsColorModifier />
+            </FixedHeightContainer>
+        </FixedHeightContainer>
+    </div>
+);
+
+
+export default PlaneSettings;
+
+
+/*
+import React from 'react';
+//Components
 import ButtonWithIcon from '../../../../../../../Layout/Buttons/ButtonWithIcon';
 //Factories
 import TextureFactory from '../../../../../../../../classes/3D/Models/TextureFactory';
 //Icons
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 
-const PlaneSettings = ({ editorWidth, editorHeight, setEditorHeight, setEditorWidth, handleTextureChange }) => (
+const PlaneSettings = ({ editorWidth, editorHeight, setEditorHeight, setEditorWidth, handleTextureChange }) => 
+(
     <div className='dropup'>
         <div className='dropdown'>
             <ButtonWithIcon 
@@ -66,3 +123,4 @@ const PlaneSettings = ({ editorWidth, editorHeight, setEditorHeight, setEditorWi
 );
 
 export default PlaneSettings;
+*/

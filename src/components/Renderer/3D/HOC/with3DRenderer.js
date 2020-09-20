@@ -10,6 +10,9 @@ import ModelPositionCalculator from '../../../../classes/3D/Models/ModelPosition
 //Factories
 import TextureFactory from '../../../../classes/3D/Models/TextureFactory';
 import CameraRotationFactory from '../../../../classes/3D/Camera/CameraRotationFactory';
+import withPlaneState from '../../../../redux/HOC/withPlaneState';
+import PlaneTextureHelper from '../../../../classes/3D/Plane/PlaneTextureHelper';
+import WallColor from '../../../../classes/3D/Walls/WallColor';
 
 
 
@@ -22,7 +25,7 @@ const with3DRenderer = (WrappedComponent) => {
             //From project HOC
             project, 
             addObject,
-            editorState: { editorWidth, editorHeight },
+            editorState: { editorWidth, editorHeight, editorDepth: roomHeight },
             updateObject, 
             removeObject, 
             //From 3d renderer context consumer HOC
@@ -31,6 +34,8 @@ const with3DRenderer = (WrappedComponent) => {
             //From editor HOC
             set2DSceneDimensions, 
             set3DSceneDimensions, 
+            //From plane state HOC
+            plane: { planeTexture, wallsColor },
             ...extraProps
         } = props;
         const { objects: projectObjects } = project;
@@ -45,13 +50,18 @@ const with3DRenderer = (WrappedComponent) => {
         const [models, setModels] = useState({});
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
+        //Walls visibility
+        const [displayWalls, setDisplayWalls] = useState(true);
         //Orbit controls
         const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
         
         //Effects
         useEffect(() => {
             //We generate a tridimensional renderer instance with the width and height that are currently set in the state
-            let sceneInstance = new TridimensionalRenderer(editorWidth, editorHeight);
+            let sceneInstance = new TridimensionalRenderer(editorWidth, editorHeight, roomHeight, planeTexture);
+            //We set the plane texture and wall's color with the values that we have in the global state
+            sceneInstance.setPlaneTexture(planeTexture);
+            sceneInstance.setWallsColor(wallsColor);
             //We initialize the scene instance and provide the drag end callback, which is the update model function
             sceneInstance.init();
             sceneInstance.setDragEndCallback(updateModel);
@@ -85,7 +95,7 @@ const with3DRenderer = (WrappedComponent) => {
             restoreModels();
             //Freeing up memory
             return () => {
-                sceneInstance.deleteScene()
+                sceneInstance.deleteScene();
                 sceneInstance = null;
             }
         }, []);
@@ -106,12 +116,36 @@ const with3DRenderer = (WrappedComponent) => {
         ]);
 
         useEffect(() => {
+            if(!sceneInstance || !sceneInstance.plane)
+                return;
+            let plane = sceneInstance.plane;
+            let planeTextureHelper = new PlaneTextureHelper(plane, sceneInstance);
+            planeTextureHelper.applyTexture(planeTexture);
+        }, [planeTexture]);
+
+        useEffect(() => {
+            if(!sceneInstance || !sceneInstance.walls)
+                return;
+            sceneInstance.walls.forEach(wall => {
+                WallColor.applyColor(wall, wallsColor);
+            });
+        }, [wallsColor]);
+
+        useEffect(() => {
             if(!draggedObject)
                 return;
             //We get the id and coordinates
             let { uuid, x, y, z } = draggedObject;
             updateModelPosition(uuid, { x, y, z });  
         }, [draggedObject]);
+
+        useEffect(() => {
+            if(sceneInstance) {
+                sceneInstance.walls.forEach(wall => {
+                    wall.visible = displayWalls;
+                })
+            }
+        }, [displayWalls]);
 
         useEffect(() => {
             if(sceneInstance)
@@ -312,17 +346,23 @@ const with3DRenderer = (WrappedComponent) => {
             removeObject(projectObjectToDelete);  
         }
 
+        const toggleWallsVisibility = () => {
+            setDisplayWalls(!displayWalls);
+        };
+
 
 
         return <WrappedComponent
             models = { models }
             sceneModels = { sceneInstanceModels }
+            displayWalls = { displayWalls }
             rotateCamera = { rotateCamera }
             deleteModelById = { deleteModelById }
             addTextureToPlane = { addTextureToPlane }
             addTextureToObject = { addTextureToObject }
             toggleOrbitControls = { toggleOrbitControls }
             orbitControlsEnabled = { orbitControlsEnabled }
+            toggleWallsVisibility = { toggleWallsVisibility }
             { ...extraProps }
         />
     }
@@ -331,8 +371,10 @@ const with3DRenderer = (WrappedComponent) => {
     let WithProjectState = withProjectState(With3DRenderer);
     //We apply the editor state HOC
     let WithEditorState = withEditorState(WithProjectState);
+    //We apply the plane state HOC
+    let WithPlaneState = withPlaneState(WithEditorState);
     //We apply the 3d renderer context consumer HOC
-    let With3DRendererContextConsumer = with3DRendererContextConsumer(WithEditorState);
+    let With3DRendererContextConsumer = with3DRendererContextConsumer(WithPlaneState);
     //We return the decorated component
     return With3DRendererContextConsumer;
 }

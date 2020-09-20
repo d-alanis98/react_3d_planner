@@ -9,14 +9,13 @@ import with3DRenderer from '../../../../Renderer/3D/HOC/with3DRenderer';
 
 const Editor = ({ 
     models, 
-    addModel,
-    sceneModels, 
+    addModel, 
     rotateCamera, 
-    deleteModelById, 
-    addTextureToPlane, 
-    addTextureToObject, 
+    displayWalls, 
+    addTextureToPlane,  
     toggleOrbitControls, 
-    orbitControlsEnabled 
+    orbitControlsEnabled,
+    toggleWallsVisibility
 }) => (
     <FixedHeightContainer
         height = { 100 }
@@ -33,9 +32,11 @@ const Editor = ({
                 models = { models } 
                 addModel = { addModel }
                 rotateCamera = { rotateCamera }
+                displayWalls = { displayWalls }
                 addTextureToPlane = { addTextureToPlane }
                 toggleOrbitControls = { toggleOrbitControls }
                 orbitControlsEnabled = { orbitControlsEnabled }
+                toggleWallsVisibility = { toggleWallsVisibility }
             />
         </FixedHeightContainer>
     </FixedHeightContainer>
