@@ -13,7 +13,7 @@ const CurrentTexture = ({
         >
             <h6>Textura actual</h6>
             <img 
-                src = { `${process.env.REACT_APP_ENDPOINT}/storage/textures/floor/${planeTexture}.jpg` }
+                src = { `${process.env.MIX_APP_ENDPOINT}/storage/textures/floor/${planeTexture}.jpg` }
             />
         </div>
     </div>

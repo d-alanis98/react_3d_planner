@@ -46,7 +46,7 @@ const initialState = {
 }
 //Others
 const PROJECT_ID              = 'PROJECT_ID';
-const BASE_ENDPOINT           = `${process.env.REACT_APP_API_ENDPOINT}/disenhios3D`;
+const BASE_ENDPOINT           = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
 const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
 export const PROJECT_PROGRESS = 'PROJECT_PROGRESS';
 

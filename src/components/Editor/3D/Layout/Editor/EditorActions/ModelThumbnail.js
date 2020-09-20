@@ -14,7 +14,7 @@ const ModelThumbnail = ({ title, model, onClick, className, modelQuantity, image
             data-placement = 'right' 
         >
             <img 
-                src = {`${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${model.id_lineaProducto}/getPic?small=true`} 
+                src = {`${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${model.id_lineaProducto}/getPic?small=true`} 
                 className = { imageClassName || 'model-thumbnail' }
             />
             {

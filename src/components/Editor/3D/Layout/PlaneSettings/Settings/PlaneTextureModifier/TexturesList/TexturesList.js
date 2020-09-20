@@ -17,7 +17,7 @@ const TexturesList = ({
                     className='textures-list__item'
                 >
                     <img 
-                        src = { `${process.env.REACT_APP_ENDPOINT}/storage/textures/floor/${index + 1}.jpg` }
+                        src = { `${process.env.MIX_APP_ENDPOINT}/storage/textures/floor/${index + 1}.jpg` }
                         className = 'textures-list__item-img'
                     />
                 </div>

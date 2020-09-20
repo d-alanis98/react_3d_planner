@@ -99,7 +99,7 @@ export default class WallFactory {
     }
 
     createWall = side => {
-        let uri = `${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${WallFactory.WALL_MODEL_ID}/getModel`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${WallFactory.WALL_MODEL_ID}/getModel`;
         let { x, y, z } = this.getSideCoordinates(side);
         const { width, height, depth } = this.getSideDimensions(side);
         let loader = new GLTFLoader();
