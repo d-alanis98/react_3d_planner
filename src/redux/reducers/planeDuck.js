@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 0.1.0
+ * @version 2.1.0
  */
 
 //Dependencies
@@ -45,7 +45,10 @@ const reducer = (state = initialState, action) => {
 export default reducer;
 
 //ACTIONS
-
+/**
+ * Action to set the current wall color.
+ * @param {string|number} color 
+ */
 export let setWallsColorAction = color => (dispatch, getState) => {
     dispatch({
         type: SET_WALLS_COLOR,
@@ -53,6 +56,10 @@ export let setWallsColorAction = color => (dispatch, getState) => {
     });
 }
 
+/**
+ * Action to set the current texture applied to the plane.
+ * @param {number|string} textureId 
+ */
 export let setPlaneTextureAction = textureId => (dispatch, getState) => {
     dispatch({
         type: SET_PLANE_TEXTURE,
@@ -60,9 +67,24 @@ export let setPlaneTextureAction = textureId => (dispatch, getState) => {
     });
 }
 
+/**
+ * Action to set the state of the display setting flag, if true, the plane settings 
+ * menu will be displayed, else it will be hidden.
+ * @param {bool} displayPlaneSettings 
+ */
 export let setDisplayPlaneSettingsAction = displayPlaneSettings => (dispatch, getState) => {
     dispatch({
         type: SET_DISPLAY_PLANE_SETTINGS,
         payload: displayPlaneSettings,
     });
+}
+
+/**
+ * Action that takes the walls color and plane texture retrieved from the restore
+ * session action. 
+ * @param {object} state 
+ */
+export let setPlaneStateAction = ({ wallsColor, planeTexture }) => (dispatch, getState) => {
+    setWallsColorAction(wallsColor)(dispatch, getState);
+    setPlaneTextureAction(planeTexture)(dispatch, getState);
 }

@@ -51,6 +51,9 @@ const withPDFGeneration = WrappedComponent => {
          * controls and redirect to the PDF generation section.
          */
         useEffect(() => {
+            //If we are not currently exporting to PDF we ignore the following validations
+            if(!exportingProjectToPDF)
+                return;
             const itemsToCapture = getItemsToCapture();
             if(itemsToCapture <= projectToPDFItems.length)
                 stopProjectPDFExport();

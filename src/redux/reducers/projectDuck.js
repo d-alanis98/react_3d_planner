@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 4.3.5
+ * @version 5.1.2
  */
 //Actions
 import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
@@ -12,6 +12,7 @@ import BidimensionalRenderer from '../../classes/Renderers/BidimensionalRenderer
 import TridimensionalRenderer from '../../classes/Renderers/TridimensionalRenderer';
 //Constants
 import { TOP } from '../../constants/models/models';
+import { setPlaneStateAction } from './planeDuck';
 
 //CONSTANTS
 //Action types
@@ -166,11 +167,14 @@ const restoreProjectSuccess = (serializedProjectData, dispatch, getState) => {
     let projectData = JSON.parse(serializedProjectData);
     //We get the data from the object
     let { 
+        plane = {},
         editor: { editorDepth, editorWidth, editorHeight }, 
         project,
     } = projectData;
     //Project
     setProjectAction(project)(dispatch, getState);
+    //Plane
+    setPlaneStateAction(plane)(dispatch, getState);
     //Editor
     setEditorDepthAction(editorDepth)(dispatch, getState);
     setEditorWidthAction(editorWidth)(dispatch, getState);
@@ -247,10 +251,12 @@ const getSaveProgressHeaders = formData => ({
  */
 const getProgressDataFromState = getState => {
     const { 
+        plane,
         editor, 
         project, 
     } = { ...getState() };
     return {
+        plane,
         editor, 
         project: {
             ...project,
@@ -467,7 +473,14 @@ const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
     );
 }
 
-
+/**
+ * This action saves the progress of the project. First, it saves the basic data of the project, 
+ * such as the name, description and dimensions. If the id of the project is not present (this apply
+ * for new projects) it creates a new record with the aforementioned data.
+ * Finally, this action calls the saveProgressInDatabaseAction, to save the actual state of the project 
+ * in JSON string, this contains the necesarry data to reconstruct the project anytime and in any client
+ * (objects, textures applied, coordinates, etc).
+ */
 export let saveProjectAction = () => (dispatch, getState) => {
     //SAVE IN SERVER
     //Endpoint and headers for the request
@@ -484,6 +497,10 @@ export let saveProjectAction = () => (dispatch, getState) => {
     saveProgressDataInDatabaseAction()(dispatch, getState);
 }
 
+/**
+ * This action sets the state of the visibility of the models menu.
+ * @param {bool} displayModelsMenu 
+ */
 export let setDisplayModelsMenuAction = displayModelsMenu => (dispatch, getState) => {
     dispatch({
         type: SET_DISPLAY_MODELS_MENU,
@@ -491,7 +508,9 @@ export let setDisplayModelsMenuAction = displayModelsMenu => (dispatch, getState
     });
 }
 
-
+/**
+ * This action sets the the status of the export to PDF action to true.
+ */
 export let startProjectPDFExportAction = () => (dispatch, getState) => {
     dispatch({
         type: SET_EXPORTING_PROJECT_TO_PDF,
@@ -499,6 +518,9 @@ export let startProjectPDFExportAction = () => (dispatch, getState) => {
     });
 }
 
+/**
+ * This action sets the the status of the export to PDF action to false.
+ */
 export let stopProjectPDFExportAction = () => (dispatch, getState) => {
     dispatch({
         type: SET_EXPORTING_PROJECT_TO_PDF,
@@ -506,6 +528,9 @@ export let stopProjectPDFExportAction = () => (dispatch, getState) => {
     });
 }
 
+/**
+ * This action sets the items that will be contained in the PDF document along its different sections.
+ */
 export let setProjectToPDFItemsAction = items => (dispatch, getState) => {
     dispatch({
         type: SET_PROJECT_TO_PDF_ITEMS,
@@ -513,6 +538,10 @@ export let setProjectToPDFItemsAction = items => (dispatch, getState) => {
     });
 }
 
+/**
+ * Adds an item to the array of items that will be contained in the PDF document.
+ * @param {object} item 
+ */
 export let addItemToPDFAction = item => (dispatch, getState) => {
     const { projectToPDFItems: existingItems } = { ...getState().project };
     
@@ -520,6 +549,10 @@ export let addItemToPDFAction = item => (dispatch, getState) => {
     setProjectToPDFItemsAction(updatedItems)(dispatch, getState);
 }
 
+/**
+ * Removes an item to the array of items that will be contained in the PDF document.
+ * @param {object} itemToRemove 
+ */
 export let removeItemFromPDFAction = itemToRemove => (dispatch, getState) => {
     const { projectToPDFItems: existingItems } = { ...getState().project };
 
@@ -527,6 +560,15 @@ export let removeItemFromPDFAction = itemToRemove => (dispatch, getState) => {
     setProjectToPDFItemsAction(updatedItems)(dispatch, getState);
 }
 
+/**
+ * This action sets the pages of the PDF, each page contains an array of its layout, that is to say, the
+ * distribution of the containers with the posible width values, from 'sm' to 'xl', with:
+ * - 'sm' - 25% width 50% height.
+ * - 'md' - 50% width 50% height.
+ * - 'lg' - 75% width 50% height.
+ * - 'xl' - 100% width 50% height. 
+ * @param {array} pages 
+ */
 export let setProjectPDFPagesAction = pages => (dispatch, getState) => {
     dispatch({
         type: SET_PROJECT_TO_PDF_PAGES,

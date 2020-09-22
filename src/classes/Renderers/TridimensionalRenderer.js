@@ -15,7 +15,7 @@ import WallFactory from '../3D/Walls/WallFactory';
 
 /**
  * @author Damián Alanís Ramírez
- * @version 8.8.3
+ * @version 8.9.3
  * Main class to control the tridimensional scene, making use of the library Three.js and custom logic to
  * manipulate the 3D editor and provide actions to change its behavior in runtime.
  * It sets scene settings and controls model addition, the only parameters that it receives in the constructor are
@@ -31,9 +31,10 @@ export default class TridimensionalRenderer{
     //Light parameters
     static DEFAULT_LIGHT_COLOR = 0xFFFFFF;
     static DEFAULT_LIGHT_INTENSITY = 1;
+    //Camera parameters
+    static CAMERA_DISTANCE_FACTOR = 1.75;
     //Default texture
     static DEFAULT_TEXTURE_URI = TextureFactory.getTextureUri();
-
     //CONSTRUCTOR
     constructor(sceneWidth = PlaneFactory.DEFAULT_SIZE, sceneHeight = PlaneFactory.DEFAULT_SIZE, roomHeight){
         this.objects = [];
@@ -425,7 +426,7 @@ export default class TridimensionalRenderer{
      * Method to get camera´s optimal distance, we need to get far enough to get the whole scene, therefore we 
      * take the maximum value between height and width
      */
-    getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth)  * 1.15;
+    getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth) * TridimensionalRenderer.CAMERA_DISTANCE_FACTOR;
 
     deleteModelById = modelId => {
         let modelToDelete = this.objects.find(model => model.uuid === modelId);
