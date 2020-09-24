@@ -6,16 +6,16 @@ import ProjectSettings from '../ProjectSettings/ProjectSettings';
 import withEditorState from '../../redux/HOC/withEditorState';
 import withFamilyState from '../../redux/HOC/withFamilyState';
 import withProjectState from '../../redux/HOC/withProjectState';
-import with3DRendererContextProvider from '../Renderer/3D/HOC/with3DRendererContextProvider';
 //Constants
 import { SectionComponentToRender } from '../../constants/sections/sections';
 import withPDFGenerationControls from '../PDFGenerator/HOC/withPDFGenerationControls';
+import ObjectsHelper from '../../classes/Helpers/ObjectsHelper';
 
 
 const MainSectionRender = props => {
     //PROPS
     const { 
-        project: { type: projectType },
+        project: { type: projectType, isNewProject },
         family,
         getFamily,
         editorState: { editorType, editorWidth, editorHeight }, 
@@ -27,19 +27,24 @@ const MainSectionRender = props => {
 
     /* Every time the projectType changes we will fetch the new family data */
     useEffect(() => {
-        if(projectType)
+        if(!isNewProject)
             getFamily();
-    }, [projectType]);
+    }, [
+        projectType, 
+        isNewProject
+    ]);
+
+    const shouldSectionComponentRender = () => editorWidth && editorHeight && family && !ObjectsHelper.isEmpty(family);
 
     //Loading state
-    if(fetchingFamily || !family)
+    if(fetchingFamily)
         return <FamilyLoader 
             fetchingFamily = { fetchingFamily }
         />
     
     
     else return (
-        editorWidth && editorHeight ?
+        shouldSectionComponentRender() ?
             SectionComponentToRender[editorType]
         : <ProjectSettings />
     );

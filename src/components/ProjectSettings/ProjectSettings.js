@@ -26,7 +26,7 @@ const ProjectSettings = props => {
     const CHANGES_SAVED_SUCCESSFULLY = 'Cambios guardados exitosamente';
     //Props destructuring
     const { 
-        project: { name, type, description }, 
+        project: { name, type, description, isNewProject }, 
         editorState: { editorDepth, editorHeight, editorWidth },
         saveProject,
         setProjectName, 
@@ -39,8 +39,6 @@ const ProjectSettings = props => {
         setProjectDescription, 
     } = props;
 
-
-    console.log({ editorDepth })
     //Initial state
     const initialState = {
         projectName: name,
@@ -117,6 +115,7 @@ const ProjectSettings = props => {
             <hr />
             <ProjectType 
                 projectType = { projectType }
+                isNewProject = { isNewProject }
                 handleSettingChange = { handleSettingChange }
             />
             <ProjectName 

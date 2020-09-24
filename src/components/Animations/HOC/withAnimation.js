@@ -10,7 +10,6 @@ const withAnimation = displayPropertyName => WrappedComponent => {
         const container = useRef();
 
         useEffect(() => {
-            console.log({ displayComponent })
             if(displayComponent) {
                 container.current.classList.remove('animation__container--unmounted');
                 container.current.classList.add('animation__container--mounted');

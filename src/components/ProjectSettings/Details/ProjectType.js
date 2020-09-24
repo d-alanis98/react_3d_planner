@@ -3,7 +3,7 @@ import LabelWithIcon from '../../Layout/Labels/LabelWithIcon';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons';
 import ProjectConfiguration from '../../../classes/ProjectConfiguration';
 
-const ProjectType = ({ projectType, handleSettingChange }) => (
+const ProjectType = ({ projectType, isNewProject, handleSettingChange }) => (
     <div className='form-group'>
         <LabelWithIcon 
             icon = { faQuestion }
@@ -12,6 +12,7 @@ const ProjectType = ({ projectType, handleSettingChange }) => (
         />
         <select 
             name = 'projectType'
+            disabled = { !isNewProject }
             onChange = { handleSettingChange }
             className = 'form-control'
             defaultValue = { projectType }

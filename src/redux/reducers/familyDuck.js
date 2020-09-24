@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.1.0
+ * @version 2.1.0
  */
 import Requests from '../../classes/Helpers/Requests';
 import ProjectConfiguration from '../../classes/ProjectConfiguration';
@@ -15,7 +15,7 @@ const BASE_ENDPOINT         = `${process.env.MIX_APP_API_ENDPOINT}/familias`;
 //Initial state
 const initialState = {
     family: {},
-    fetching: true,
+    fetching: false,
 }
 
 //REDUCER
@@ -81,7 +81,7 @@ const getFamilyError = (errorCode, errorMessage, dispatch) => {
  */
 export let getFamilyAction = () => (dispatch, getState) => {
     let { project: { type } } = { ...getState() };
-    let familyId = (type === ProjectConfiguration.KITCHEN_PROJECT) ? 3 : 1;
+    let familyId = ProjectConfiguration.getFamilyIdByProjectType(type);
     let endpoint = `${BASE_ENDPOINT}/${familyId}`
     //We pass dispatch as callback argument to be able to use this method in the callbacks
     let callbackArguments = [dispatch];

@@ -147,7 +147,6 @@ const withPDFGeneration = WrappedComponent => {
                     });
                     const documentWidth = pdfDocument.internal.pageSize.getWidth();
                     const documentHeight = pdfDocument.internal.pageSize.getHeight();
-                    console.log({ projectName })
                     pdfDocument.text(projectName, 5, 7.5)
                     pdfDocument.addImage(dataUrl, 'PNG', 0, 7.5, documentWidth, documentHeight - 7.5);
                     pdfDocument.save('sample-document.pdf');

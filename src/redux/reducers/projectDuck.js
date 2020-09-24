@@ -1,8 +1,9 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 5.1.2
+ * @version 5.2.3
  */
 //Actions
+import { setPlaneStateAction } from './planeDuck';
 import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
 import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction, setEditorTypeAction, TRIDIMENSIONAL_EDITOR } from './editorDuck';
 //Classes
@@ -12,7 +13,6 @@ import BidimensionalRenderer from '../../classes/Renderers/BidimensionalRenderer
 import TridimensionalRenderer from '../../classes/Renderers/TridimensionalRenderer';
 //Constants
 import { TOP } from '../../constants/models/models';
-import { setPlaneStateAction } from './planeDuck';
 
 //CONSTANTS
 //Action types
@@ -40,6 +40,7 @@ const initialState = {
     scene: initialScene,
     objects: [],
     description: '',
+    isNewProject: true,
     displayModelsMenu: false,
     projectToPDFItems: [],
     projectToPDFPages: [],
@@ -57,7 +58,8 @@ const reducer = (state = initialState, action) => {
     switch(type){
         case SET_PROJECT:
             return {
-                ...payload
+                ...payload,
+                isNewProject: false,
             };
         case SET_PROJECT_NAME:
             return {
@@ -68,6 +70,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 type: payload,
+                isNewProject: false,
             };
         case SET_PROJECT_SCENE:
             return {
@@ -210,7 +213,7 @@ const getProjectStateAsFormData = (getState) => {
     let { 
         editor: { editorDepth, editorWidth, editorHeight },
         family: { family: { id_familiaProducto } },
-        project: { name, description },
+        project: { name, type, description },
     } = { ...getState() };
     //We prepare them in an object
     let data = {
@@ -219,7 +222,7 @@ const getProjectStateAsFormData = (getState) => {
         fondo: editorHeight * 100,
         nombre: name,
         descripcion: description,
-        id_familiaProducto,
+        id_familiaProducto: ProjectConfiguration.getFamilyIdByProjectType(type),
     }
     //We create and return the form data using the formDataFromObject method of the Requests class
     return Requests.getFormDataFromObject(data);
