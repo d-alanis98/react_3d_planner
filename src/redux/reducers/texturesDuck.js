@@ -63,7 +63,7 @@ export let getTexturesAction = () => (dispatch, getState) => {
     dispatch({
         type: GET_TEXTURES
     });
-    let endpoint = `${process.env.MIX_APP_API_ENDPOINT}/colors`;
+    let endpoint = `${process.env.REACT_APP_API_ENDPOINT}/colors`;
     let callbackArguments = [dispatch];
     Requests.makeRequest(endpoint, {}, getTexturesSuccess, getTexturesError, ...callbackArguments);
 }
