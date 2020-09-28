@@ -147,7 +147,7 @@ export default class CollisionDetector {
             let movingObjectData = getRelevantAttributes(movingObjectAttributes);
             let fixedObjectData = getRelevantAttributes(fixedObjectAttributes);
             //If there is an intersection we make the snap
-            if (haveIntersection(movingObjectData, fixedObjectData))
+            if (haveIntersection(fixedObjectData, movingObjectData))
                 model.position(calculateSnapPosition(fixedObjectData, movingObjectData, movementDirection))
           });
     }
