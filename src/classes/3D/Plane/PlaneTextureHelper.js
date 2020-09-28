@@ -12,7 +12,7 @@ export default class PlaneTextureHelper {
     }
 
     applyTexture = (textureId = 1) => {
-        let textureUri = `${process.env.REACT_APP_ENDPOINT}/storage/textures/floor/${textureId}.jpg`;
+        let textureUri = `${process.env.MIX_APP_ENDPOINT}/storage/textures/floor/${textureId}.jpg`;
         let texture = new THREE.TextureLoader().load(textureUri);
         //Required parameters, specially encoding, which is set to RGBA
         texture.encoding = THREE.RGBAFormat;

@@ -1,11 +1,10 @@
 import React from 'react';
 //Components
+import ColorPicker from './ColorPicker/ColorPicker';
 import EditorSection from '../../../ModelEditor/EditorSections/EditorSection';
 import CurrentWallColor from './CurrentWallColor/CurrentWallColor';
 //Icons
-import { faEyeDropper, faHome } from '@fortawesome/free-solid-svg-icons';
-import ColorPicker from './ColorPicker/ColorPicker';
-
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 
 const WallsColorModifier = () => {
     return (

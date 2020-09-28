@@ -16,7 +16,6 @@ export default class PlaneFactory {
                 plane = new THREE.GridHelper(width, PlaneFactory.DEFAULT_GRID);
                 break;
             case PlaneFactory.MESH_PLANE:
-                const loader = new THREE.TextureLoader();
                 plane = new THREE.Mesh(
                     new THREE.PlaneGeometry(
                         width, 

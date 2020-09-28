@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 //Components
 import FlexRow from '../../Layout/Flex/FlexRow';
 import PDFLayout from '../PDFLayout/PDFLayout';
 import CircularIcon from '../../Layout/Icons/CircularIcon';
+import LabelWithIcon from '../../Layout/Labels/LabelWithIcon';
 //Styles
 import './PageBuilder.css';
 //Icons
 import { faMinusCircle, faPrint } from '@fortawesome/free-solid-svg-icons';
-import LabelWithIcon from '../../Layout/Labels/LabelWithIcon';
+
 
 
 const PageBuilder = ({ 

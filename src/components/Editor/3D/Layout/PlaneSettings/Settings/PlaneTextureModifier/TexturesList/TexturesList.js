@@ -17,7 +17,8 @@ const TexturesList = ({
                     className='plane-textures-list__item'
                 >
                     <img 
-                        src = { `${process.env.REACT_APP_ENDPOINT}/storage/textures/floor/${index + 1}.jpg` }
+                        src = { `${process.env.MIX_APP_ENDPOINT}/storage/textures/floor/${index + 1}.jpg` }
+                        alt = {`Textura ${index + 1}`}
                         className = 'plane-textures-list__item-img'
                     />
                 </div>

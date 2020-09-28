@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 //Components
 import FlexRow from '../Layout/Flex/FlexRow';
 import FlexColumn from '../Layout/Flex/FlexColumn';
-import ButtonWithIcon from '../Layout/Buttons/ButtonWithIcon';
-//HOC
-import withPDFGeneration from './HOC/withPDFGeneration';
-//Icons
-import { faDownload, faInfoCircle, faPlayCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import PageBuilder from './PageBuilder/PageBuilder';
 import LabelWithIcon from '../Layout/Labels/LabelWithIcon';
+import ButtonWithIcon from '../Layout/Buttons/ButtonWithIcon';
+//HOC
 import withProjectState from '../../redux/HOC/withProjectState';
+import withPDFGeneration from './HOC/withPDFGeneration';
+//Icons
+import { faInfoCircle, faPlayCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 const PDFGenerator = ({ 
     printPDF, 

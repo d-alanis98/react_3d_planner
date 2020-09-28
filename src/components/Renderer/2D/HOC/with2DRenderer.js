@@ -9,9 +9,7 @@ import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRe
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
-import { TOP } from '../../../../constants/models/models';
 import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
-import RoomCoordinatesCalculator from '../../../../classes/2D/Room/RoomCoordinatesCalculator';
 import BidimensionalModelLayerManager from '../../../../classes/2D/Models/BidimensionalModelLayerManager';
 
 const with2DRenderer = WrappedComponent => {

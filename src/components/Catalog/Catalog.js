@@ -1,8 +1,11 @@
-import React, { Fragment } from 'react';
-import LabelWithIcon from '../Layout/Labels/LabelWithIcon';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
+//Components
 import ModelsLibrary from './ModelsLibrary/ModelsLibrary';
+import LabelWithIcon from '../Layout/Labels/LabelWithIcon';
+//HOC
 import withFamilyState from '../../redux/HOC/withFamilyState';
+//Icons
+import { faBook } from '@fortawesome/free-solid-svg-icons';
 
 const Catalog = ({ family }) => (
     <div className='container mt-3 text-center'>

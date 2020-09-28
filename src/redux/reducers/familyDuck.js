@@ -11,7 +11,7 @@ const GET_FAMILY           = 'GET_FAMILY';
 const GET_FAMILY_ERROR     = 'GET_FAMILY_ERROR';
 const GET_FAMILY_SUCCESS   = 'GET_FAMILY_SUCCESS';
 //Others
-const BASE_ENDPOINT         = `${process.env.REACT_APP_API_ENDPOINT}/familias`;
+const BASE_ENDPOINT         = `${process.env.MIX_APP_API_ENDPOINT}/familias`;
 //Initial state
 const initialState = {
     family: {},

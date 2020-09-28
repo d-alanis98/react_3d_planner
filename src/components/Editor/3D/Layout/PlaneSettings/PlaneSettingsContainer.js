@@ -1,6 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import withPlaneState from '../../../../../redux/HOC/withPlaneState';
+import React, { useEffect, useRef } from 'react';
+//Components
 import PlaneSettings from './PlaneSettings';
+//HOC
+import withPlaneState from '../../../../../redux/HOC/withPlaneState';
+
 
 const PlaneSettingsContainer = ({
     plane: { displayPlaneSettings },

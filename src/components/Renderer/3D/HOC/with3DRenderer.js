@@ -104,12 +104,14 @@ const with3DRenderer = (WrappedComponent) => {
             if(sceneInstance)
                 setRendererState({
                     ...rendererState,
+                    displayWalls,
                     sceneInstance,
                     deleteModelById,
                     sceneInstanceModels,
                     updateModelPositionParameters,
                 });
         }, [
+            displayWalls,
             sceneInstance, 
             projectObjects, 
             sceneInstanceModels

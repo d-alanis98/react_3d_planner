@@ -6,7 +6,7 @@ let mouseEnterInterval;
 
 const ButtonWithIcon = ({ icon, type, onClick, className, buttonText, onHoverText, iconClassName, ...extraProps }) => {
     //CONSTANTS
-    const MOUSE_ENTER_TIME = 500;
+    const MOUSE_ENTER_TIME = 100;
     
     //HOOKS
     //State

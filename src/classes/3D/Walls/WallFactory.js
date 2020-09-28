@@ -99,7 +99,7 @@ export default class WallFactory {
     }
 
     createWall = side => {
-        let uri = `${process.env.REACT_APP_API_ENDPOINT}/productos/lineas/${WallFactory.WALL_MODEL_ID}/getModel`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${WallFactory.WALL_MODEL_ID}/getModel`;
         let { x, y, z } = this.getSideCoordinates(side);
         const { width, height, depth } = this.getSideDimensions(side);
         let loader = new GLTFLoader();
@@ -139,12 +139,13 @@ export default class WallFactory {
     }
 
     createAllWalls = () => {
-        const { TOP_SIDE, LEFT_SIDE, RIGHT_SIDE } = WallFactory;
+        const { TOP_SIDE, LEFT_SIDE, RIGHT_SIDE, BOTTOM_SIDE } = WallFactory;
         return new Promise((resolve, reject) => {
             let topWall = this.createWall(TOP_SIDE);
             let leftWall = this.createWall(LEFT_SIDE);
             let rightWall = this.createWall(RIGHT_SIDE);
-            Promise.all([topWall, leftWall, rightWall])
+            let bottomWall = this.createWall(BOTTOM_SIDE);
+            Promise.all([topWall, leftWall, rightWall, bottomWall])
                 .then(walls => resolve(walls))
                 .catch(error => reject(error));
         });

@@ -1,6 +1,5 @@
 import React from 'react';
 //Components
-import Container from '../../../../../../Layout/Containers/Container';
 import AxisModifier from './AxisModifier';
 import AxisReference from '../../../../../../Miscelaneous/AxisReference/AxisReference';
 import EditorSection from '../EditorSection';
@@ -10,9 +9,11 @@ import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/wit
 //Classes
 import ModelPositionCalculator from '../../../../../../../classes/3D/Models/ModelPositionCalculator';
 //Icons
-import { faCrosshairs, faArrowsAltH, faArrowsAltV, faArrowsAlt, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCrosshairs, faArrowsAltH, faArrowsAltV, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './PositionModifier.css';
+import Row from '../../../../../../Layout/Grid/Row';
+import Column from '../../../../../../Layout/Grid/Column';
 
 
 
@@ -51,40 +52,51 @@ const PositionModifier = ({ modelToEdit, rendererState }) => {
             sectionIcon = { faCrosshairs }
             sectionName = 'Modificar posición'
         >
-            <Container>
-                <AxisModifier 
-                    id = 'x'
-                    value = { modelToEdit.position.x }
-                    onChange = { handlePositionChange }
-                    axisLabel = 'X'
-                />
-                <AxisDescription 
-                    icon = { faArrowsAltH }
-                    description = 'Modifica la posición a lo largo del plano'
-                />
-                <AxisModifier 
-                    id = 'y'
-                    value = { modelToEdit.position.y }
-                    onChange = { handlePositionChange }
-                    axisLabel = 'Y'
-                />
-                <AxisDescription 
-                    icon = { faArrowsAltV }
-                    description = 'Modifica la posición a lo alto del plano'
-                />
-                <AxisModifier 
-                    id = 'z'
-                    value = { modelToEdit.position.z }
-                    onChange = { handlePositionChange }
-                    axisLabel = 'Z'
-                />
-                <AxisDescription 
-                    icon = { faExpandArrowsAlt }
-                    description = 'Modifica la posición a lo ancho del plano'
-                />
-                <hr/>
-                <AxisReference />
-            </Container>
+            <Row
+            >
+                <Column
+                    mdBreakpoint = { 12 }
+                    lgBreakpoint = { 6 }
+                >
+                    <AxisModifier 
+                        id = 'x'
+                        value = { modelToEdit.position.x }
+                        onChange = { handlePositionChange }
+                        axisLabel = 'X'
+                    />
+                    <AxisDescription 
+                        icon = { faArrowsAltH }
+                        description = 'Modifica la posición a lo largo del plano'
+                    />
+                    <AxisModifier 
+                        id = 'y'
+                        value = { modelToEdit.position.y }
+                        onChange = { handlePositionChange }
+                        axisLabel = 'Y'
+                    />
+                    <AxisDescription 
+                        icon = { faArrowsAltV }
+                        description = 'Modifica la posición a lo alto del plano'
+                    />
+                    <AxisModifier 
+                        id = 'z'
+                        value = { modelToEdit.position.z }
+                        onChange = { handlePositionChange }
+                        axisLabel = 'Z'
+                    />
+                    
+                    <AxisDescription 
+                        icon = { faExpandArrowsAlt }
+                        description = 'Modifica la posición a lo ancho del plano'
+                    />
+                </Column>
+                <Column
+                    mdBreakpoint = { 12 }
+                    lgBreakpoint = { 6 }
+                >
+                    <AxisReference />
+                </Column>
+            </Row>
         </EditorSection>
     );
 }

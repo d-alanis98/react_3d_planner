@@ -10,6 +10,7 @@ const AxisReference = ({ containerStyle }) => (
         >
             <img 
                 src = '/storage/assets/position-reference.png' 
+                alt = 'Referencia de ejes'
                 className = 'axis-reference__image' 
             />
         </div>

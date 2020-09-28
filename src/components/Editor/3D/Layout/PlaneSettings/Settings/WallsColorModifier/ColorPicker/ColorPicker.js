@@ -12,7 +12,7 @@ const ColorPicker = ({
     }
     return (
         <FlexRow
-            className = 'align-items-center justify-content-center'
+            className = 'align-items-center justify-content-center mb-2'
         >
             <SketchPicker
                 color = { wallsColor }

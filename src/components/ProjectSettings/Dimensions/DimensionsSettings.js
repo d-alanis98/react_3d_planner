@@ -4,7 +4,7 @@ import Row from '../../Layout/Grid/Row';
 import Column from '../../Layout/Grid/Column';
 import DimensionInput from './DimensionInput';
 //Icons
-import { faArrowsAltH, faArrowsAltV, faArrowsAlt, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsAltH, faArrowsAltV, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 
 const DimensionsSettings = ({ projectEditorWidth, projectEditorHeight, projectEditorDepth, handleSettingChange }) => (
     <Row

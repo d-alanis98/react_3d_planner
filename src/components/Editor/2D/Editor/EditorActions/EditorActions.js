@@ -3,16 +3,14 @@ import React from 'react';
 import FlexRow from '../../../../Layout/Flex/FlexRow';
 import EditorView from './EditorView/EditorView';
 //Clases
-import BidimensionalRenderer from '../../../../../classes/Renderers/BidimensionalRenderer';
 import withProjectState from '../../../../../redux/HOC/withProjectState';
 
-const EditorActions = ({ project: projectState, setProjectScene }) => {
+const EditorActions = () => {
     return (
         <FlexRow
             className = 'justify-content-start align-items-center px-3 h-100'
         >
             <EditorView />
-
         </FlexRow>
     );
 }

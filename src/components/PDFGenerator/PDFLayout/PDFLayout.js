@@ -1,10 +1,12 @@
-import { faImage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+//HOC
 import withProjectState from '../../../redux/HOC/withProjectState';
 //Styles
 import './PDFLayout.css';
+//Icons
+import { faImage } from '@fortawesome/free-solid-svg-icons';
 
 const PDFLayout = ({ 
     layout,

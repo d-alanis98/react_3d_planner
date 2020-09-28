@@ -33,20 +33,20 @@ export let models2D = {
     [FURNITURE]: {
         //Views
         [TOP]: {
-            uri: '/assets/models/2D/furniture/furniture_top.svg',
-            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
+            uri: '/storage/assets/models/2D/furniture/furniture_top.svg',
+            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT]: {
-            uri: '/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
+            uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
+            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT_LEFT]: {
-            uri: '/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
+            uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
+            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT_RIGHT]: {
-            uri: '/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
+            uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
+            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
         }
     }
 }

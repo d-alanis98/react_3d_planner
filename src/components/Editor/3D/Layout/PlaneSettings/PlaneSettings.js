@@ -9,6 +9,7 @@ import PlaneTextureModifier from './Settings/PlaneTextureModifier/PlaneTextureMo
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './PlaneSettings.css';
+import WallsVisibilityModifier from './Settings/WallsVisibilityModifier/WallsVisibilityModifier';
 
 
 
@@ -44,6 +45,7 @@ const PlaneSettings = ({
             >
                 <PlaneTextureModifier />
                 <WallsColorModifier />
+                <WallsVisibilityModifier />
             </FixedHeightContainer>
         </FixedHeightContainer>
     </div>

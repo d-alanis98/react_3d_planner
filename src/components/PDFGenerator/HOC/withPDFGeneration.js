@@ -19,7 +19,7 @@ import ObjectsHelper from '../../../classes/Helpers/ObjectsHelper';
 import BidimensionalRenderer from '../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../classes/Renderers/TridimensionalRenderer';
 //Constants
-import { NOTIFICATION_DANGER, NOTIFICATION_INFO, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_TIME_SM, NOTIFICATION_WARNING } from '../../../redux/reducers/notificationDuck';
+import { NOTIFICATION_DANGER, NOTIFICATION_INFO, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_TIME_SM } from '../../../redux/reducers/notificationDuck';
 import { BIDIMENSIONAL_EDITOR, PDF_GENERATION, TRIDIMENSIONAL_EDITOR } from '../../../constants/sections/sections';
 
 
