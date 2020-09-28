@@ -55,9 +55,10 @@ const WallsVisibilityModifier = ({
      * When the visibility of a wall change, we will apply the correct values to the walls.
      */
     useEffect(() => {
-        Object.entries(wallsVisibility).forEach(([ wallId, visible ]) => (
-            walls[getWallIndexById(wallId)].visible = visible
-        ));
+        if(walls.length > 0)
+            Object.entries(wallsVisibility).forEach(([ wallId, visible ]) => (
+                walls[getWallIndexById(wallId)].visible = visible
+            ));
     }, [wallsVisibility])
 
     /**

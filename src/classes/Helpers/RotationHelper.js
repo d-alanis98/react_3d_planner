@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 1.0.0
+ * @version 1.2.1
  * Helper methods for the rotation angles and number of turns
  */
 export default class RotationHelper {
@@ -20,5 +20,5 @@ export default class RotationHelper {
      * Returns true if the number of turns (90° or -90° for each turn) is odd, otherwise returns false.
      * @param {number} rotationInDegrees 
      */
-    static isNumberOfTurnsOdd = rotationInDegrees => (rotationInDegrees / 90) % 2 === 0;
+    static isNumberOfTurnsOdd = rotationInDegrees => !rotationInDegrees || ((rotationInDegrees / 90) % 2 === 0);
 }

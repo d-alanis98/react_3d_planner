@@ -12,6 +12,8 @@ export default class ModelEvents {
     static DRAG_END_EVENT    = 'dragend';
     static DRAG_MOVE_EVENT    = 'dragmove';
     static RIGHT_CLICK_EVENT = 'contextmenu';
+    //Mouse movement direction
+    static mouseMovementDirection = null;
 
     /**
      * This method adds an event listener to the object
@@ -71,14 +73,24 @@ export default class ModelEvents {
      * @param {function} onUpdate 
      * @param {function} onSelection 
      */
-    static addModelBasicEventListeners = (model, onUpdate, onSelection) => {
+    static addModelBasicEventListeners = (model, onUpdate, onSelection, detectCollisions = true) => {
         let {
             addDragEndListener,
             addDragMoveListener,
             addRightClickListener
         } = ModelEvents;
-        addDragEndListener(model, onUpdate);
-        addDragMoveListener(model, event => CollisionDetector.detectCollisions(event, model))
+        addDragEndListener(model, event => {
+            //We reset the last mouse movement direction, otherwise, it will be always the first that was set
+            this.mouseMovementDirection = null;
+            onUpdate(event);
+        });
+        if(detectCollisions)
+            addDragMoveListener(model, event => {
+                //Singleton like, we get the stored mouseMovementDirection, if its null, we get it using the getMovementDirection method
+                if(!this.mouseMovementDirection)
+                    this.mouseMovementDirection = CollisionDetector.getMovementDirection(event);
+                CollisionDetector.detectCollisions(event, model, this.mouseMovementDirection)
+            });
         addRightClickListener(model, onSelection);
     }
 
