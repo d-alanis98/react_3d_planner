@@ -49,8 +49,8 @@ export default class BidimensionalModelDimensions {
                 height = productDimensions.height;
                 //In the specific case of the front view, we check if there is an even number of turns (n / 90 % 2 != 0), in hthat case, we swap the dimensions to "rotate it"
                 if(rotation && !RotationHelper.isNumberOfTurnsOdd(rotation)){
-                    height = productDimensions.depth;
-                    width = productDimensions.height;
+                    height = productDimensions.height;
+                    width = productDimensions.depth;
                 }
                 break;
             default:

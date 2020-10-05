@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 5.2.3
+ * @version 5.2.4
  */
 //Actions
 import { setPlaneStateAction } from './planeDuck';
@@ -8,6 +8,7 @@ import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, N
 import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction, setEditorTypeAction, TRIDIMENSIONAL_EDITOR } from './editorDuck';
 //Classes
 import Requests from '../../classes/Helpers/Requests';
+import URLParameters from '../../classes/Helpers/URLParameters';
 import ProjectConfiguration from '../../classes/ProjectConfiguration';
 import BidimensionalRenderer from '../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../classes/Renderers/TridimensionalRenderer';
@@ -17,9 +18,11 @@ import { TOP } from '../../constants/models/models';
 //CONSTANTS
 //Action types
 const SET_PROJECT                   = 'SET_PROJECT';
+const SET_PROJECT_ID                = 'SET_PROJECT_ID';
 const SET_PROJECT_NAME              = 'SET_PROJECT_NAME';
 const SET_PROJECT_TYPE              = 'SET_PROJECT_TYPE';
 const SET_PROJECT_SCENE             = 'SET_PROJECT_SCENE';
+const SET_COTIZATION_ID             = 'SET_COTIZATION_ID';
 const SET_PROJECT_OBJECTS           = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION       = 'SET_PROJECT_DESCRIPTION';
 const SET_DISPLAY_MODELS_MENU       = 'SET_DISPLAY_MODELS_MENU';
@@ -35,11 +38,13 @@ const initialScene = {
 }
 
 const initialState = {
+    id: '',
     name: '',
     type: ProjectConfiguration.CLOSET_PROJECT,
     scene: initialScene,
     objects: [],
     description: '',
+    cotizationId: '',
     isNewProject: true,
     displayModelsMenu: false,
     projectToPDFItems: [],
@@ -47,10 +52,11 @@ const initialState = {
     exportingProjectToPDF: false,
 }
 //Others
-const PROJECT_ID              = 'PROJECT_ID';
-const BASE_ENDPOINT           = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
-const PROJECT_SAVED_MESSAGE   = 'Progreso guardado';
-export const PROJECT_PROGRESS = 'PROJECT_PROGRESS';
+const PROJECT_ID                 = 'id_disenhio';
+const COTIZATION_ID              = 'id_cotizacion';
+const BASE_ENDPOINT              = `${process.env.MIX_APP_API_ENDPOINT}/disenhios3D`;
+const PROJECT_SAVED_MESSAGE      = 'Progreso guardado';
+export const PROJECT_PROGRESS    = 'PROJECT_PROGRESS';
 
 //REDUCER
 const reducer = (state = initialState, action) => {
@@ -60,6 +66,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...payload,
                 isNewProject: false,
+            };
+        case SET_PROJECT_ID:
+            return {
+                ...state,
+                id: payload,
             };
         case SET_PROJECT_NAME:
             return {
@@ -76,6 +87,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 scene: payload,
+            };
+        case SET_COTIZATION_ID:
+            return {
+                ...state,
+                cotizationId: payload,
             };
         case SET_PROJECT_OBJECTS:
             return {
@@ -119,11 +135,13 @@ export default reducer;
  * Success callback for the saveProjectAction request method
  * @param {object} createdDesign 
  */
-const saveProgressSuccess = (createdDesign) => {
+const saveProgressSuccess = (createdDesign, dispatch) => {
     //Create notification with successMessage
     const { id_disenhio: designId } = createdDesign;
-    localStorage.setItem(PROJECT_ID, designId.toString());
-    
+    dispatch({
+        type: SET_PROJECT_ID,
+        payload: designId.toString(),
+    });
 }
 
 
@@ -198,11 +216,15 @@ const restoreProjectError = (errorCode, errorMessage, dispatch, getState) => {
 }
 
 /**
- * Gets the existing project design id from the local storage
- * @todo this will later come from a data attribute in the root div container, with the id of the project
+ * Gets the existing project design id from the URL parameters
  */
-const getExistingProjectId = () => localStorage.getItem(PROJECT_ID);
+const getExistingProjectId = () => URLParameters.getParameter(PROJECT_ID);
 
+
+/**
+ * Gets the existing cotization id from the URL parameters
+ */
+const getExistingCotizationId = () => URLParameters.getParameter(COTIZATION_ID);
 
 /**
  * Converts the required parameters from project state to form data type.
@@ -212,15 +234,16 @@ const getProjectStateAsFormData = (getState) => {
     //We get the required parameters from state
     let { 
         editor: { editorDepth, editorWidth, editorHeight },
-        project: { name, type, description },
+        project: { name, type, description, cotizationId },
     } = { ...getState() };
     //We prepare them in an object
     let data = {
-        alto: editorDepth * 100,
         ancho: editorWidth * 100,
+        alto: editorDepth * 100,
         fondo: editorHeight * 100,
         nombre: name,
         descripcion: description,
+        id_cotizacion: cotizationId,
         id_familiaProducto: ProjectConfiguration.getFamilyIdByProjectType(type),
     }
     //We create and return the form data using the formDataFromObject method of the Requests class
@@ -231,9 +254,9 @@ const getProjectStateAsFormData = (getState) => {
  * This function gets the endpoint of the save progress request based on the existance or inexistance of the projectProgressId
  * @todo get from root div dataset and not from local storage
  */
-const getSaveProgressEndpoint = () => {
+const getSaveProgressEndpoint = getState => {
     let endpoint = `${BASE_ENDPOINT}/`;
-    let projectProgressId = getExistingProjectId();
+    let projectProgressId = getState().project.id;
     //Endpoint based on the existance of project id (if it doesn´t exist a new design is created, if it exists the id is used to update the data of the existing design)
     return endpoint += projectProgressId ? projectProgressId : 'new';
 }
@@ -430,13 +453,27 @@ export let removeObjectFromProjectAction = objectToRemove => (dispatch, getState
     setProjectObjectsAction(newProjectObjects)(dispatch, getState);
 }
 
+/**
+ * Action to set the cotization id (which is retrieved from URL parameters) in the global state
+ */
+export let saveCotizationIdAction = () => (dispatch, getState) => {
+    let cotizationId = getExistingCotizationId();
+    dispatch({
+        type: SET_COTIZATION_ID,
+        payload: cotizationId,
+    });
+}
+
 
 /**
  * This action restores the project state based on the received project store (which may come serialized in JSON string)
  * @param {string|object} serializedProject 
  */
-export let restoreProjectAction = (serializedProject = null) => (dispatch, getState) => {
+export let restoreProjectAction = () => (dispatch, getState) => {
     let projectProgressId = getExistingProjectId();
+    //We save the cotization id in the state
+    saveCotizationIdAction()(dispatch, getState);
+
     if(!projectProgressId)
         return;
     //The endpoint to load the existing project
@@ -457,7 +494,8 @@ export let restoreProjectAction = (serializedProject = null) => (dispatch, getSt
  * This action saves the project's progress data in the database.
  */
 const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
-    let projectProgressId = getExistingProjectId();
+    let projectProgressId = getState().project.id;
+    console.log({ projectProgressId })
     if(!projectProgressId)
         return;
     let endpoint = `${BASE_ENDPOINT}/${projectProgressId}/save`;
@@ -485,19 +523,25 @@ const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
  */
 export let saveProjectAction = () => (dispatch, getState) => {
     //SAVE IN SERVER
+    //We validate the cotization id presence
+    let cotizationId = getState().project.cotizationId;
+    if(!cotizationId)
+        return;
     //Endpoint and headers for the request
-    let endpoint = getSaveProgressEndpoint();
+    let endpoint = getSaveProgressEndpoint(getState);
     let formData = getProjectStateAsFormData(getState);
     let headers = getSaveProgressHeaders(formData);
+
     //We make the request
     Requests.makeRequest(
         endpoint, 
         headers, 
         saveProgressSuccess, 
-        saveProgressError
+        saveProgressError,
+        dispatch
     );
     saveProgressDataInDatabaseAction()(dispatch, getState);
-}
+};
 
 /**
  * This action sets the state of the visibility of the models menu.

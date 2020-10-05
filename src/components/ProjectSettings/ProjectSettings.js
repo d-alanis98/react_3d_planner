@@ -14,7 +14,7 @@ import withNotifications from '../Notifications/HOC/withNotifications';
 //Icons
 import { faCogs, faCrop  } from '@fortawesome/free-solid-svg-icons';
 //Constants
-import { NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
+import { createNotificationAction, NOTIFICATION_DANGER, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
 
 
 
@@ -23,10 +23,11 @@ import { NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers
 
 const ProjectSettings = props => {
     //CONSTANTS
+    const NO_COTIZATION_ID_WARNING   = 'El id de cotización es requerido';
     const CHANGES_SAVED_SUCCESSFULLY = 'Cambios guardados exitosamente';
     //Props destructuring
     const { 
-        project: { name, type, description, isNewProject }, 
+        project: { name, type, description, isNewProject, cotizationId }, 
         editorState: { editorDepth, editorHeight, editorWidth },
         saveProject,
         setProjectName, 
@@ -66,12 +67,15 @@ const ProjectSettings = props => {
 
     //Effects
     useEffect(() => {
-        projectName && projectDescription && projectEditorWidth && projectEditorHeight ?
+        cotizationId && projectName && projectDescription && projectEditorWidth && projectEditorHeight ?
             setFieldsValidated(true)
         : setFieldsValidated(false);
     }, [projectSettings]);
 
-
+    useEffect(() => {
+        if(!cotizationId)
+            createNotification(NO_COTIZATION_ID_WARNING, NOTIFICATION_DANGER);
+    }, [cotizationId]);
 
 
     const saveProjectChanges = event => {

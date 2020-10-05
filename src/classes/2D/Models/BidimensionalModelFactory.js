@@ -3,7 +3,6 @@ import Konva from 'konva';
 //Classes
 import ModelEvents from './ModelEvents';
 import RoomBoundDetector from '../Room/RoomBoundDetector';
-import CollisionDetector from './CollisionDetector';
 import BidimensionalModelRotation from './BidimensionalModelRotation';
 import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
@@ -16,6 +15,10 @@ import { TOP, getModel2DUri } from '../../../constants/models/models';
  */
 
 export default class BidimensionalModelFactory {
+    //Constants
+    static MINIMUM_TEXT_SIZE    = 10;
+    static DEFAULT_TEXT_COLOR   = 'rgba(0,0,0,0.65)';
+    static DEFAULT_TEXT_PADDING = 2;
     /**
      * Factory method, we create the model via the method fromUrl from Konva.Image, we provide this method the 
      * width and height - calculated with the class BidimensionalModelDimensions which get the pixel dimensions
@@ -35,6 +38,7 @@ export default class BidimensionalModelFactory {
             type,
             scene,
             rotation,
+            modelName,
             editorView,
             onUpdate,
             onSuccess, 
@@ -50,8 +54,8 @@ export default class BidimensionalModelFactory {
         
         Konva.Image.fromURL(path, imageNode => {
             let { containerWidth, containerHeight } = scene;
-            imageNode.setAttrs({
-                //If no coordinates were given we place the objects in the middle of the plane
+            //We create a new group to contain the model and the label
+            let group = new Konva.Group({
                 x: x || containerWidth / 2,
                 y: y || containerHeight / 2,
                 type,
@@ -61,24 +65,55 @@ export default class BidimensionalModelFactory {
                 offsetX: width / 2,
                 offsetY: height / 2,
                 //We enable the drag and drop interaction for this element
-                draggable: 'true',
+                draggable: true,
                 //The function that defines the bound for dragging
-                dragBoundFunc: position => RoomBoundDetector.boundDetection(scene, width, height, position),    
+                dragBoundFunc: position => RoomBoundDetector.boundDetection(scene, width, height, position), 
             });
-            //We add the models event listeners (drag -> onUpdate, right click -> onSelection)
-            ModelEvents.addModelBasicEventListeners(imageNode, onUpdate, onSelection);
+
+            //We add the group's event listeners (drag -> onUpdate, right click -> onSelection)
+            ModelEvents.addModelBasicEventListeners(group, onUpdate, onSelection);
+            
+            //We set the image width and height (100% of the group 'container')
+            imageNode.setAttrs({
+                width,
+                height,   
+            });
+            
+            //We add the image to the group
+            group.add(imageNode);
+
+            //We add the text (with the model's name) to the group, at last, in order to get it at the front layer
+            group.add(new Konva.Text({
+                text: modelName,
+                fill: BidimensionalModelFactory.DEFAULT_TEXT_COLOR,
+                width,
+                height,
+                padding: BidimensionalModelFactory.DEFAULT_TEXT_PADDING,
+                fontSize: BidimensionalModelFactory.getTextSizeBasedOnWidth(width, modelName),
+                fontFamily: 'Calibri',
+                align: 'center',
+                verticalAlign: 'middle',
+            }))
             //We add the object to the layer
-            scene.layer.add(imageNode);
+            scene.layer.add(group);
             //If rotation is not null (or 0) we rotate the model and update the drag bound function
-            if(rotation)
-                BidimensionalModelRotation.rotate(imageNode, rotation, scene);
+            if(rotation && editorView === TOP){
+                BidimensionalModelRotation.rotate(group, rotation, scene);
+            }
 
             //If given, we execute the success callback passing the created object as argument
             if(onSuccess && typeof(onSuccess) === 'function')
-                onSuccess(imageNode);
+                onSuccess(group);
                 
             //We update the layer
             scene.layer.batchDraw();
         });
+    }
+
+    static getTextSizeBasedOnWidth = (width, modelName) => {
+        const { MINIMUM_TEXT_SIZE, DEFAULT_TEXT_PADDING } = BidimensionalModelFactory;
+        let modelNameLength = modelName.length;
+        let textSize = Math.floor((width - 2.5 * DEFAULT_TEXT_PADDING) / modelNameLength);
+        return textSize >= MINIMUM_TEXT_SIZE ? textSize : MINIMUM_TEXT_SIZE;
     }
 }

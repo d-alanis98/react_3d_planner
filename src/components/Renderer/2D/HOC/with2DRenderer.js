@@ -136,34 +136,35 @@ const with2DRenderer = WrappedComponent => {
                 //We iterate over the existing models and create the 2d model
                 projectObjectsByLayer.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, rotation, productLine } = model;
+                    const { type, name: modelName, rotation, productLine } = model;
                     //We get the coordinates from the calculation of them based on the existing 3d coordinates
-                    let coordinates = get2DCoordinatesFrom3DState(model);
+                    let { x, y } = get2DCoordinatesFrom3DState(model);
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the SVG model
-                    sceneInstance.loadSVGModel(
+                    sceneInstance.loadSVGModel({
+                        x,
+                        y,
                         type,
-                        productLine,
-                        coordinates,
                         rotation,
-                        editorView,
-                        createdModel => { //onSuccess callback
-                            let { _id, attrs: { x, y } } = createdModel;
-                            const { id, name } = model;
+                        onUpdate: updateModel, //onUpdate
+                        onSuccess: createdModel => { //onSuccess
+                            let { _id, attrs: { x: _x, y: _y } } = createdModel;
                             let modelWithUpdatedId = {
                                 ...model,
-                                name: name || `Modelo ${ id }`,
+                                name: modelName || `Modelo ${ model.id }`,
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
-                                    coordinates: { x, y }
+                                    coordinates: { x: _x, y: _y }
                                 },
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
-                        updateModel, //onUpdate
-                        onSelectedModel, //onSelection
-                    );
+                        modelName: modelName || `Modelo ${ model.id }`,
+                        editorView,
+                        productLine,
+                        onSelection: onSelectedModel, //onSelection
+                    });
                 });
                 setModels(modelsCopy);
             }

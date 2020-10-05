@@ -190,7 +190,18 @@ export default class BidimensionalRenderer {
     }
 
     
-    loadSVGModel(type, productLine, { x, y }, rotation, editorView, onSuccess, onUpdate, onSelection){
+    loadSVGModel({
+        x,
+        y,
+        type, 
+        rotation, 
+        onUpdate,
+        onSuccess,
+        modelName, 
+        editorView,
+        onSelection,
+        productLine,      
+    }){
         //We bind the instance to a variable
         let scene = this;
         //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
@@ -200,12 +211,13 @@ export default class BidimensionalRenderer {
             type,
             scene, 
             rotation,
-            editorView,
-            onUpdate,      
+            onUpdate,
             onSuccess: createdModel => {
                 onSuccess(createdModel);
                 this.objects.push(createdModel)
             }, 
+            modelName,
+            editorView,
             onSelection, 
             productLine,
         });
