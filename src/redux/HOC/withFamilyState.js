@@ -16,11 +16,42 @@ const withFamilyState = WrappedComponent => {
             return subFamilyItem ? subFamilyItem.lineas : undefined;
         }
 
+        const getLineById = lineId => {
+            let lines = family.subFamilias
+                            .reduce((accumulated, current) => accumulated.concat(current.lineas), []);
+            return lines.find(line => line.id_lineaProducto === lineId);
+        }
+
+        const getLineName = lineId => {
+            let targetLine = getLineById(lineId);
+            return targetLine ? targetLine.descripcion_es : '';
+        }
+
+        const getProductByIdAndLine = (productId, lineId) => {
+            let targetLine = getLineById(lineId);
+            if(!targetLine)
+                return;
+            return targetLine.productos.find(product => product.id_producto === productId);
+        }
+
+        const getProductKey = (productId, lineId) => {
+            let targetProduct = getProductByIdAndLine(productId, lineId);
+            return targetProduct ? targetProduct.clave : '';
+        }
+
+        const getProductName = (productId, lineId) => {
+            let targetProduct = getProductByIdAndLine(productId, lineId);
+            return targetProduct ? targetProduct.descripcion_es : '';
+        }
+
         return <WrappedComponent 
             family = { family }
             getLine = { getLine }
             getFamily = { getFamilyAction }
             subFamilies = { family.subFamilias }
+            getLineName = { getLineName }
+            getProductKey = { getProductKey }
+            getProductName = { getProductName }
             fetchingFamily = { fetchingFamily }
             { ...ownProps }
         />

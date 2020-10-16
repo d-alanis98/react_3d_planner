@@ -15,9 +15,10 @@ import ObjectsHelper from '../../classes/Helpers/ObjectsHelper';
 const MainSectionRender = props => {
     //PROPS
     const { 
-        project: { type: projectType, isNewProject },
+        project: { id: designId, type: projectType, isNewProject },
         family,
         getFamily,
+        saveProject,
         editorState: { editorType, editorWidth, editorHeight }, 
         fetchingFamily,
     } = props;
@@ -34,7 +35,16 @@ const MainSectionRender = props => {
         isNewProject
     ]);
 
-    const shouldSectionComponentRender = () => editorWidth && editorHeight && family && !ObjectsHelper.isEmpty(family);
+    /**
+     * Interval to save the project every 30 seconds
+     */
+    useEffect(() => {
+        let saveProjectInterval = setInterval(() => saveProject({ silentSave: true }), 30000);
+        return () => clearInterval(saveProjectInterval);
+    }, [designId]); 
+
+
+    const shouldSectionComponentRender = () => designId && family && !ObjectsHelper.isEmpty(family);
 
     //Loading state
     if(fetchingFamily)

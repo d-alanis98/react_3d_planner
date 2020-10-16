@@ -136,7 +136,7 @@ const with2DRenderer = WrappedComponent => {
                 //We iterate over the existing models and create the 2d model
                 projectObjectsByLayer.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, name: modelName, rotation, productLine } = model;
+                    const { type, name: modelName, rotation, productKey, productLine } = model;
                     //We get the coordinates from the calculation of them based on the existing 3d coordinates
                     let { x, y } = get2DCoordinatesFrom3DState(model);
                     //We update the model quantity
@@ -161,6 +161,7 @@ const with2DRenderer = WrappedComponent => {
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
                         modelName: modelName || `Modelo ${ model.id }`,
+                        productKey,
                         editorView,
                         productLine,
                         onSelection: onSelectedModel, //onSelection
@@ -195,7 +196,7 @@ const with2DRenderer = WrappedComponent => {
             let { rotation } = modelInState;
             let updatedObject = { 
                 ...modelInState,
-                rotation: degrees + rotation || 0,
+                rotation: degrees + (rotation || 0),
             };
             updateObject(updatedObject);
         }

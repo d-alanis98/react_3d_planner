@@ -31,10 +31,11 @@ const Products = ({ project, products, addObject, setEditorType }) => {
         setModels(existingModels);
     }, [])
 
-    const addObjectToProject = (type, productLine) => {
+    const addObjectToProject = (type, productLine, productKey) => {
         let objectToAdd = {
             id: projectObjects.length,
             type,
+            productKey,
             productLine,
             '2d': {
                 uuid: '', //We don´t know the id for the 2D model, it will be generated and updated on render time

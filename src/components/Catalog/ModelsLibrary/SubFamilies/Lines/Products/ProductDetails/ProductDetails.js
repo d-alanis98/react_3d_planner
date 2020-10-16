@@ -6,13 +6,17 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ProductDetails = ({ product, addObjectToProject }) => {
     //Product destructuring 
-    const { alto, ancho, fondo, id_producto, id_lineaProducto, descripcion_es } = product;
+    const { alto, ancho, fondo, clave: productKey, id_producto, id_lineaProducto, descripcion_es } = product;
     return (
         <table className='table table-sm table-borderless text-center'>
             <tbody>
                 <tr>
                     <th>Nombre </th>
                     <td>{ descripcion_es }</td>
+                </tr>
+                <tr>
+                    <th>Clave</th>
+                    <td>{ productKey }</td>
                 </tr>
                 <tr>
                     <th colSpan='2'>Dimensiones</th>
@@ -34,7 +38,7 @@ const ProductDetails = ({ product, addObjectToProject }) => {
                         <ButtonWithIcon 
                             id = { `${id_producto}` }
                             icon = { faPlusCircle }
-                            onClick = { event => addObjectToProject(id_producto, id_lineaProducto) }
+                            onClick = { event => addObjectToProject(id_producto, id_lineaProducto, productKey) }
                             className = 'btn btn-primary rounded-lg shadow'
                             buttonText = 'Agregar'
                         />

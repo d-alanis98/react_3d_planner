@@ -92,9 +92,6 @@ const ModelsMenuContainer = ({
         let modelToRotate = models.find(model => model.uuid === modelId);
         if(!modelToRotate)
             return;
-        /**
-         * @todo Rotation decorator class and move state logic to the with3Drenderer
-         */
         modelToRotate.rotateY(degrees * Math.PI / 180);
         updateRotationInState(modelId, degrees);
 
@@ -103,9 +100,10 @@ const ModelsMenuContainer = ({
     const updateRotationInState = (modelId, degrees) => {
         const modelInState = findObjectBy3DModelId(modelId);
         let { rotation } = modelInState;
+        //We create the updated object data
         let updatedObject = { 
             ...modelInState,
-            rotation: degrees + rotation || 0,
+            rotation: degrees + (rotation || 0),
         };
         updateObject(updatedObject);
     }

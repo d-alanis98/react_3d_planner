@@ -135,13 +135,14 @@ export default reducer;
  * Success callback for the saveProjectAction request method
  * @param {object} createdDesign 
  */
-const saveProgressSuccess = (createdDesign, dispatch) => {
+const saveProgressSuccess = (createdDesign, dispatch, resolve) => {
     //Create notification with successMessage
     const { id_disenhio: designId } = createdDesign;
     dispatch({
         type: SET_PROJECT_ID,
         payload: designId.toString(),
     });
+    resolve(designId);
 }
 
 
@@ -150,9 +151,9 @@ const saveProgressSuccess = (createdDesign, dispatch) => {
  * @param {number} errorCode 
  * @param {string} errorMessage 
  */
-const saveProgressError = (errorCode, errorMessage) => {
-    //Create notification with errorMessage
-    console.log(`[${errorCode}]: ${errorMessage}`)
+const saveProgressError = (errorCode, errorMessage, dispatch, resolve, reject) => {
+    //We reject the promise
+    reject(`[${errorCode}]: ${errorMessage}`);
 }
 
 /**
@@ -161,8 +162,11 @@ const saveProgressError = (errorCode, errorMessage) => {
  * @param {function} dispatch 
  * @param {function} getState 
  */
-const saveProgressInDatabaseSuccess = (data, dispatch, getState) => {
-    createNotificationAction(PROJECT_SAVED_MESSAGE, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+const saveProgressInDatabaseSuccess = (data, dispatch, getState, resolve, reject, silentSave) => {
+    const { project: { id: designId } } = { ...getState() };
+    !silentSave && createNotificationAction(PROJECT_SAVED_MESSAGE, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+    //We resolve the promise with the design Id
+    resolve(designId);
 }
 
 /**
@@ -172,8 +176,9 @@ const saveProgressInDatabaseSuccess = (data, dispatch, getState) => {
  * @param {function} dispatch 
  * @param {function} getState 
  */
-const saveProgressInDatabaseError = (errorCode, errorMessage, dispatch, getState) => {
+const saveProgressInDatabaseError = (errorCode, errorMessage, dispatch, getState, resolve, reject) => {
     createNotificationAction(`[${errorCode}]: ${errorMessage}`, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
+    reject(`[${errorCode}]: ${errorMessage}`);
 }
 
 /**
@@ -493,10 +498,9 @@ export let restoreProjectAction = () => (dispatch, getState) => {
 /**
  * This action saves the project's progress data in the database.
  */
-const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
-    let projectProgressId = getState().project.id;
-    console.log({ projectProgressId })
-    if(!projectProgressId)
+const saveProgressDataInDatabaseAction = (designId, silentSave) => (dispatch, getState) => {
+    let projectProgressId = getState().project.id || designId;
+    if(!projectProgressId) 
         return;
     let endpoint = `${BASE_ENDPOINT}/${projectProgressId}/save`;
     let formData = Requests.getFormDataFromObject({ 
@@ -504,13 +508,16 @@ const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
     });
     let headers = getSaveProgressHeaders(formData);
     const callbackArguments = [dispatch, getState];
-    Requests.makeRequest(
+    return new Promise((resolve, reject) => Requests.makeRequest(
         endpoint,
         headers,
         saveProgressInDatabaseSuccess,
         saveProgressInDatabaseError,
-        ...callbackArguments
-    );
+        ...callbackArguments,
+        resolve,
+        reject,
+        silentSave
+    ));
 }
 
 /**
@@ -521,7 +528,7 @@ const saveProgressDataInDatabaseAction = () => (dispatch, getState) => {
  * in JSON string, this contains the necesarry data to reconstruct the project anytime and in any client
  * (objects, textures applied, coordinates, etc).
  */
-export let saveProjectAction = () => (dispatch, getState) => {
+export let saveProjectAction = ({ silentSave } = { }) => async (dispatch, getState) => {
     //SAVE IN SERVER
     //We validate the cotization id presence
     let cotizationId = getState().project.cotizationId;
@@ -532,15 +539,21 @@ export let saveProjectAction = () => (dispatch, getState) => {
     let formData = getProjectStateAsFormData(getState);
     let headers = getSaveProgressHeaders(formData);
 
+    
     //We make the request
-    Requests.makeRequest(
-        endpoint, 
-        headers, 
-        saveProgressSuccess, 
-        saveProgressError,
-        dispatch
-    );
-    saveProgressDataInDatabaseAction()(dispatch, getState);
+    let designId = await new Promise((resolve, reject) => (
+        Requests.makeRequest(
+            endpoint, 
+            headers, 
+            saveProgressSuccess, 
+            saveProgressError,
+            dispatch,
+            resolve,
+            reject,
+        )
+    ));
+    return saveProgressDataInDatabaseAction(designId, silentSave)(dispatch, getState);
+
 };
 
 /**

@@ -78,6 +78,11 @@ const ProjectSettings = props => {
     }, [cotizationId]);
 
 
+    const setNewURLParameters = designId => {
+        const existingURL = window.location.href;
+        window.location.assign(`${existingURL}&id_disenhio=${designId}`);
+    }
+
     const saveProjectChanges = event => {
         event.preventDefault();
         setUnsavedChanges(false);
@@ -91,9 +96,14 @@ const ProjectSettings = props => {
         set3DSceneDimensions(projectEditorWidth, projectEditorHeight);
         setProjectDescription(projectDescription);
         //We save the changes in the server
-        saveProject();
-        //We create a success notification
-        createNotification(CHANGES_SAVED_SUCCESSFULLY, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD);
+        saveProject()
+            .then(designId => {
+                //We create a success notification
+                createNotification(CHANGES_SAVED_SUCCESSFULLY, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD);
+                //If the project is new, we update the URL with the design Id
+                isNewProject && setNewURLParameters(designId);
+            });
+
     }
 
     const handleSettingChange = event => {

@@ -197,7 +197,8 @@ export default class BidimensionalRenderer {
         rotation, 
         onUpdate,
         onSuccess,
-        modelName, 
+        modelName,
+        productKey, 
         editorView,
         onSelection,
         productLine,      
@@ -217,6 +218,7 @@ export default class BidimensionalRenderer {
                 this.objects.push(createdModel)
             }, 
             modelName,
+            productKey,
             editorView,
             onSelection, 
             productLine,

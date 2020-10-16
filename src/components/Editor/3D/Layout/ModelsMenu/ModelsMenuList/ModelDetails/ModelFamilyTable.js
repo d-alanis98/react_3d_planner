@@ -1,20 +1,31 @@
 import React from 'react';
+import withFamilyState from '../../../../../../../redux/HOC/withFamilyState';
 
-const ModelFamilyTable = ({ modelType, modelProductLine }) => (
+const ModelFamilyTable = ({ 
+    modelType, 
+    getProductKey,
+    getProductName,
+    modelProductLine
+ }) => (
     <table
         className = 'models-menu-list__item-details-table'
     >
         <tbody>
             <tr>
-                <th>Tipo</th>
-                <td>{ modelType }</td>
+                <th>Clave</th>
+                <td>{ getProductKey(modelType, modelProductLine) }</td>
             </tr>
             <tr>
-                <th>Linea de producto</th>
-                <td>{ modelProductLine }</td>
+                <th>Producto</th>
+                <td>{ 
+                    getProductName(modelType, modelProductLine)
+                        .split('')
+                        .map((char, index) => (index === 0) ? char.toUpperCase() : char.toLowerCase())
+                        .join('') 
+                }</td>
             </tr>
         </tbody>
     </table>
 );
 
-export default ModelFamilyTable;
+export default withFamilyState(ModelFamilyTable);

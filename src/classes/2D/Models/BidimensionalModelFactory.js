@@ -30,21 +30,20 @@ export default class BidimensionalModelFactory {
      * @param {function} onSelection 
      * @param {object} attributes
      */
-    static createModel = attributes => {
-        //Arguments destructuring
-        let {
-            x,
-            y,
-            type,
-            scene,
-            rotation,
-            modelName,
-            editorView,
-            onUpdate,
-            onSuccess, 
-            onSelection,
-            productLine
-        } = attributes;
+    static createModel = ({
+        x,
+        y,
+        type,
+        scene,
+        rotation,
+        modelName,
+        productKey,
+        editorView,
+        onUpdate,
+        onSuccess, 
+        onSelection,
+        productLine
+    }) => {
         //We load the path from catalog based on the model type
         let path = getModel2DUri(type, TOP); //We get the TOP view
         //We get the dimensions of the object based on the current view and rotation
@@ -84,7 +83,7 @@ export default class BidimensionalModelFactory {
 
             //We add the text (with the model's name) to the group, at last, in order to get it at the front layer
             group.add(new Konva.Text({
-                text: modelName,
+                text: `${modelName} \n${productKey}`,
                 fill: BidimensionalModelFactory.DEFAULT_TEXT_COLOR,
                 width,
                 height,
