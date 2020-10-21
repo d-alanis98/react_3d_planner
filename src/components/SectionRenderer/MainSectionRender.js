@@ -15,11 +15,11 @@ import ObjectsHelper from '../../classes/Helpers/ObjectsHelper';
 const MainSectionRender = props => {
     //PROPS
     const { 
-        project: { id: designId, type: projectType, isNewProject },
+        project: { id: designId, cotizationId, type: projectType, isNewProject },
         family,
         getFamily,
         saveProject,
-        editorState: { editorType, editorWidth, editorHeight }, 
+        editorState: { editorType }, 
         fetchingFamily,
     } = props;
     
@@ -39,6 +39,8 @@ const MainSectionRender = props => {
      * Interval to save the project every 30 seconds
      */
     useEffect(() => {
+        if(!designId)
+            return;
         let saveProjectInterval = setInterval(() => saveProject({ silentSave: true }), 30000);
         return () => clearInterval(saveProjectInterval);
     }, [designId]); 

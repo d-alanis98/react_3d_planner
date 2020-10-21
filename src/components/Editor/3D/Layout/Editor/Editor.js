@@ -8,6 +8,7 @@ import with3DRenderer from '../../../../Renderer/3D/HOC/with3DRenderer';
 
 
 const Editor = ({ 
+    walls,
     models, 
     addModel, 
     rotateCamera, 
@@ -29,6 +30,7 @@ const Editor = ({
             height = { 10 }
         >
             <EditorActions
+                walls = { walls }
                 models = { models } 
                 addModel = { addModel }
                 rotateCamera = { rotateCamera }

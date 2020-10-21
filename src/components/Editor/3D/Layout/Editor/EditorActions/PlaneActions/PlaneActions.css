@@ -1,0 +1,11 @@
+.walls-visibility__button {
+    border-top-right-radius: 50rem!important;
+    border-bottom-right-radius: 50rem!important;
+    border-left: none!important;
+}
+
+.walls-visibility__dropup-toggler {
+    border-top-left-radius: 50rem!important;
+    border-bottom-left-radius: 50rem!important;
+    border-right: none!important;
+}

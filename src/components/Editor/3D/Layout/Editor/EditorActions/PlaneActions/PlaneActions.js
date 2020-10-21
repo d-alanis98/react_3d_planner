@@ -2,11 +2,14 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import FlexRow from '../../../../../../Layout/Flex/FlexRow';
+import WallsModifier from '../PlaneActions/WallsModifier';
 import ButtonWithIcon from '../../../../../../Layout/Buttons/ButtonWithIcon';
 import CameraPositionMenu from './CameraPositionMenu';
 //HOC
 import withPlaneState from '../../../../../../../redux/HOC/withPlaneState';
 import withProjectState from '../../../../../../../redux/HOC/withProjectState';
+//Styles
+import './PlaneActions.css';
 //Icons
 import { faArrowsAlt, faLock, faLockOpen, faCubes, faBars, faEye, faEyeSlash, faHome, faCog } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,6 +25,7 @@ const PlaneActions = ({
     plane: { displayPlaneSettings },
     setDisplayPlaneSettings,
     //From parent component
+    sceneWalls,
     rotateCamera, 
     displayWalls,
     toggleOrbitControls, 
@@ -56,18 +60,28 @@ const PlaneActions = ({
             }
             onHoverText = { orbitControlsEnabled ? 'Bloquear plano' : 'Desbloquear plano' } 
         /> 
-        <ButtonWithIcon 
-            icon = { displayWalls ? faEyeSlash : faEye }
-            type = { displayWalls ?  'outline-secondary' : 'secondary' }
-            onClick = { toggleWallsVisibility }
-            className = 'btn-sm rounded-pill px-3 py-2 mr-2'
-            buttonText = {
-                <FontAwesomeIcon 
-                    icon = { faHome }
-                />
-            }
-            onHoverText = { displayWalls ? 'Ocultar muros' : 'Mostrar muros' } 
-        />     
+        
+        
+        <div className='btn-group' onClick={e => e.preventDefault()}>
+            <WallsModifier 
+                className = 'walls-visibility__dropup-toggler'
+                sceneWalls = { sceneWalls }
+                displayWalls = { displayWalls }
+            /> 
+            <ButtonWithIcon 
+                icon = { displayWalls ? faEyeSlash : faEye }
+                type =  {displayWalls ? 'outline-secondary' : 'secondary' } 
+                onClick = { toggleWallsVisibility }
+                className = 'btn-sm px-3 py-2 mr-2 walls-visibility__button'
+                buttonText = {     
+                    <FontAwesomeIcon 
+                        icon = { faHome }
+                    />
+                }
+                onHoverText = { displayWalls ? 'Ocultar muros' : 'Mostrar muros' } 
+            /> 
+        </div>
+        
         <ButtonWithIcon 
             icon = { faBars }
             type = 'outline-secondary'

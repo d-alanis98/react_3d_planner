@@ -13,8 +13,11 @@ import withProjectState from '../../redux/HOC/withProjectState';
 import withNotifications from '../Notifications/HOC/withNotifications';
 //Icons
 import { faCogs, faCrop  } from '@fortawesome/free-solid-svg-icons';
+//Classes
+import Validation from '../../classes/Helpers/Validation';
 //Constants
-import { createNotificationAction, NOTIFICATION_DANGER, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
+import { NOTIFICATION_DANGER, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
+
 
 
 
@@ -67,9 +70,26 @@ const ProjectSettings = props => {
 
     //Effects
     useEffect(() => {
-        cotizationId && projectName && projectDescription && projectEditorWidth && projectEditorHeight ?
-            setFieldsValidated(true)
-        : setFieldsValidated(false);
+
+        const validateDimensions = () => (
+            Validation.areAllPositive(
+                projectEditorDepth,
+                projectEditorWidth,
+                projectEditorHeight
+            )
+        );
+
+        const validateFields = () => Validation.areAllFieldsSet(
+            projectName,
+            cotizationId,
+            projectDescription,
+            validateDimensions()
+        );
+
+        validateFields()
+            ? setFieldsValidated(true)
+            : setFieldsValidated(false);
+
     }, [projectSettings]);
 
     useEffect(() => {

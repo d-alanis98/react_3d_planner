@@ -2,6 +2,7 @@ import React from 'react';
 //Components
 import LabelWithIcon from '../../../../Layout/Labels/LabelWithIcon';
 import PropertyHeader from '../ModelEditor/PropertyHeader/PropertyHeader';
+import DefaultTexture from './Settings/DefaultTexture/DefaultTexture';
 import WallsColorModifier from './Settings/WallsColorModifier/WallsColorModifier';
 import FixedHeightContainer from '../../../../Layout/Containers/FixedHeightContainer';
 import PlaneTextureModifier from './Settings/PlaneTextureModifier/PlaneTextureModifier';
@@ -43,6 +44,7 @@ const PlaneSettings = ({
                 relative
                 className = 'py-3 overflow-auto'
             >
+                <DefaultTexture />
                 <PlaneTextureModifier />
                 <WallsColorModifier />
                 <WallsVisibilityModifier />

@@ -5,7 +5,7 @@ import LabelWithIcon from '../Labels/LabelWithIcon';
 //Icons
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 
-const CollapseController = ({ expanded, targetId, className, dropupIcon, dropdownIcon, ...extraProps }) => {
+const CollapseController = ({ icon, expanded, targetId, className, dropupIcon, dropdownIcon, ...extraProps }) => {
     const [collapsed, setCollapsed] = useState(!expanded);
 
     const handleCollapse = event => {
@@ -24,7 +24,7 @@ const CollapseController = ({ expanded, targetId, className, dropupIcon, dropdow
 
     return (
         <LabelWithIcon 
-            icon = { getIcon() }
+            icon = { getIcon() || icon }
             onClick = { handleCollapse }
             className = { className || 'text-muted cursor-click mb-0 mr-2' }
             data-target = { `#${targetId}` }

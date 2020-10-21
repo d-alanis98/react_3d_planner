@@ -38,7 +38,7 @@ const with3DRenderer = (WrappedComponent) => {
             plane: { planeTexture, wallsColor },
             ...extraProps
         } = props;
-        const { objects: projectObjects } = project;
+        const { objects: projectObjects, defaultTexture } = project;
 
         //CONSTANTS
         const { BIDIMENSIONAL_SCENE } = BidimensionalRenderer;
@@ -47,6 +47,7 @@ const with3DRenderer = (WrappedComponent) => {
         //HOOKS
         //State
         //Model, scene and events
+        const [walls, setWalls] = useState([]);
         const [models, setModels] = useState({});
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
@@ -63,7 +64,8 @@ const with3DRenderer = (WrappedComponent) => {
             sceneInstance.setPlaneTexture(planeTexture);
             sceneInstance.setWallsColor(wallsColor);
             //We initialize the scene instance and provide the drag end callback, which is the update model function
-            sceneInstance.init();
+            sceneInstance.init()
+                .then(sceneWalls => setWalls(sceneWalls));
             sceneInstance.setDragEndCallback(updateModel);
             sceneInstance.setUpdateObjectsCallback(onObjectsUpdate);
             setSceneInstance(sceneInstance);
@@ -86,7 +88,7 @@ const with3DRenderer = (WrappedComponent) => {
                         productLine,
                         coordinates,
                         rotation,
-                        texture,
+                        texture || defaultTexture,
                         createdModel => onCreationSuccess(createdModel)(model, coordinates), //onSuccess
                     );
                 });
@@ -101,15 +103,33 @@ const with3DRenderer = (WrappedComponent) => {
         }, []);
 
         useEffect(() => {
-            if(sceneInstance)
-                setRendererState({
-                    ...rendererState,
-                    displayWalls,
-                    sceneInstance,
-                    deleteModelById,
-                    sceneInstanceModels,
-                    updateModelPositionParameters,
-                });
+            if(!defaultTexture || !sceneInstance)
+                return;
+            const textureUri = TextureFactory.getTextureUriFromId(defaultTexture);
+            //We add the texture
+            projectObjects.forEach(object => {
+                //If the object doesn't have a predefined texture we apply the new default texture
+                if(!object.texture) {
+                    let model = sceneInstance.objects.find(_object => _object.uuid === object[TridimensionalRenderer.TRIDIMENSIONAL_SCENE].uuid);
+                    if(!model)
+                        return;
+                    sceneInstance.addTextureToObject(model, textureUri);
+                }
+            });
+        }, [defaultTexture])
+
+        useEffect(() => {
+            if(!sceneInstance) 
+                return;
+            setWalls(sceneInstance.getWalls());
+            setRendererState({
+                ...rendererState,
+                displayWalls,
+                sceneInstance,
+                deleteModelById,
+                sceneInstanceModels,
+                updateModelPositionParameters,
+            });
         }, [
             displayWalls,
             sceneInstance, 
@@ -117,6 +137,8 @@ const with3DRenderer = (WrappedComponent) => {
             sceneInstanceModels
         ]);
 
+        
+        
         useEffect(() => {
             if(!sceneInstance || !sceneInstance.plane)
                 return;
@@ -354,7 +376,10 @@ const with3DRenderer = (WrappedComponent) => {
 
 
 
+
+
         return <WrappedComponent
+            walls = { walls }
             models = { models }
             sceneModels = { sceneInstanceModels }
             displayWalls = { displayWalls }

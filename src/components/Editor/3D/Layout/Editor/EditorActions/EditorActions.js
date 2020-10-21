@@ -5,6 +5,7 @@ import FixedWidthContainer from '../../../../../Layout/Containers/FixedWidthCont
 import PlaneActions from './PlaneActions/PlaneActions';
 
 const EditorActions = ({ 
+    walls,
     rotateCamera, 
     displayWalls,
     addTextureToPlane, 
@@ -19,6 +20,7 @@ const EditorActions = ({
             width = { 70 }
         >
             <PlaneActions 
+                sceneWalls = { walls }
                 rotateCamera = { rotateCamera }
                 displayWalls = { displayWalls }
                 addTextureToPlane = { addTextureToPlane }

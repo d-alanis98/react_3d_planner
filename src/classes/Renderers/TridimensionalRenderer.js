@@ -72,14 +72,16 @@ export default class TridimensionalRenderer{
      * as the mainloop.
      */
     init(){
-        this.setInitialScene();
-        this.setInitialCameraState();
-        this.setInitialRenderer();
-        this.addControls();
-        this.addPlane();
-        this.addWalls();
-        this.addResizeListener();
-        this.render()
+        return new Promise((resolve, reject) => {
+            this.setInitialScene();
+            this.setInitialCameraState();
+            this.setInitialRenderer();
+            this.addControls();
+            this.addPlane();
+            this.addWalls(resolve);
+            this.addResizeListener();
+            this.render()
+        });
     }
 
     /**
@@ -308,7 +310,7 @@ export default class TridimensionalRenderer{
     /**
      * We add the walls to the scene
      */
-    addWalls(){
+    addWalls(resolveInitPromise){
         let sceneInstance = this;
         let wallFactory = new WallFactory(
             this.sceneWidth, 
@@ -319,7 +321,11 @@ export default class TridimensionalRenderer{
             this.wallsColor
         );
         wallFactory.createAllWalls()
-            .then(createdWalls => sceneInstance.walls = createdWalls); //We store the created walls in the current instance, in the walls property
+            .then(createdWalls => {
+                //We store the created walls in the current instance, in the walls property
+                sceneInstance.walls = createdWalls;
+                resolveInitPromise(createdWalls);
+            }); 
     }
 
     /**
@@ -428,6 +434,8 @@ export default class TridimensionalRenderer{
      */
     getOptimalCameraDistance = () => Math.max(this.sceneHeight, this.sceneWidth) * TridimensionalRenderer.CAMERA_DISTANCE_FACTOR;
 
+
+    getWalls = () => this.walls;
     deleteModelById = modelId => {
         let modelToDelete = this.objects.find(model => model.uuid === modelId);
         if(!modelToDelete)

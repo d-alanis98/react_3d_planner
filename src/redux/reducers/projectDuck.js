@@ -23,6 +23,7 @@ const SET_PROJECT_NAME              = 'SET_PROJECT_NAME';
 const SET_PROJECT_TYPE              = 'SET_PROJECT_TYPE';
 const SET_PROJECT_SCENE             = 'SET_PROJECT_SCENE';
 const SET_COTIZATION_ID             = 'SET_COTIZATION_ID';
+const SET_DEFAULT_TEXTURE           = 'SET_DEFAULT_TEXTURE';
 const SET_PROJECT_OBJECTS           = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION       = 'SET_PROJECT_DESCRIPTION';
 const SET_DISPLAY_MODELS_MENU       = 'SET_DISPLAY_MODELS_MENU';
@@ -46,6 +47,7 @@ const initialState = {
     description: '',
     cotizationId: '',
     isNewProject: true,
+    defaultTexture: '',
     displayModelsMenu: false,
     projectToPDFItems: [],
     projectToPDFPages: [],
@@ -92,6 +94,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 cotizationId: payload,
+            };
+        case SET_DEFAULT_TEXTURE:
+            return {
+                ...state,
+                defaultTexture: payload,
             };
         case SET_PROJECT_OBJECTS:
             return {
@@ -319,6 +326,17 @@ export let setProjectNameAction = projectName => (dispatch, getState) => {
     dispatch({
         type: SET_PROJECT_NAME,
         payload: projectName,
+    });
+}
+
+/**
+ * This action sets the default 3D models texture
+ * @param {string|number} texture 
+ */
+export let setDefaultTextureAction = texture => (dispatch, getState) => {
+    dispatch({
+        type: SET_DEFAULT_TEXTURE,
+        payload: texture,
     });
 }
 
