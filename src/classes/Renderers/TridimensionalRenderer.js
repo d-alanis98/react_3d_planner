@@ -123,6 +123,10 @@ export default class TridimensionalRenderer{
      */
     addControls(){
         this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );
+    }
+
+
+    addDragControls() {
         this.dragControls = new DragControls(this.objects, this.camera, this.renderer.domElement);
         this.addControlsEventListeners();
     }

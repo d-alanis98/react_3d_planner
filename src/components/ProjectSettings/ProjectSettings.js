@@ -16,12 +16,8 @@ import { faCogs, faCrop  } from '@fortawesome/free-solid-svg-icons';
 //Classes
 import Validation from '../../classes/Helpers/Validation';
 //Constants
+import { BIDIMENSIONAL_EDITOR } from '../../constants/sections/sections';
 import { NOTIFICATION_DANGER, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD } from '../../redux/reducers/notificationDuck';
-
-
-
-
-
 
 
 const ProjectSettings = props => {
@@ -33,6 +29,7 @@ const ProjectSettings = props => {
         project: { name, type, description, isNewProject, cotizationId }, 
         editorState: { editorDepth, editorHeight, editorWidth },
         saveProject,
+        setEditorType,
         setProjectName, 
         setProjectType,
         setEditorDepth,
@@ -103,6 +100,10 @@ const ProjectSettings = props => {
         window.location.assign(`${existingURL}&id_disenhio=${designId}`);
     }
 
+    const redirectToEditor = () => {
+        setEditorType(BIDIMENSIONAL_EDITOR);
+    }
+
     const saveProjectChanges = event => {
         event.preventDefault();
         setUnsavedChanges(false);
@@ -121,7 +122,9 @@ const ProjectSettings = props => {
                 //We create a success notification
                 createNotification(CHANGES_SAVED_SUCCESSFULLY, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD);
                 //If the project is new, we update the URL with the design Id
-                isNewProject && setNewURLParameters(designId);
+                if(isNewProject)
+                    setNewURLParameters(designId);
+                else redirectToEditor();
             });
 
     }

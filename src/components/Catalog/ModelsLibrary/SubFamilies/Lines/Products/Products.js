@@ -9,7 +9,7 @@ import withFamilyState from '../../../../../../redux/HOC/withFamilyState';
 import withProjectState from '../../../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../../../redux/HOC/withEditorState';
 //Constants
-import { TRIDIMENSIONAL_EDITOR } from '../../../../../../constants/sections/sections';
+import { BIDIMENSIONAL_EDITOR } from '../../../../../../constants/sections/sections';
 
 const Products = ({ project, products, addObject, setEditorType }) => {
     //PROPS
@@ -51,7 +51,7 @@ const Products = ({ project, products, addObject, setEditorType }) => {
         existingModels[type] ? existingModels[type].quantity++ : existingModels[type] = { quantity: 1 };
         setModels(existingModels);
         //We redirect to the 3D editor
-        setEditorType(TRIDIMENSIONAL_EDITOR);
+        setEditorType(BIDIMENSIONAL_EDITOR);
 
     }
 

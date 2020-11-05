@@ -8,18 +8,20 @@ import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/wit
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 //Data
 import { walls as sceneWalls, getWallIndexById, getWallIdByIndex } from './wallsData';
+import withProjectState from '../../../../../../../redux/HOC/withProjectState';
 
 
 const WallsVisibilityModifier = ({ 
     rendererState,
     rendererState: { 
         sceneInstance, displayWalls
-    }
+    },
 }) => {
     
 
     const [walls, setWalls] = useState([]);
     const [wallsVisibility, setWallsVisibility] = useState({});
+
 
     useEffect(() => {
         
@@ -55,6 +57,7 @@ const WallsVisibilityModifier = ({
      * When the visibility of a wall change, we will apply the correct values to the walls.
      */
     useEffect(() => {
+        console.log('CAMBIO')
         if(walls.length > 0)
             Object.entries(wallsVisibility).forEach(([ wallId, visible ]) => (
                 walls[getWallIndexById(wallId)].visible = visible
@@ -99,4 +102,7 @@ const WallsVisibilityModifier = ({
     );
 }
 
-export default with3DRendererContextConsumer(WallsVisibilityModifier);
+let With3DRendererContextConsumer = with3DRendererContextConsumer(WallsVisibilityModifier);
+let WithProjectState = withProjectState(With3DRendererContextConsumer);
+
+export default WithProjectState;

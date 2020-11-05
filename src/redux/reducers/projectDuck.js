@@ -5,7 +5,7 @@
 //Actions
 import { setPlaneStateAction } from './planeDuck';
 import { createNotificationAction, NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD, NOTIFICATION_DANGER } from './notificationDuck';
-import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction, setEditorTypeAction, TRIDIMENSIONAL_EDITOR } from './editorDuck';
+import { setEditorWidthAction, setEditorHeightAction, setEditorDepthAction, setEditorTypeAction, BIDIMENSIONAL_EDITOR } from './editorDuck';
 //Classes
 import Requests from '../../classes/Helpers/Requests';
 import URLParameters from '../../classes/Helpers/URLParameters';
@@ -212,7 +212,7 @@ const restoreProjectSuccess = (serializedProjectData, dispatch, getState) => {
     setEditorDepthAction(editorDepth)(dispatch, getState);
     setEditorWidthAction(editorWidth)(dispatch, getState);
     setEditorHeightAction(editorHeight)(dispatch, getState);
-    setEditorTypeAction(TRIDIMENSIONAL_EDITOR)(dispatch, getState);
+    setEditorTypeAction(BIDIMENSIONAL_EDITOR)(dispatch, getState);
     createNotificationAction('Proyecto restaurado con éxito desde el servidor', NOTIFICATION_SUCCESS, NOTIFICATION_TIME_MD)(dispatch, getState);
 } 
 
@@ -402,6 +402,23 @@ export let set3DSceneDimensionsAction = (sceneWidth, sceneHeight) => (dispatch, 
         ...tridimensionalSceneParameters,
         sceneWidth,
         sceneHeight
+    };
+    let projectSceneParameters = {
+        ...scene,
+        '3d': newTridimensionalSceneParameters
+    };
+    dispatch({
+        type: SET_PROJECT_SCENE,
+        payload: projectSceneParameters,
+    });
+}
+
+export let set3DWallsVisibilityAction = wallsVisibility => (dispatch, getState) => {
+    let { scene } = { ...getState().project };
+    let tridimensionalSceneParameters = scene['3d'];
+    let newTridimensionalSceneParameters = {
+        ...tridimensionalSceneParameters,
+        wallsVisibility
     };
     let projectSceneParameters = {
         ...scene,

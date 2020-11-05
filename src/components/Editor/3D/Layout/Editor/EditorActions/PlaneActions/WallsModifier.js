@@ -1,34 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { isEmptyObject } from 'jquery';
 //Components
 import Dropup from '../../../../../../Layout/Dropdowns/Dropup';
 import WallVisibilityToggler from '../../../PlaneSettings/Settings/WallsVisibilityModifier/WallVisibilityToggler';
 //HOC
+import withProjectState from '../../../../../../../redux/HOC/withProjectState';
 import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/with3DRendererContextConsumer';
+//Classes
+import TridimensionalRenderer from '../../../../../../../classes/Renderers/TridimensionalRenderer';
 //Icons
-import { faCaretUp, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 //Data
 import { walls as wallsFromData, getWallIndexById, getWallIdByIndex } from '../../../PlaneSettings/Settings/WallsVisibilityModifier/wallsData';
 
+
 const WallsVisibilityModifier = ({ 
+    project: { scene },
     className,
     sceneWalls,
     displayWalls,
+    set3DWallsVisibility,
+    toggleWallsVisibility
 }) => {
     //CONSTANTS
     const WALLS_MODIFIER_MENU = 'walls_modifier_menu';
     //HOOKS
     //State
     const [walls, setWalls] = useState([]);
-    const [wallsNotSet, setWallsNotSet] = useState(true);
     const [wallsVisibility, setWallsVisibility] = useState({});
 
-    
-    //useEffect(() => {
     useEffect(() => {
-        //We set the walls, and we also turn off the walls not set flag
+        //We set the wall
         setWalls(sceneWalls);
-        setWallsNotSet(false);
+        //If the walls could be restored successfully from the state we skip the wallVisibility update
+        if(setWallsVisibilityFromState())
+                return;
         setWallsVisibility(
             sceneWalls.reduce((accumulated, current, index) => ({
                 ...accumulated,
@@ -36,10 +43,6 @@ const WallsVisibilityModifier = ({
             }), {})
         );
     }, [sceneWalls]);
-    //});
-
-    console.log({ sceneWalls })
-
 
 
     /**
@@ -49,7 +52,6 @@ const WallsVisibilityModifier = ({
     useEffect(() => {
         if(walls.length === 0)
             return;
-
         setWallsVisibility(
             walls.reduce((accumulated, current, index) => ({
                 ...accumulated,
@@ -66,7 +68,19 @@ const WallsVisibilityModifier = ({
             Object.entries(wallsVisibility).forEach(([ wallId, visible ]) => (
                 walls[getWallIndexById(wallId)].visible = visible
             ));
-    }, [wallsVisibility])
+        set3DWallsVisibility(wallsVisibility);
+    }, [walls, wallsVisibility]);
+
+    /**
+     * Gets the walls visibility from the state and sets it locally, if it does not exists in state, returns false
+     */
+    const setWallsVisibilityFromState = () => {
+        let tridimensionalScene = scene[TridimensionalRenderer.TRIDIMENSIONAL_SCENE];
+        if(isEmptyObject(tridimensionalScene) || !tridimensionalScene.wallsVisibility)
+            return false;
+        setWallsVisibility(tridimensionalScene.wallsVisibility);
+        return true;
+    }
 
     /**
      * When a wall visibility is toggled we update the state to set the new visibility.
@@ -87,26 +101,34 @@ const WallsVisibilityModifier = ({
     return (
         <Dropup
             id = { WALLS_MODIFIER_MENU }
-            togglerText = {            
-                <FontAwesomeIcon 
-                    icon = { faCaretUp }
-                    size = 'lg'
-                />  
+            togglerText = {     
+                <Fragment>
+                    <FontAwesomeIcon 
+                        icon = { faHome }
+                        size = 'lg'
+                        className = 'mr-1'
+                    />  
+                    Muros
+                </Fragment> 
             }
             noPadding
-            className = { `btn btn-sm btn-${displayWalls ? 'outline-' : '' }secondary px-2 ${ className || ''}` }
+            className = { `btn btn-sm btn-${displayWalls ? 'outline-' : '' }secondary px-0 py-0 mr-2 rounded-pill ${ className || ''}` }
+            togglerClassName = 'px-3 py-2'
         >
             <WallsVisibilityMenu 
+                displayWalls = { displayWalls }
                 wallsFromData = { wallsFromData }
-                handleWallChange = { handleWallChange }
                 wallsVisibility = { wallsVisibility }
+                handleWallChange = { handleWallChange }
+                toggleWallsVisibility = { toggleWallsVisibility }
             />
         </Dropup>
     );
 }
 
 let With3DRendererContextConsumer = with3DRendererContextConsumer(WallsVisibilityModifier);
-export default With3DRendererContextConsumer;
+let WithProjectState = withProjectState(With3DRendererContextConsumer);
+export default WithProjectState;
 
 
 //EXTRA COMPONENTS
@@ -117,7 +139,13 @@ const style = {
     padding: '0.5rem 0.5rem',
     backgroundColor: 'rgba(0,0,0,0.5)',
 }
-const WallsVisibilityMenu = ({ wallsFromData, handleWallChange, wallsVisibility }) => (
+const WallsVisibilityMenu = ({ 
+    displayWalls,
+    wallsFromData, 
+    wallsVisibility, 
+    handleWallChange, 
+    toggleWallsVisibility 
+}) => (
     <div
         style = { style }
     >
@@ -134,5 +162,14 @@ const WallsVisibilityMenu = ({ wallsFromData, handleWallChange, wallsVisibility 
                 
             ))
         }
+        <hr 
+            style = {{ borderTop: '1px solid rgba(255, 255, 255, 0.5)'}}
+        />
+        <WallVisibilityToggler 
+            visible = { displayWalls }
+            customLabel = { displayWalls ? 'Ocultar todos los muros' : 'Mostrar todos los muros' }
+            handleWallChange = { ev => toggleWallsVisibility() }
+        />
+
     </div>
 );

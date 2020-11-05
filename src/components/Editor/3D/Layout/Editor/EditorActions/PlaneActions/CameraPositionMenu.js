@@ -21,8 +21,8 @@ const CameraPositionMenu = ({ rotateCamera }) => {
                     icon = { faVideo }
                     type = 'outline-secondary'
                     className = 'btn-sm rounded-pill px-2 py-2'
-                    onHoverText = 'Vistas'
-                    iconClassName = 'mr-0'
+                    buttonText = 'Vistas'
+                    iconClassName = 'mr-1'
                 />
             }
         >

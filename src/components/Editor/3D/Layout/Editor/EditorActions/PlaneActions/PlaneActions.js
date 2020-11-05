@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import FlexRow from '../../../../../../Layout/Flex/FlexRow';
@@ -45,8 +45,8 @@ const PlaneActions = ({
             type = 'outline-secondary'
             onClick = { event => setDisplayPlaneSettings(!displayPlaneSettings) }
             className = 'btn-sm rounded-pill px-2 py-2 mr-2'
-            onHoverText = 'Ajustes'
-            iconClassName = 'mr-0'
+            buttonText = 'Ajustes'
+            iconClassName = 'mr-1'
         />
         <ButtonWithIcon 
             icon = { orbitControlsEnabled ? faLock : faLockOpen }
@@ -54,31 +54,23 @@ const PlaneActions = ({
             onClick = { toggleOrbitControls }
             className = 'btn-sm rounded-pill px-3 py-2 mr-2'
             buttonText = {
-                <FontAwesomeIcon 
-                    icon = { faArrowsAlt }
-                />
+                <Fragment>
+                    <FontAwesomeIcon 
+                        icon = { faArrowsAlt }
+                        className = 'mr-1'
+                    />
+                    { orbitControlsEnabled ? 'Bloquear plano' : 'Liberar plano' } 
+
+                </Fragment>
             }
-            onHoverText = { orbitControlsEnabled ? 'Bloquear plano' : 'Desbloquear plano' } 
         /> 
         
         
         <div className='btn-group' onClick={e => e.preventDefault()}>
             <WallsModifier 
-                className = 'walls-visibility__dropup-toggler'
                 sceneWalls = { sceneWalls }
                 displayWalls = { displayWalls }
-            /> 
-            <ButtonWithIcon 
-                icon = { displayWalls ? faEyeSlash : faEye }
-                type =  {displayWalls ? 'outline-secondary' : 'secondary' } 
-                onClick = { toggleWallsVisibility }
-                className = 'btn-sm px-3 py-2 mr-2 walls-visibility__button'
-                buttonText = {     
-                    <FontAwesomeIcon 
-                        icon = { faHome }
-                    />
-                }
-                onHoverText = { displayWalls ? 'Ocultar muros' : 'Mostrar muros' } 
+                toggleWallsVisibility = { toggleWallsVisibility }
             /> 
         </div>
         
@@ -88,11 +80,14 @@ const PlaneActions = ({
             onClick = { event => setDisplayModelsMenu(!displayModelsMenu) }
             className = 'btn-sm rounded-pill px-3 py-2 mr-2'
             buttonText = {
-                <FontAwesomeIcon 
-                    icon = { faCubes }
-                />
+                <Fragment>
+                    <FontAwesomeIcon 
+                        icon = { faCubes }
+                        className = 'mr-1'
+                    />
+                    Modelos
+                </Fragment>
             }
-            onHoverText = { displayModelsMenu ? 'Ocultar menu' : 'Mostrar menu' }
         /> 
     </FlexRow>
 );

@@ -16,6 +16,7 @@ import {
     set2DRoomDimensionsAction,
     set2DSceneDimensionsAction,
     set3DSceneDimensionsAction,
+    set3DWallsVisibilityAction,
     setDisplayModelsMenuAction,
     setProjectDescriptionAction,
     removeObjectFromProjectAction,
@@ -39,6 +40,7 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
             set3DSceneDimensionsAction,
+            set3DWallsVisibilityAction,
             setDisplayModelsMenuAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,
@@ -64,6 +66,7 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensions = { set2DRoomDimensionsAction }
             set2DSceneDimensions = { set2DSceneDimensionsAction }
             set3DSceneDimensions = { set3DSceneDimensionsAction }
+            set3DWallsVisibility = { set3DWallsVisibilityAction }
             setDisplayModelsMenu = { setDisplayModelsMenuAction }
             setProjectDescription = { setProjectDescriptionAction }
             findObjectBy3DModelId = { findObjectBy3DModelId }
@@ -95,6 +98,7 @@ const withProjectState = WrappedComponent => {
             set2DRoomDimensionsAction,
             set2DSceneDimensionsAction,
             set3DSceneDimensionsAction,
+            set3DWallsVisibilityAction,
             setDisplayModelsMenuAction,
             setProjectDescriptionAction,
             removeObjectFromProjectAction,

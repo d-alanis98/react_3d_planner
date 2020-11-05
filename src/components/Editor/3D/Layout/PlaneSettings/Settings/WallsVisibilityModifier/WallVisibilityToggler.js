@@ -4,7 +4,13 @@ import LabelWithIcon from '../../../../../../Layout/Labels/LabelWithIcon';
 //Icons
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
-const WallVisibilityToggler = ({ id, visible, wallName, handleWallChange }) => {
+const WallVisibilityToggler = ({ 
+    id, 
+    visible, 
+    wallName, 
+    customLabel, 
+    handleWallChange 
+}) => {
 
     const getIcon = () => (
         visible ? faEyeSlash : faEye
@@ -25,7 +31,7 @@ const WallVisibilityToggler = ({ id, visible, wallName, handleWallChange }) => {
                 icon = { getIcon() }
                 onClick = { handleWallChange }
                 className = { getClassName() }
-                labelText = { getLabelText() }
+                labelText = { customLabel || getLabelText() }
             />
         </div>
     );
