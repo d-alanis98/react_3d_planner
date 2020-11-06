@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 2.1.0
+ * @version 3.2.1
  * @description Facade for adding a set of listeners to the model, with an interface to add any other in the future, the 
  * only requirement is to keep a reference to the model instance and provide a callback function.
  */
@@ -10,7 +10,8 @@ import CollisionDetector from "./CollisionDetector";
 export default class ModelEvents {
     //Constants
     static DRAG_END_EVENT    = 'dragend';
-    static DRAG_MOVE_EVENT    = 'dragmove';
+    static DRAG_MOVE_EVENT   = 'dragmove';
+    static DRAG_START_EVENT  = 'dragstart';
     static RIGHT_CLICK_EVENT = 'contextmenu';
     //Mouse movement direction
     static mouseMovementDirection = null;
@@ -44,6 +45,18 @@ export default class ModelEvents {
         });
     }
 
+    /**
+     * This method adds the drag start event listener to the model.
+     * @param {object} model 
+     * @param {function} eventCallback 
+     */
+    static addDragStartListener = (model, eventCallback) => {
+        let {
+            addEventListener,
+            DRAG_START_EVENT
+        } = ModelEvents;
+        addEventListener(model, DRAG_START_EVENT, eventCallback);
+    }
 
     /**
      * This method adds the drag end event listener to the model.
@@ -77,20 +90,33 @@ export default class ModelEvents {
         let {
             addDragEndListener,
             addDragMoveListener,
+            addDragStartListener,
             addRightClickListener
         } = ModelEvents;
+        //Variable to make a reference to the mouse direction cleaner interval
+        let movementInterval;
+        //Drag end event
         addDragEndListener(model, event => {
             //We reset the last mouse movement direction, otherwise, it will be always the first that was set
             this.mouseMovementDirection = null;
             onUpdate(event);
+            clearInterval(movementInterval);
         });
-        if(detectCollisions)
+        //Collision detection events
+        if(detectCollisions) {
+            //On drag start, we start an interval to clear the mouse direction every 10 ms
+            addDragStartListener(model, event => {
+                movementInterval = setInterval(() => this.mouseMovementDirection = null, 10);
+            });
+            //During drag we validate collisions and make snap when necessary
             addDragMoveListener(model, event => {
                 //Singleton like, we get the stored mouseMovementDirection, if its null, we get it using the getMovementDirection method
                 if(!this.mouseMovementDirection)
                     this.mouseMovementDirection = CollisionDetector.getMovementDirection(event);
+
                 CollisionDetector.detectCollisions(event, model, this.mouseMovementDirection)
             });
+        }
         addRightClickListener(model, onSelection);
     }
 

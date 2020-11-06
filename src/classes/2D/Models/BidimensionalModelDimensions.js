@@ -1,7 +1,8 @@
 //Dependencies
-import { TOP, FRONT } from '../../../constants/models/models';
-import DimensionsGetter from '../../Models/DimensionsGetter';
 import RotationHelper from '../../Helpers/RotationHelper';
+import DimensionsGetter from '../../Models/DimensionsGetter';
+//Constants
+import { TOP, FRONT, FRONT_RIGHT } from '../../../constants/models/models';
 
 /**
  * @author Damián Alanís Ramírez
@@ -51,6 +52,15 @@ export default class BidimensionalModelDimensions {
                 if(rotation && !RotationHelper.isNumberOfTurnsOdd(rotation)){
                     height = productDimensions.height;
                     width = productDimensions.depth;
+                }
+                break;
+            case FRONT_RIGHT:
+                width = productDimensions.depth; //X is now model's Z
+                height = productDimensions.height; //Y is model's Y
+                //In the specific case of the front view, we check if there is an even number of turns (n / 90 % 2 != 0), in hthat case, we swap the dimensions to "rotate it"
+                if(rotation && !RotationHelper.isNumberOfTurnsOdd(rotation)){
+                    height = productDimensions.depth;
+                    width = productDimensions.height;
                 }
                 break;
             default:

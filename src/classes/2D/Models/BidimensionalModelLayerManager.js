@@ -1,5 +1,5 @@
 //Dependencies
-import { TOP, FRONT } from "../../../constants/models/models";
+import { TOP, FRONT, FRONT_RIGHT } from "../../../constants/models/models";
 import TridimensionalRenderer from "../../Renderers/TridimensionalRenderer";
 
 
@@ -30,6 +30,8 @@ export default class BidimensionalModelLayerManager {
             case TOP:
                 return getModelsArrayOrderedByLayerInTopView(stateModelsArray);
             case FRONT:
+                return getModelsArrayOrderedByLayerInFrontView(stateModelsArray);
+            case FRONT_RIGHT:
                 return getModelsArrayOrderedByLayerInFrontView(stateModelsArray);
             default:
                 return getModelsArrayOrderedByLayerInTopView(stateModelsArray);

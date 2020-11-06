@@ -12,7 +12,7 @@ import BidimensionalRenderer from '../../../../../../classes/Renderers/Bidimensi
 //Icons
 import { faVideo, faCaretSquareUp, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 //Constants
-import { TOP, FRONT } from '../../../../../../constants/models/models';
+import { TOP, FRONT, FRONT_RIGHT } from '../../../../../../constants/models/models';
 
 
 
@@ -68,6 +68,12 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
                     icon = { faWindowMaximize }
                     labelText = 'Frontal'
                     onClick = { event => changeView(FRONT) }
+                    className = 'cursor-click dropdown-item'
+                />
+                <LabelWithIcon 
+                    icon = { faWindowMaximize }
+                    labelText = 'Lateral'
+                    onClick = { event => changeView(FRONT_RIGHT) }
                     className = 'cursor-click dropdown-item'
                 />
             </Dropup>
