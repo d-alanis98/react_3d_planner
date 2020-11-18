@@ -90,6 +90,7 @@ export default class CoordinatesTransformation {
         let planeCenterY = bidimensionalSceneHeight / 2;
 
         let heightPadding;
+
         switch(editorView) {
             case TOP:
                 return {
@@ -144,6 +145,7 @@ export default class CoordinatesTransformation {
                     y: -1 * originY * yRatio
                 }
             case FRONT_RIGHT:
+                xRatio = tridimensionalSceneHeight / bidimensionalRoomWidth;
                 yRatio = roomAltitude / bidimensionalRoomHeight;
                 return {
                     z:  -1 * originX * xRatio,
@@ -238,6 +240,7 @@ export default class CoordinatesTransformation {
                 yRatio = bidimensionalRoomHeight / roomAltitude;
                 return originTridimensionalPlaneCoordinates(x * xRatio, y * yRatio, bidimensionalEditorView);
             case FRONT_RIGHT:
+                xRatio = bidimensionalRoomWidth / tridimensionalSceneHeight; 
                 yRatio = bidimensionalRoomHeight / roomAltitude;
                 return originTridimensionalPlaneCoordinates(z * xRatio, y * yRatio, bidimensionalEditorView);
 

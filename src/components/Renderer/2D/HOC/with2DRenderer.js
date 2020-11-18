@@ -95,6 +95,7 @@ const with2DRenderer = WrappedComponent => {
             let editorXAxis = BidimensionalSceneHelper.getXAxis(editorView, editorWidth, editorHeight);
             //The editorYAxis is the parameter that is going to be considered the y in canvas, the height (which actually is the depth) or the depth (which actually is the height)
             let editorYAxis = BidimensionalSceneHelper.getYAxis(editorView, editorHeight, editorDepth);
+            console.log({ editorXAxis, editorYAxis })
             //We set the scene instance
             let sceneInstance = new BidimensionalRenderer(editorXAxis, editorYAxis);
             sceneInstance.init();
