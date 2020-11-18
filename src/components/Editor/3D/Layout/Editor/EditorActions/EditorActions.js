@@ -18,6 +18,7 @@ const EditorActions = ({
     >
         <FixedWidthContainer
             width = { 70 }
+            className = 'overflow-auto'
         >
             <PlaneActions 
                 sceneWalls = { walls }
