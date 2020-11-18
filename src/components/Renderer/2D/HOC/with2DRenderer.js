@@ -91,10 +91,12 @@ const with2DRenderer = WrappedComponent => {
         }, [draggedObject]);
 
         const initialize = () => {
+            //The editorXAxis is the parameter that is going to be considered the x in canvas, the height (which actually is the depth) or the width
+            let editorXAxis = BidimensionalSceneHelper.getXAxis(editorView, editorWidth, editorHeight);
             //The editorYAxis is the parameter that is going to be considered the y in canvas, the height (which actually is the depth) or the depth (which actually is the height)
             let editorYAxis = BidimensionalSceneHelper.getYAxis(editorView, editorHeight, editorDepth);
             //We set the scene instance
-            let sceneInstance = new BidimensionalRenderer(editorWidth, editorYAxis);
+            let sceneInstance = new BidimensionalRenderer(editorXAxis, editorYAxis);
             sceneInstance.init();
             setSceneInstance(sceneInstance);
             //We set the container dimensions

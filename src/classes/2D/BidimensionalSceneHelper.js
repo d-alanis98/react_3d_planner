@@ -1,10 +1,11 @@
 //Constants
-import { TOP } from "../../constants/models/models";
+import { FRONT_RIGHT, TOP } from "../../constants/models/models";
 
 /**
  * @author Damián Alanís Ramírez
  * @version 1.0.0
  */
 export default class BidimensionalSceneHelper {
-    static getYAxis = (editorView, editorHeight, editorDepth) => editorView === TOP ? editorHeight : editorDepth;
+    static getXAxis = (editorView, editorXCoordinate, editorZCoordinate) => editorView === FRONT_RIGHT ? editorZCoordinate : editorXCoordinate;
+    static getYAxis = (editorView, editorZCoordinate, editorYCoordinate) => editorView === TOP ? editorZCoordinate : editorYCoordinate;
 }
