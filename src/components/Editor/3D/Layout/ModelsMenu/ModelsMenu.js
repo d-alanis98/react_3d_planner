@@ -18,8 +18,10 @@ const ModelsMenu = ({
     rotateModel, 
     modelToEdit, 
     projectModels, 
+    handleStateChange,
     displayModelsMenu,
-    setDisplayModelsMenu
+    setDisplayModelsMenu,
+    handleDirectionChange
 }) => {
     const modelsMenuContainer = useRef();
 
@@ -61,6 +63,8 @@ const ModelsMenu = ({
                         deleteModel = { deleteModel }
                         rotateModel = { rotateModel }
                         projectModels = { projectModels }
+                        handleStateChange = { handleStateChange }
+                        handleDirectionChange = { handleDirectionChange }
                     />
                 </FixedHeightContainer>
                 <FixedHeightContainer

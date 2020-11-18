@@ -8,13 +8,21 @@ import '../ModelsMenu.css';
 import TridimensionalRenderer from '../../../../../../classes/Renderers/TridimensionalRenderer';
 
 
-const ModelsMenuListItem = ({ isFocused, focusModel, deleteModel, rotateModel, projectModel }) => {
+const ModelsMenuListItem = ({ 
+    isFocused, 
+    focusModel, 
+    deleteModel, 
+    rotateModel, 
+    projectModel,
+    handleStateChange,
+    handleDirectionChange 
+}) => {
     //CONSTANTS
     const { TRIDIMENSIONAL_SCENE } = TridimensionalRenderer;
     //PROPS
     const project3DModel = projectModel[TRIDIMENSIONAL_SCENE];
     const { uuid: modelId } = project3DModel;
-    const { type: modelType, name: modelName, productLine: modelProductLine } = projectModel;
+    const { type: modelType, name: modelName, productLine: modelProductLine, modelState, modelDirection } = projectModel;
 
     return (
         <li 
@@ -32,8 +40,12 @@ const ModelsMenuListItem = ({ isFocused, focusModel, deleteModel, rotateModel, p
             <ModelDetails 
                 modelId = { modelId }
                 modelType = { modelType }
+                modelState = { modelState }
                 rotateModel = { rotateModel }
+                modelDirection = { modelDirection }
                 modelProductLine = { modelProductLine }
+                handleStateChange = { handleStateChange }
+                handleDirectionChange = { handleDirectionChange }
             />
         </li>
     );

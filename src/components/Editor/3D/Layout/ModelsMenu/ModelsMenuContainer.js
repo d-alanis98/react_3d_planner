@@ -108,6 +108,26 @@ const ModelsMenuContainer = ({
         updateObject(updatedObject);
     }
 
+    const handleStateChange = (event, modelId) => {
+        const { target: { value: modelState } } = event;
+        const modelInState = findObjectBy3DModelId(modelId);
+        let updatedObject = {
+            ...modelInState,
+            modelState,
+        };
+        updateObject(updatedObject);
+    }
+
+    const handleDirectionChange = (event, modelId) => {
+        const { target: { value: modelDirection } } = event;
+        const modelInState = findObjectBy3DModelId(modelId);
+        let updatedObject = {
+            ...modelInState,
+            modelDirection,
+        };
+        updateObject(updatedObject);
+    }
+
     return <ModelsMenu 
         isFocused = { isFocused }
         focusModel = { focusModel }
@@ -115,8 +135,10 @@ const ModelsMenuContainer = ({
         rotateModel = { rotateModel }
         modelToEdit = { modelToEdit }
         projectModels = { projectModels }
+        handleStateChange = { handleStateChange }
         displayModelsMenu = { displayModelsMenu }
         setDisplayModelsMenu = { setDisplayModelsMenu }
+        handleDirectionChange = { handleDirectionChange }
     />
   
 }

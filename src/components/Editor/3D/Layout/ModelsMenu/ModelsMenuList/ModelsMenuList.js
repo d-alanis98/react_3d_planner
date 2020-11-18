@@ -6,7 +6,15 @@ import ModelsMenuListItem from './ModelsMenuListItem';
 import './ModelsMenuList.css';
 
 
-const ModelsMenuList = ({ isFocused, focusModel, deleteModel, rotateModel, projectModels }) => (
+const ModelsMenuList = ({ 
+    isFocused, 
+    focusModel, 
+    deleteModel, 
+    rotateModel, 
+    projectModels,
+    handleStateChange,
+    handleDirectionChange 
+}) => (
     <ul className='models-menu-list'>
         {
             projectModels.length > 0 ?
@@ -18,6 +26,8 @@ const ModelsMenuList = ({ isFocused, focusModel, deleteModel, rotateModel, proje
                         deleteModel = { deleteModel }
                         rotateModel = { rotateModel }
                         projectModel = { projectModel }
+                        handleStateChange = { handleStateChange }
+                        handleDirectionChange = { handleDirectionChange }
                     />
                 ))
             : <EmptyModels />

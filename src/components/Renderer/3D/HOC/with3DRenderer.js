@@ -78,7 +78,7 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, rotation, texture, productLine } = model;
+                    const { type, rotation, texture, productLine, modelState, modelDirection } = model;
                     const { coordinates } = model[TRIDIMENSIONAL_SCENE];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -90,6 +90,8 @@ const with3DRenderer = (WrappedComponent) => {
                         rotation,
                         texture || defaultTexture,
                         createdModel => onCreationSuccess(createdModel)(model, coordinates), //onSuccess
+                        modelState,
+                        modelDirection
                     );
                 });
                 setModels(modelsCopy);

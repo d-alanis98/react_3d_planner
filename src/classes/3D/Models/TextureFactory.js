@@ -1,5 +1,5 @@
-const WOOD_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/22`;
-const FLOOR_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/9`;
+const WOOD_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/22?hd`;
+const FLOOR_TEXTURE_URI = `${process.env.MIX_APP_API_ENDPOINT}/colors/9?hd`;
 
 export default class TextureFactory {
     static WOOD_TEXTURE = 'WOOD_TEXTURE';
@@ -18,5 +18,5 @@ export default class TextureFactory {
     }
 
     static getTextureUriFromId = textureId => 
-        textureId ? `${process.env.MIX_APP_API_ENDPOINT}/colors/${textureId}` : WOOD_TEXTURE_URI;
+        textureId ? `${process.env.MIX_APP_API_ENDPOINT}/colors/${textureId}?hd=1` : WOOD_TEXTURE_URI;
 }

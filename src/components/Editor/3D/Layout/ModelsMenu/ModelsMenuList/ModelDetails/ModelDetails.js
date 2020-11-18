@@ -5,13 +5,18 @@ import ModelThumbnail from './ModelThumbnail';
 import ModelFamilyTable from './ModelFamilyTable';
 import CollapsableContent from '../../../../../../Layout/Collapsable/CollapsableContent';
 import ModelRotationControls from './ModelRotationControls';
+import ModelState from './ModelState';
 
 
 const ModelDetails = ({ 
     modelId, 
     modelType, 
+    modelState,
     rotateModel, 
-    modelProductLine  
+    modelDirection,
+    modelProductLine,
+    handleStateChange,
+    handleDirectionChange  
 }) => (
     <CollapsableContent
         id = { `details_${modelId}` }
@@ -29,6 +34,13 @@ const ModelDetails = ({
             <ModelFamilyTable 
                 modelType = { modelType }
                 modelProductLine = { modelProductLine }
+            />
+            <ModelState 
+                modelId = { modelId }
+                modelState = { modelState }
+                modelDirection = { modelDirection }
+                handleStateChange = { handleStateChange }
+                handleDirectionChange = { handleDirectionChange }
             />
         </FlexRow>
     </CollapsableContent>

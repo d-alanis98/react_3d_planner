@@ -341,9 +341,9 @@ export default class TridimensionalRenderer{
      * @param {string|number} texture 
      * @param {function} onSuccess 
      */
-    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess){
+    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess, modelState = 'O', modelDirection = 'I'){
         //We conform the uri of the model
-        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel?direction=${modelDirection}&state=${modelState}`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
         //We load the model

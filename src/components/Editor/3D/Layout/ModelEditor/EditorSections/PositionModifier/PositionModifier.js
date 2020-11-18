@@ -1,10 +1,13 @@
 import React from 'react';
 //Components
+import Row from '../../../../../../Layout/Grid/Row';
+import Column from '../../../../../../Layout/Grid/Column';
 import AxisModifier from './AxisModifier';
 import AxisReference from '../../../../../../Miscelaneous/AxisReference/AxisReference';
 import EditorSection from '../EditorSection';
 import AxisDescription from './AxisDescription';
 //HOC
+import withEditorState from '../../../../../../../redux/HOC/withEditorState';
 import with3DRendererContextConsumer from '../../../../../../Renderer/3D/HOC/with3DRendererContextConsumer';
 //Classes
 import ModelPositionCalculator from '../../../../../../../classes/3D/Models/ModelPositionCalculator';
@@ -12,30 +15,63 @@ import ModelPositionCalculator from '../../../../../../../classes/3D/Models/Mode
 import { faCrosshairs, faArrowsAltH, faArrowsAltV, faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 //Styles
 import './PositionModifier.css';
-import Row from '../../../../../../Layout/Grid/Row';
-import Column from '../../../../../../Layout/Grid/Column';
 
 
-
-
-const PositionModifier = ({ modelToEdit, rendererState }) => {
+const PositionModifier = ({ 
+    modelToEdit, 
+    editorState, 
+    rendererState,
+}) => {
     //PROPS DESTRUCTURING
     const { 
         updateModelPositionParameters 
     } = rendererState;
 
+    console.log({ editorState })
+    const {
+        editorDepth = 2.5,
+        editorWidth = 4,
+        editorHeight = 3
+    } = editorState;
+
+    
+
     //CONSTANTS
     const { uuid: modelId } = modelToEdit;
+
+    const getNormalizedValue = (value, axis) => {
+        switch(axis) {
+            case 'x':
+                return (value / 100) - (editorWidth / 2);
+            case 'y':
+                return value / 100;
+            case 'z':
+                return (value / 100) - (editorHeight / 2);
+        }
+    }
+
+    const getReadableValue = (value, axis) => {
+        switch(axis) {
+            case 'x':
+                return (value + (editorWidth / 2)) * 100;
+            case 'y':
+                return value * 100;
+            case 'z':
+                return (value + (editorHeight / 2)) * 100;
+        }
+    }
 
     //HANDLERS
     const handlePositionChange = event => {
         const { target: { id: axis, value } } = event;
         //We get a shallow copy of the position
         const modelPosition = { ...modelToEdit.position };
+        let numericValue = Number(value);
+        let normalizedValue = getNormalizedValue(numericValue, axis);
         //We delete the previous position in the current axis
         delete modelPosition[axis];
         //We update this axis with the value obtained from the event
-        modelPosition[axis] = Number(value);
+        modelPosition[axis] = normalizedValue;
         //We set the position to the new coordinates
         const { x, y, z } = modelPosition;
         modelToEdit.position.set(x, y, z);
@@ -60,7 +96,7 @@ const PositionModifier = ({ modelToEdit, rendererState }) => {
                 >
                     <AxisModifier 
                         id = 'x'
-                        value = { modelToEdit.position.x }
+                        value = { getReadableValue(modelToEdit.position.x, 'x') }
                         onChange = { handlePositionChange }
                         axisLabel = 'X'
                     />
@@ -70,7 +106,7 @@ const PositionModifier = ({ modelToEdit, rendererState }) => {
                     />
                     <AxisModifier 
                         id = 'y'
-                        value = { modelToEdit.position.y }
+                        value = { getReadableValue(modelToEdit.position.y, 'y') }
                         onChange = { handlePositionChange }
                         axisLabel = 'Y'
                     />
@@ -80,7 +116,7 @@ const PositionModifier = ({ modelToEdit, rendererState }) => {
                     />
                     <AxisModifier 
                         id = 'z'
-                        value = { modelToEdit.position.z }
+                        value = { getReadableValue(modelToEdit.position.z, 'z') }
                         onChange = { handlePositionChange }
                         axisLabel = 'Z'
                     />
@@ -104,5 +140,7 @@ const PositionModifier = ({ modelToEdit, rendererState }) => {
 
 //We apply the 3D renderer context consumer HOC to get access to the methods and scene instance of the with3DRenderer HOC
 let With3DRendererContextConsumer = with3DRendererContextConsumer(PositionModifier);
+//We apply the project state HOC
+let WithEditorState = withEditorState(With3DRendererContextConsumer);
 //We export the decorated component
-export default With3DRendererContextConsumer;
+export default WithEditorState;

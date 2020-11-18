@@ -37,6 +37,8 @@ const Products = ({ project, products, addObject, setEditorType }) => {
             type,
             productKey,
             productLine,
+            modelState: 'O',
+            modelDirection: 'I',
             '2d': {
                 uuid: '', //We don´t know the id for the 2D model, it will be generated and updated on render time
                 coordinates: { x: 0, y: 0 }
