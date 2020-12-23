@@ -341,11 +341,33 @@ export default class TridimensionalRenderer{
      * @param {string|number} texture 
      * @param {function} onSuccess 
      */
-    load3DModel(type, productLine, { x = 0, y = 0, z = 0 }, rotation, texture = null, onSuccess, modelState = 'O', modelDirection = 'I'){
+    load3DModel(
+        type, 
+        productLine, 
+        { x = 0, y = 0, z = 0 }, 
+        rotation, texture = null, 
+        onSuccess, 
+        modelState = 'O', 
+        modelDirection = 'I'
+    ) {
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel?direction=${modelDirection}&state=${modelState}`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
+        //DEPTH CORRECTIONS FOR OPENED DOOR
+        /**
+         * If model has door(s)
+         * depth += (width / numberOfDoors)
+         * z += (width / (2 * numberOfDoors))
+         * 
+         * hasDoor and numberOfDoors will come as parameter
+         * @todo Change implementation of this function, to receive an object with the parameters, instead of the positional ones
+         * The change must be done in with3DRenderer.js too.
+         */
+        if(modelState === 'O') {
+            depth += (width / 2);
+            z += (width / 4);
+        }
         //We load the model
         let loader = new GLTFLoader();
         loader.load(
@@ -380,6 +402,32 @@ export default class TridimensionalRenderer{
                     }
                 }) 
             },
+        );
+    }
+
+    hotReplaceModel({
+        modelData: { 
+            type,
+            texture,
+            rotation,
+            modelState,
+            coordinates,
+            productLine,
+            modelDirection
+        },
+        onSuccess,
+        modelToReplaceId
+    }) {
+        this.deleteModelById(modelToReplaceId);
+        this.load3DModel(
+            type,
+            productLine,
+            coordinates,
+            rotation,
+            texture,
+            onSuccess,
+            modelState,
+            modelDirection,
         );
     }
 
@@ -440,6 +488,7 @@ export default class TridimensionalRenderer{
 
 
     getWalls = () => this.walls;
+
     deleteModelById = modelId => {
         let modelToDelete = this.objects.find(model => model.uuid === modelId);
         if(!modelToDelete)

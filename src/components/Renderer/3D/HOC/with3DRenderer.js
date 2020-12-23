@@ -128,6 +128,7 @@ const with3DRenderer = (WrappedComponent) => {
                 ...rendererState,
                 displayWalls,
                 sceneInstance,
+                hotReplaceModel,
                 deleteModelById,
                 sceneInstanceModels,
                 updateModelPositionParameters,
@@ -316,6 +317,44 @@ const with3DRenderer = (WrappedComponent) => {
             setDraggedObject({ x, y, z, uuid });
         }
 
+        const hotReplaceSuccess = (newModel, modelId, modelState) => {
+            let modelData = findObjectBy3DModelId(modelId);
+            let tridimensionalSceneData = modelData[TRIDIMENSIONAL_SCENE];
+            updateObject({
+                ...modelData,
+                modelState,
+                [TRIDIMENSIONAL_SCENE]: {
+                    ...tridimensionalSceneData,
+                    uuid: newModel.uuid,
+                }
+            });
+        }
+
+        const getModelData = (modelId, modelState) => {
+            let model = findObjectBy3DModelId(modelId);
+            const { type, rotation, texture, productLine, modelDirection } = model;
+            const { coordinates } = model[TRIDIMENSIONAL_SCENE];
+            return {
+                type,
+                texture,
+                rotation,
+                modelState,
+                coordinates,
+                productLine,
+                modelDirection
+            };
+        }
+
+        const hotReplaceModel = (modelId, modelState) => {
+            if(!sceneInstance)
+                return;
+            let modelData = getModelData(modelId, modelState);
+            sceneInstance.hotReplaceModel({
+                modelData,
+                onSuccess: object => hotReplaceSuccess(object, modelId, modelState),
+                modelToReplaceId: modelId 
+            })
+        }
         /**
          * This function is the callback for the objects update of the scene instance. This way we can get the real reference to the
          * objects in the local state.

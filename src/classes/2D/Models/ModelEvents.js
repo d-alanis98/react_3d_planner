@@ -111,8 +111,10 @@ export default class ModelEvents {
             //During drag we validate collisions and make snap when necessary
             addDragMoveListener(model, event => {
                 //Singleton like, we get the stored mouseMovementDirection, if its null, we get it using the getMovementDirection method
-                if(!this.mouseMovementDirection)
-                    this.mouseMovementDirection = CollisionDetector.getMovementDirection(event);
+                if(!this.mouseMovementDirection) {
+                    this.mouseMovementDirection = CollisionDetector.getMovementDirection(event, this.previousDirection);
+                    this.previousDirection = this.mouseMovementDirection;
+                }
 
                 CollisionDetector.detectCollisions(event, model, this.mouseMovementDirection)
             });

@@ -27,7 +27,6 @@ const PositionModifier = ({
         updateModelPositionParameters 
     } = rendererState;
 
-    console.log({ editorState })
     const {
         editorDepth = 2.5,
         editorWidth = 4,

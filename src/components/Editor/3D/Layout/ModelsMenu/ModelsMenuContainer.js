@@ -19,6 +19,7 @@ const ModelsMenuContainer = ({
     const { ACTIVE_STYLE, INACTIVE_STYLE } = ModelDecorator;
     //PROPS DESTRUCTURING
     const { 
+        hotReplaceModel,
         deleteModelById,
         sceneInstanceModels: models 
     } = rendererState;
@@ -31,7 +32,7 @@ const ModelsMenuContainer = ({
     
     //Effects
     useEffect(() => {
-        if(!modelToFocus)
+        if(!modelToFocus || !modelToFocus.model)
             return;
         ModelDecorator.applyStyle(
             modelToFocus.model,
@@ -53,7 +54,7 @@ const ModelsMenuContainer = ({
         //The focused property
         let focused = true;
         //If existing, we toggle the previous one in state (only if it was the same model)
-        if(modelToFocus)
+        if(modelToFocus && modelToFocus.model)
             if(modelToFocus.model.uuid === modelId)
                 focused = !modelToFocus.focused;
             else clearAppliedStylesToModels();
@@ -76,8 +77,9 @@ const ModelsMenuContainer = ({
         );
     }
 
+
     const isFocused = modelId => {
-        if(!modelToFocus) return false;
+        if(!modelToFocus || !modelToFocus.model) return false;
         return modelToFocus.model.uuid === modelId && modelToFocus.focused;
     }
 
@@ -109,13 +111,17 @@ const ModelsMenuContainer = ({
     }
 
     const handleStateChange = (event, modelId) => {
+        setModelToFocus(null);
         const { target: { value: modelState } } = event;
         const modelInState = findObjectBy3DModelId(modelId);
         let updatedObject = {
             ...modelInState,
             modelState,
         };
+        
+        hotReplaceModel(modelId, modelState);
         updateObject(updatedObject);
+
     }
 
     const handleDirectionChange = (event, modelId) => {

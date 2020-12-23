@@ -6,7 +6,7 @@
 import RotationHelper from "../../Helpers/RotationHelper";
 
 export default class CollisionDetector {
-    static EPSILON = 0.1;
+    static EPSILON = 0.05;
     static MOVEMENT_IN_X_AXIS = 'MOVEMENT_IN_X_AXIS';
     static MOVEMENT_IN_Y_AXIS = 'MOVEMENT_IN_Y_AXIS';
 
@@ -17,11 +17,17 @@ export default class CollisionDetector {
      */
     static haveIntersection(fixedObject, movingObject) {
         const { EPSILON } = CollisionDetector;
-        return !(
-          movingObject.x > fixedObject.x + fixedObject.width + EPSILON ||
-          movingObject.x + movingObject.width < fixedObject.x + EPSILON ||
-          movingObject.y > fixedObject.y + fixedObject.height + EPSILON ||
-          movingObject.y + movingObject.height < fixedObject.y + EPSILON
+        //Paddings
+        let movingObjectWidthPadding = movingObject.width / 2;
+        let fixedObjectWidthPadding = fixedObject.width / 2;
+        let movingObjectHeightPadding = movingObject.height / 2;
+        let fixedObjectHeightPadding = fixedObject.height / 2;
+
+        return (
+            movingObject.x + movingObjectWidthPadding + EPSILON >= fixedObject.x - fixedObjectWidthPadding &&
+            movingObject.x - movingObjectWidthPadding - EPSILON <= fixedObject.x + fixedObjectWidthPadding &&
+            movingObject.y - movingObjectHeightPadding - EPSILON <= fixedObject.y + fixedObjectHeightPadding &&
+            movingObject.y + movingObjectHeightPadding + EPSILON >= fixedObject.y - fixedObjectHeightPadding
         );
     }
 
@@ -36,27 +42,30 @@ export default class CollisionDetector {
             x: movingObject.x,
             y: movingObject.y
         }
+        //Paddings
+        let movingObjectWidthPadding = movingObject.width / 2;
+        let fixedObjectWidthPadding = fixedObject.width / 2;
+        let movingObjectHeightPadding = movingObject.height / 2;
+        let fixedObjectHeightPadding = fixedObject.height / 2;
 
         const { 
             EPSILON,
             MOVEMENT_IN_X_AXIS,
         } = CollisionDetector;
 
+
         //If the movement is in X
         if(movementDirection === MOVEMENT_IN_X_AXIS) {
             //If the moving object comes from the right side
             if(
-                movingObject.x > fixedObject.x + EPSILON && 
-                movingObject.x < fixedObject.x + fixedObject.width + EPSILON
+                movingObject.x - movingObjectWidthPadding <= fixedObject.x + fixedObjectWidthPadding  && 
+                movingObject.x - movingObjectWidthPadding > fixedObject.x - fixedObject.width
             ){
                 position.x = fixedObject.x + (fixedObject.width / 2) + (movingObject.width / 2);
                 return position;
             }
             //If the moving object comes from the left side
-            if(
-                movingObject.x < fixedObject.x + EPSILON && 
-                movingObject.x + movingObject.width + EPSILON < fixedObject.x + fixedObject.width
-            ){
+            else if( movingObject.x + movingObjectWidthPadding >= fixedObject.x - fixedObjectWidthPadding ){
                 position.x = fixedObject.x - (fixedObject.width / 2) - (movingObject.width / 2);
                 return position;
             }
@@ -64,23 +73,21 @@ export default class CollisionDetector {
         
         //If the movement is in the Y axis
         else {
-            //If the moving object cones from the top
-            if(
-                movingObject.y < fixedObject.y + EPSILON &&
-                movingObject.y + movingObject.height + EPSILON < fixedObject.y + fixedObject.height
+            //If the moving object comes from the top
+            if( 
+                movingObject.y + movingObjectHeightPadding >= fixedObject.y - fixedObjectHeightPadding &&
+                movingObject.y + movingObjectHeightPadding < fixedObject.y + fixedObjectHeightPadding
             ) {
-                position.y = fixedObject.y - (fixedObject.height / 2) - (movingObject.height / 2)
+                position.y = fixedObject.y - fixedObjectHeightPadding - movingObjectHeightPadding;
                 return position;
             }
             //If the moving object comes from the bottom
-            else if(
-                movingObject.y > fixedObject.y + EPSILON && 
-                movingObject.y < fixedObject.y + fixedObject.height + EPSILON
-            ){
+            else if( movingObject.y - movingObjectHeightPadding <= fixedObject.y + fixedObjectHeightPadding ){
                 position.y = fixedObject.y + (fixedObject.height / 2) + (movingObject.height / 2);
                 return position;
             }
         }
+    
         return position;
 
     }
@@ -89,7 +96,7 @@ export default class CollisionDetector {
      * Method to get the direction of the mouse movement (X axis or Y axis) based on the event data.
      * @param {object} event 
      */
-    static getMovementDirection = (event) => {
+    static getMovementDirection = (event, previousDirection) => {
         //We get the posible movement directions
         const { MOVEMENT_IN_X_AXIS, MOVEMENT_IN_Y_AXIS } = CollisionDetector;
         //We extract relevant data from the event
@@ -101,6 +108,15 @@ export default class CollisionDetector {
         //If the ammount of movement in X is greater than the ammount of movement in Y, we consider the movement along the X axis
         if(Math.abs(movementX) > Math.abs(movementY))
             movementMainlyInXAxis = true;
+        //We validate the "change" of the direction
+        if(Math.abs(movementX) - Math.abs(movementY) >= 2)
+            movementMainlyInXAxis = true;
+        else if(Math.abs(movementY) - Math.abs(movementX) >= 2)
+            movementMainlyInXAxis = false;
+        //If the change in either direction was not significant, we return the previous value
+        else if(previousDirection)
+            return previousDirection;
+        
         return movementMainlyInXAxis ? MOVEMENT_IN_X_AXIS : MOVEMENT_IN_Y_AXIS;
     }
 
