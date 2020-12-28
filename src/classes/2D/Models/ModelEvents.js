@@ -9,6 +9,7 @@ import CollisionDetector from "./CollisionDetector";
 
 export default class ModelEvents {
     //Constants
+    static CLICK_EVENT       = 'click';
     static DRAG_END_EVENT    = 'dragend';
     static DRAG_MOVE_EVENT   = 'dragmove';
     static DRAG_START_EVENT  = 'dragstart';
@@ -26,13 +27,20 @@ export default class ModelEvents {
         model.on(eventType, eventCallback);
     }
 
+    static addClickListener = (model, eventCallback) => {
+        const {
+            CLICK_EVENT,
+            addEventListener
+        } = ModelEvents;
+        addEventListener(model, CLICK_EVENT, eventCallback);
+    }
     /**
      * This method adds the right click event listener to the model
      * @param {object} model 
      * @param {function} eventCallback 
      */
     static addRightClickListener = (model, eventCallback) => {
-        let {
+        const {
             addEventListener,
             RIGHT_CLICK_EVENT
         } = ModelEvents;
@@ -86,7 +94,7 @@ export default class ModelEvents {
      * @param {function} onUpdate 
      * @param {function} onSelection 
      */
-    static addModelBasicEventListeners = (model, onUpdate, onSelection, detectCollisions = true) => {
+    static addModelBasicEventListeners = (model, onUpdate, onSelection, onDragStart, detectCollisions = true) => {
         let {
             addDragEndListener,
             addDragMoveListener,
@@ -107,6 +115,7 @@ export default class ModelEvents {
             //On drag start, we start an interval to clear the mouse direction every 10 ms
             addDragStartListener(model, event => {
                 movementInterval = setInterval(() => this.mouseMovementDirection = null, 10);
+                onDragStart(event);
             });
             //During drag we validate collisions and make snap when necessary
             addDragMoveListener(model, event => {

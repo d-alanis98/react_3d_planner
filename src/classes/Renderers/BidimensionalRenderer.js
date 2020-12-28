@@ -201,7 +201,9 @@ export default class BidimensionalRenderer {
         productKey, 
         editorView,
         onSelection,
-        productLine,      
+        onDragStart,
+        productLine,
+        onModelClick      
     }){
         //We bind the instance to a variable
         let scene = this;
@@ -221,7 +223,9 @@ export default class BidimensionalRenderer {
             productKey,
             editorView,
             onSelection, 
+            onDragStart,
             productLine,
+            onModelClick
         });
 
     }

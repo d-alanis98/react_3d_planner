@@ -11,7 +11,7 @@ import withEditorState from '../../../../../../redux/HOC/withEditorState';
 //Constants
 import { BIDIMENSIONAL_EDITOR } from '../../../../../../constants/sections/sections';
 
-const Products = ({ project, products, addObject, setEditorType }) => {
+const Products = ({ project, products, addObject, setEditorType, getProductDoorStatus }) => {
     //PROPS
     //Destructuring
     const { objects: projectObjects } = project;
@@ -32,9 +32,11 @@ const Products = ({ project, products, addObject, setEditorType }) => {
     }, [])
 
     const addObjectToProject = (type, productLine, productKey) => {
+        let doorStatus = getProductDoorStatus(type, productLine);
         let objectToAdd = {
             id: projectObjects.length,
             type,
+            doorStatus,
             productKey,
             productLine,
             modelState: 'O',

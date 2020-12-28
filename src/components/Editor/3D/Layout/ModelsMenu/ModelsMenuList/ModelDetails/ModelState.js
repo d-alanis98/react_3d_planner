@@ -1,4 +1,6 @@
 import React from 'react';
+//Constants
+import { modelDirections, modelStates } from '../../../../../../../constants/models/models';
 
 const ModelState = ({ 
     modelId,
@@ -20,8 +22,16 @@ const ModelState = ({
                             onChange = { event => handleStateChange(event, modelId) }
                             className = 'position-modifier__input' 
                         >                       
-                            <option value='O'>Abierto</option>
-                            <option  value='C'>Cerrado</option>
+                            <option 
+                                value = { modelStates.open } 
+                            >
+                                Abierto
+                            </option>
+                            <option  
+                                value = { modelStates.closed }
+                            >
+                                Cerrado
+                            </option>
                         </select>
                     </td>
                 </tr>
@@ -33,8 +43,16 @@ const ModelState = ({
                             onChange = { event => handleDirectionChange(event, modelId) }
                             className = 'position-modifier__input' 
                         >
-                            <option value='I'>Izquierda</option>
-                            <option  value='D'>Derecha</option>
+                            <option 
+                                value = { modelDirections.left } 
+                            >
+                                Izquierda
+                            </option>
+                            <option  
+                                value = { modelDirections.right } 
+                            >
+                                Derecha
+                            </option>
                         </select>
                     </td>
                 </tr>

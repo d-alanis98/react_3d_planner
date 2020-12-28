@@ -12,6 +12,9 @@ import ModelScaleCalculator from '../3D/Models/ModelScaleCalculator';
 import PlaneFactory from '../3D/Plane/PlaneFactory';
 import TextureFactory from '../3D/Models/TextureFactory';
 import WallFactory from '../3D/Walls/WallFactory';
+//Constants
+import { modelStates } from '../../constants/models/models';
+import RotationHelper from '../Helpers/RotationHelper';
 
 /**
  * @author Damián Alanís Ramírez
@@ -332,6 +335,31 @@ export default class TridimensionalRenderer{
             }); 
     }
 
+    applyDoorCorrection = (modelState, rotation, doorStatus, width, depth, z) => {
+        /**
+         * If model has door(s)
+         * depth += (width / numberOfDoors)
+         * z += (width / (2 * numberOfDoors))
+         * 
+         * hasDoor and numberOfDoors will come as parameter
+         * @todo Change implementation of this function, to receive an object with the parameters, instead of the positional ones
+         * The change must be done in with3DRenderer.js too.
+         */
+        let [numberOfDoors] = doorStatus ? doorStatus.split(',') : 0;
+        numberOfDoors = Number(numberOfDoors);
+        if(modelState === modelStates.open && numberOfDoors > 0) {
+            if(RotationHelper.isNumberOfTurnsOdd(rotation)) {
+                depth += (width / numberOfDoors);
+                z += (width / (2 * numberOfDoors));
+            } else {
+                depth += (width / numberOfDoors);
+                z -= (width / (2 * numberOfDoors));
+            }
+        }
+
+        return { z, width, depth };
+    }
+
     /**
      * This method loads a 3D model of the specified type and in the provided coordinates to the scene.
      * @param {string|number} type 
@@ -348,26 +376,18 @@ export default class TridimensionalRenderer{
         rotation, texture = null, 
         onSuccess, 
         modelState = 'O', 
-        modelDirection = 'I'
+        modelDirection = 'I',
+        doorStatus = '0,w',
     ) {
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel?direction=${modelDirection}&state=${modelState}`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
-        //DEPTH CORRECTIONS FOR OPENED DOOR
-        /**
-         * If model has door(s)
-         * depth += (width / numberOfDoors)
-         * z += (width / (2 * numberOfDoors))
-         * 
-         * hasDoor and numberOfDoors will come as parameter
-         * @todo Change implementation of this function, to receive an object with the parameters, instead of the positional ones
-         * The change must be done in with3DRenderer.js too.
-         */
-        if(modelState === 'O') {
-            depth += (width / 2);
-            z += (width / 4);
-        }
+        //We apply door corrections
+        let { z: doorCorrectedZ, width: doorCorrectedWidth, depth: doorCorrectedDepth } = this.applyDoorCorrection(modelState, rotation, doorStatus, width, depth, z);
+        z = doorCorrectedZ;
+        width = doorCorrectedWidth;
+        depth = doorCorrectedDepth;
         //We load the model
         let loader = new GLTFLoader();
         loader.load(
@@ -410,6 +430,7 @@ export default class TridimensionalRenderer{
             type,
             texture,
             rotation,
+            doorStatus,
             modelState,
             coordinates,
             productLine,
@@ -428,6 +449,7 @@ export default class TridimensionalRenderer{
             onSuccess,
             modelState,
             modelDirection,
+            doorStatus,
         );
     }
 

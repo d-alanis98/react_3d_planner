@@ -22,4 +22,19 @@ export default class BidimensionalModelRotation {
         //If the angle is npi/2, with n even
         else model.dragBoundFunc(position => RoomBoundDetector.boundDetection(scene, width, height, position));
     }
+
+    static getWidthAndHeightBasedOnRotation = model => {
+        const { attrs: { width, height, rotation } } = model;
+        let modelWidth = width;
+        let modelHeight = height;
+        //If the angle is npi/2, with n odd
+        if((Math.abs(rotation) / 90) % 2 !== 0) {
+            modelWidth = height;
+            modelHeight = width;
+        }
+        return {
+            modelWidth,
+            modelHeight
+        }
+    }
 }

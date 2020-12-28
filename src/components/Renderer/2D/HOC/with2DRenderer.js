@@ -4,6 +4,7 @@ import BidimensionalContextMenu from '../../../Editor/2D/ContextMenu/Bidimension
 //HOC
 import withProjectState from '../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../redux/HOC/withEditorState';
+import with2DRendererContextConsumer from './with2DRendererContextConsumer';
 //Classes
 import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
@@ -26,7 +27,10 @@ const with2DRenderer = WrappedComponent => {
             updateObject, 
             removeObject, 
             set2DRoomDimensions,
-            set2DSceneDimensions, 
+            set2DSceneDimensions,
+            //From 2d renderer context consumer HOC
+            rendererState,
+            setRendererState, 
             ...ownProps 
         } = props;
         //Project
@@ -41,6 +45,7 @@ const with2DRenderer = WrappedComponent => {
         //HOOKS
         //State
         const [models, setModels] = useState({});
+        const [modelToEdit, setModelToEdit] = useState();
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
         const [contextMenuModel, setContextMenuModel] = useState({});
@@ -58,7 +63,6 @@ const with2DRenderer = WrappedComponent => {
             initialize();
         }, [editorView]);
 
-
         /**
          * Effect used to update the dragged object
          */
@@ -67,7 +71,8 @@ const with2DRenderer = WrappedComponent => {
                 return;
             //We get the id and the coordinates from the dragged object
             const { _id, x, y } = draggedObject
-            
+            updateModelPosition(_id, x, y);
+            /*
             let existingObject = findObjectBy2DModelId(_id);
             if(!existingObject)
                 return;
@@ -88,7 +93,30 @@ const with2DRenderer = WrappedComponent => {
                 }
             };
             updateObject(updatedObject);
+            */
         }, [draggedObject]);
+
+
+
+
+        useEffect(() => {
+            if(!sceneInstance) 
+                return;
+            setRendererState({
+                ...rendererState,
+                modelToEdit,
+                sceneInstance,
+                setModelToEdit,
+                updateModelPosition,
+                handleModelDeletion,
+                handleModelRotation
+            });
+        }, [
+            modelToEdit,
+            sceneInstance, 
+            setModelToEdit,
+            projectObjects,
+        ]);
 
         const initialize = () => {
             //The editorXAxis is the parameter that is going to be considered the x in canvas, the height (which actually is the depth) or the width
@@ -167,12 +195,38 @@ const with2DRenderer = WrappedComponent => {
                         editorView,
                         productLine,
                         onSelection: onSelectedModel, //onSelection
+                        onDragStart,
+                        onModelClick
                     });
                 });
                 setModels(modelsCopy);
             }
             restoreModels();
         }
+
+        const updateModelPosition = (modelId, x, y) => {
+            let existingObject = findObjectBy2DModelId(modelId);
+            if(!existingObject)
+                return;
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
+            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
+            let updatedObject = { 
+                ...existingObject,
+                [BIDIMENSIONAL]: {
+                    uuid: modelId,
+                    coordinates: { x, y }
+                },
+                [TRIDIMENSIONAL]: {
+                    ...tridimensionalEditorState,
+                    coordinates: {
+                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
+                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
+                    }    
+                }
+            };
+            updateObject(updatedObject);
+        }
+
 
 
         /**
@@ -186,7 +240,27 @@ const with2DRenderer = WrappedComponent => {
                 return;
             //We get the 2d model id and the new coordinates
             const { target: { _id, attrs: { x, y } } } = event;
+            setModelToEdit(null);
             setDraggedObject({ x, y, _id });       
+        }
+
+
+
+        const onModelClick = event => {
+            const { currentTarget: model } = event;
+            setModelToEdit(model);
+        }
+
+        const onDragStart = event => {
+            setModelToEdit(null);
+        }
+
+
+        const onSelectedModel = event => {
+            const { evt: { x, y }, currentTarget: model } = event;
+            setContextMenuModel(model);
+            setDisplayContextMenu(true);
+            setContextMenuPosition({ x, y });
         }
 
         const handleModelRotation = (model, degrees) => {
@@ -196,9 +270,10 @@ const with2DRenderer = WrappedComponent => {
             let modelInState = findObjectBy2DModelId(modelId);
             //We retrieve the existing rotation in state to add it to the new one
             let { rotation } = modelInState;
+            let updatedRotation = degrees + (rotation || 0);
             let updatedObject = { 
                 ...modelInState,
-                rotation: degrees + (rotation || 0),
+                rotation: updatedRotation,
             };
             updateObject(updatedObject);
         }
@@ -212,13 +287,6 @@ const with2DRenderer = WrappedComponent => {
             modelToDelete.destroy();
             let modelInState = findObjectBy2DModelId(modelId);
             removeObject(modelInState);
-        }
-
-        const onSelectedModel = event => {
-            const { evt: { x, y }, currentTarget: model } = event;
-            setContextMenuModel(model);
-            setDisplayContextMenu(true);
-            setContextMenuPosition({ x, y });
         }
 
 
@@ -268,8 +336,10 @@ const with2DRenderer = WrappedComponent => {
     let WithProjectState = withProjectState(With2DRenderer);
     //We apply the editor state decorator
     let WithEditorState = withEditorState(WithProjectState);
+    //We apply the 2d renderer context consumer HOC
+    let With2DRendererContextConsumer = with2DRendererContextConsumer(WithEditorState);
     //We return the decorated component
-    return WithEditorState;
+    return With2DRendererContextConsumer;
 }
 
 

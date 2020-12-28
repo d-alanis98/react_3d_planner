@@ -47,7 +47,15 @@ const withProjectState = WrappedComponent => {
             ...ownProps
         } = props;
 
+        const findObjectBy2DModelId = id2DModel => project.objects.find(object => object['2d'].uuid === id2DModel);
         const findObjectBy3DModelId = id3DModel => project.objects.find(object => object['3d'].uuid === id3DModel);
+
+        const getModelRotationBy2DId = id2DModel => {
+            const model = findObjectBy2DModelId(id2DModel);
+            if(!model)
+                return 0;
+            return model.rotation;
+        } 
 
         return <WrappedComponent 
             project = { project }
@@ -69,7 +77,9 @@ const withProjectState = WrappedComponent => {
             set3DWallsVisibility = { set3DWallsVisibilityAction }
             setDisplayModelsMenu = { setDisplayModelsMenuAction }
             setProjectDescription = { setProjectDescriptionAction }
+            findObjectBy2DModelId = { findObjectBy2DModelId }
             findObjectBy3DModelId = { findObjectBy3DModelId }
+            getModelRotationBy2DId = { getModelRotationBy2DId }
             { ...ownProps }
         />
     }

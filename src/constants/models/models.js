@@ -34,19 +34,19 @@ export let models2D = {
         //Views
         [TOP]: {
             uri: '/storage/assets/models/2D/furniture/furniture_top.svg',
-            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
+            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT]: {
             uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
+            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT_LEFT]: {
             uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
+            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
         },
         [FRONT_RIGHT]: {
             uri: '/storage/assets/models/2D/furniture/furniture_front.svg',
-            thumbnail: '/storage/assets/models/3D/furniture/thumbnail.png',
+            thumbnail: '/assets/models/3D/furniture/thumbnail.png',
         }
     }
 }
@@ -115,3 +115,13 @@ export let getModelThumbnail = type => {
             return models[TABLE].thumbnail;
     }
 }
+
+export let modelStates = {
+    open: 'O',
+    closed: 'C',
+};
+
+export let modelDirections = {
+    left: 'I',
+    right: 'D',
+};

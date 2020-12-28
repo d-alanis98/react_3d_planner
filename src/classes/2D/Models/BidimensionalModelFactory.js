@@ -42,7 +42,9 @@ export default class BidimensionalModelFactory {
         onUpdate,
         onSuccess, 
         onSelection,
-        productLine
+        onDragStart,
+        productLine,
+        onModelClick,
     }) => {
         //We load the path from catalog based on the model type
         let path = getModel2DUri(type, TOP); //We get the TOP view
@@ -69,8 +71,9 @@ export default class BidimensionalModelFactory {
                 dragBoundFunc: position => RoomBoundDetector.boundDetection(scene, width, height, position), 
             });
 
-            //We add the group's event listeners (drag -> onUpdate, right click -> onSelection)
-            ModelEvents.addModelBasicEventListeners(group, onUpdate, onSelection);
+            //We add the group's event listeners (drag -> onUpdate, right click -> onSelection, click -> onModelClick)
+            ModelEvents.addModelBasicEventListeners(group, onUpdate, onSelection, onDragStart);
+            ModelEvents.addClickListener(group, onModelClick);
             
             //We set the image width and height (100% of the group 'container')
             imageNode.setAttrs({

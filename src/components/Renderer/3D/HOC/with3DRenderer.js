@@ -78,7 +78,7 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, rotation, texture, productLine, modelState, modelDirection } = model;
+                    const { type, rotation, texture, productLine, doorStatus, modelState, modelDirection } = model;
                     const { coordinates } = model[TRIDIMENSIONAL_SCENE];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
@@ -91,7 +91,8 @@ const with3DRenderer = (WrappedComponent) => {
                         texture || defaultTexture,
                         createdModel => onCreationSuccess(createdModel)(model, coordinates), //onSuccess
                         modelState,
-                        modelDirection
+                        modelDirection,
+                        doorStatus
                     );
                 });
                 setModels(modelsCopy);
@@ -317,12 +318,14 @@ const with3DRenderer = (WrappedComponent) => {
             setDraggedObject({ x, y, z, uuid });
         }
 
-        const hotReplaceSuccess = (newModel, modelId, modelState) => {
+        const hotReplaceSuccess = (newModel, modelId, modelState, modelDirection) => {
             let modelData = findObjectBy3DModelId(modelId);
             let tridimensionalSceneData = modelData[TRIDIMENSIONAL_SCENE];
+            const { modelState: existingModelState, modelDirection: existingModelDirection } = modelData;
             updateObject({
                 ...modelData,
-                modelState,
+                modelState: modelState || existingModelState,
+                modelDirection: modelDirection || existingModelDirection,
                 [TRIDIMENSIONAL_SCENE]: {
                     ...tridimensionalSceneData,
                     uuid: newModel.uuid,
@@ -330,28 +333,29 @@ const with3DRenderer = (WrappedComponent) => {
             });
         }
 
-        const getModelData = (modelId, modelState) => {
+        const getModelData = (modelId, receivedModelState, receivedModelDirection) => {
             let model = findObjectBy3DModelId(modelId);
-            const { type, rotation, texture, productLine, modelDirection } = model;
+            const { type, rotation, texture, productLine, doorStatus, modelState, modelDirection } = model;
             const { coordinates } = model[TRIDIMENSIONAL_SCENE];
             return {
                 type,
                 texture,
                 rotation,
-                modelState,
+                doorStatus,
+                modelState: receivedModelState || modelState,
                 coordinates,
                 productLine,
-                modelDirection
+                modelDirection: receivedModelDirection || modelDirection
             };
         }
 
-        const hotReplaceModel = (modelId, modelState) => {
+        const hotReplaceModel = ({ modelId, modelState, modelDirection }) => {
             if(!sceneInstance)
                 return;
-            let modelData = getModelData(modelId, modelState);
+            let modelData = getModelData(modelId, modelState, modelDirection);
             sceneInstance.hotReplaceModel({
                 modelData,
-                onSuccess: object => hotReplaceSuccess(object, modelId, modelState),
+                onSuccess: object => hotReplaceSuccess(object, modelId, modelState, modelDirection),
                 modelToReplaceId: modelId 
             })
         }

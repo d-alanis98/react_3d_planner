@@ -119,7 +119,10 @@ const ModelsMenuContainer = ({
             modelState,
         };
         
-        hotReplaceModel(modelId, modelState);
+        hotReplaceModel({ 
+            modelId, 
+            modelState 
+        });
         updateObject(updatedObject);
 
     }
@@ -131,6 +134,12 @@ const ModelsMenuContainer = ({
             ...modelInState,
             modelDirection,
         };
+
+        hotReplaceModel({ 
+            modelId, 
+            modelDirection 
+        });
+
         updateObject(updatedObject);
     }
 

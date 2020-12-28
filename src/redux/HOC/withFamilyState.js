@@ -44,6 +44,11 @@ const withFamilyState = WrappedComponent => {
             return targetProduct ? targetProduct.descripcion_es : '';
         }
 
+        const getProductDoorStatus = (productId, lineId) => {
+            let targetProduct = getProductByIdAndLine(productId, lineId);
+            return targetProduct ? targetProduct.open_depth : '0,w';
+        }
+
         return <WrappedComponent 
             family = { family }
             getLine = { getLine }
@@ -53,6 +58,7 @@ const withFamilyState = WrappedComponent => {
             getProductKey = { getProductKey }
             getProductName = { getProductName }
             fetchingFamily = { fetchingFamily }
+            getProductDoorStatus = { getProductDoorStatus }
             { ...ownProps }
         />
     }
