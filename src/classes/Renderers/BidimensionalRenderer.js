@@ -10,6 +10,7 @@ import Konva from 'konva';
 import PlaneEvents from '../2D/Plane/PlaneEvents';
 import RoomCoordinatesCalculator from '../2D/Room/RoomCoordinatesCalculator';
 import BidimensionalModelFactory from '../2D/Models/BidimensionalModelFactory';
+import BoundsFactory from '../2D/Models/BoundsFactory';
 
 
 export default class BidimensionalRenderer {
@@ -217,7 +218,8 @@ export default class BidimensionalRenderer {
             onUpdate,
             onSuccess: createdModel => {
                 onSuccess(createdModel);
-                this.objects.push(createdModel)
+                this.objects.push(createdModel);
+                this.addBounds(createdModel)
             }, 
             modelName,
             productKey,
@@ -229,6 +231,11 @@ export default class BidimensionalRenderer {
         });
 
     }
+
+    addBounds = createdModel => {
+        let boundFactory = new BoundsFactory(createdModel, this);
+        boundFactory.create();
+    } 
 
     getModelById = modelId => this.objects.find(model => model.uuid === modelId);
 }

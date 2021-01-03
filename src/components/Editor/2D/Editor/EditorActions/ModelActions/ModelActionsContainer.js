@@ -69,10 +69,18 @@ const ModelActionsContainer = ({
         correctSelectionBox();
     }
 
-    const moveModel = (x, y) => { 
+    const getValidatedRoomBoundCoordinates = (x, y) => {
         let { modelWidth, modelHeight } = BidimensionalModelRotation.getWidthAndHeightBasedOnRotation(modelToEdit);
         //We apply the room bound detection
         let { x: roomBoundX, y: roomBoundY } = RoomBoundDetector.boundDetection(sceneInstance, modelWidth, modelHeight, { x, y });
+        return {
+            roomBoundX,
+            roomBoundY
+        }
+    }
+
+    const moveModel = (x, y) => { 
+        const { roomBoundX, roomBoundY } = getValidatedRoomBoundCoordinates(x, y);
         moveTo(roomBoundX, roomBoundY);
         //We update the position in state
         updateModelPosition(modelToEdit._id, roomBoundX, roomBoundY);
@@ -80,11 +88,13 @@ const ModelActionsContainer = ({
         correctSelectionBox();
     }
 
+
     const handleKeyDown = event => {
         const { keyCode } = event;
         //Model properties
         let modelX = modelToEdit.attrs.x;
         let modelY = modelToEdit.attrs.y;
+        
         //Initial coordinates
         let x = modelX, y = modelY;
         switch(keyCode) {

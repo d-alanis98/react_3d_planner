@@ -14,6 +14,11 @@ const useSelectionBox = (modelToEdit, sceneInstance) => {
 
     }, [modelToEdit]);
 
+    //Clean up
+    useEffect(() => () => {
+        selectionBox && selectionBox.destroy()
+    }, [selectionBox])
+
     useEffect(() => {
         if(!sceneInstance || !selectionBox)
             return;

@@ -28,7 +28,7 @@ export default class BidimensionalModelRotation {
         let modelWidth = width;
         let modelHeight = height;
         //If the angle is npi/2, with n odd
-        if((Math.abs(rotation) / 90) % 2 !== 0) {
+        if(rotation && (Math.abs(rotation) / 90) % 2 !== 0) {
             modelWidth = height;
             modelHeight = width;
         }

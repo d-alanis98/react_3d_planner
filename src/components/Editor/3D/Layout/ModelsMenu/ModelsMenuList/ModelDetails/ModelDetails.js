@@ -16,7 +16,9 @@ const ModelDetails = ({
     modelDirection,
     modelProductLine,
     handleStateChange,
-    handleDirectionChange  
+    handleDirectionChange,
+    canDoorBeOpenedOrClosed,
+    modelHasRightOrLeftVariant 
 }) => (
     <CollapsableContent
         id = { `details_${modelId}` }
@@ -41,6 +43,8 @@ const ModelDetails = ({
                 modelDirection = { modelDirection }
                 handleStateChange = { handleStateChange }
                 handleDirectionChange = { handleDirectionChange }
+                canDoorBeOpenedOrClosed = { canDoorBeOpenedOrClosed }
+                modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
             />
         </FlexRow>
     </CollapsableContent>

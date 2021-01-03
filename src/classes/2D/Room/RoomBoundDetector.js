@@ -38,6 +38,7 @@ export default class RoomBoundDetector {
             : position.y + objectHeightOffset  >= roomHeight + heightPadding 
                 ? roomHeight - objectHeightOffset + heightPadding 
                 : position.y;
+
         return { x, y }
     }
 }

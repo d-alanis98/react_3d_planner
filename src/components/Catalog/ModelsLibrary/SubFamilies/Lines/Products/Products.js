@@ -10,8 +10,18 @@ import withProjectState from '../../../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../../../redux/HOC/withEditorState';
 //Constants
 import { BIDIMENSIONAL_EDITOR } from '../../../../../../constants/sections/sections';
+import { modelDirections, modelStates } from '../../../../../../constants/models/models';
 
-const Products = ({ project, products, addObject, setEditorType, getProductDoorStatus }) => {
+const Products = ({ 
+    project, 
+    products, 
+    addObject, 
+    setEditorType, 
+    getProductDoorStatus,
+    canDoorBeOpenedOrClosed,
+    modelHasRightOrLeftVariant,
+    getProductInitialCoordinates
+}) => {
     //PROPS
     //Destructuring
     const { objects: projectObjects } = project;
@@ -32,22 +42,29 @@ const Products = ({ project, products, addObject, setEditorType, getProductDoorS
     }, [])
 
     const addObjectToProject = (type, productLine, productKey) => {
+        //We get initial values
         let doorStatus = getProductDoorStatus(type, productLine);
+        let initialState = modelStates.closed;
+        let initialDirection = modelDirections.left;
+        let initialCoordinates = getProductInitialCoordinates(type, productLine);
+        //We create the object structure
         let objectToAdd = {
             id: projectObjects.length,
             type,
             doorStatus,
             productKey,
             productLine,
-            modelState: 'O',
-            modelDirection: 'I',
+            modelState: initialState,
+            modelDirection: initialDirection,
+            canDoorBeOpenedOrClosed: canDoorBeOpenedOrClosed(productLine),
+            modelHasRightOrLeftVariant: modelHasRightOrLeftVariant(productLine),
             '2d': {
                 uuid: '', //We don´t know the id for the 2D model, it will be generated and updated on render time
                 coordinates: { x: 0, y: 0 }
             },
             '3d': {
                 uuid: '', //We don´t know the id for the 3D model, it will be generated and updated on render time
-                coordinates: { x: 0, y: 0, z: 0 },
+                coordinates: initialCoordinates,
             }
         }
         addObject(objectToAdd);

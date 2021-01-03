@@ -1,5 +1,5 @@
 .action-with-input {
-    width: fit-content;
+    width: min-content;
     display: flex;
     padding: 0.35rem 0.8rem;
     flex-direction: row;

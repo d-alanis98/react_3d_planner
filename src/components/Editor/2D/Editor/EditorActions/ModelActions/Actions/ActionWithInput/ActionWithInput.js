@@ -2,7 +2,7 @@ import React from 'react';
 //Style
 import './ActionWithInput.css';
 
-const ActionWithInput = ({ type, onChange, className, actionText, ...extraProps }) => (
+const ActionWithInput = ({ type, unit, onChange, className, actionText, ...extraProps }) => (
     <div
         className = {`action-with-input rounded-pill ${className || ''}`}
     >
@@ -12,6 +12,7 @@ const ActionWithInput = ({ type, onChange, className, actionText, ...extraProps 
             onChange = { onChange }
             { ...extraProps }
         />
+        { unit && <span className='ml-1'>{ unit }</span> }
     </div>
 
 );

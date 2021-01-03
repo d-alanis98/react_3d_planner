@@ -76,7 +76,7 @@ const WallsVisibilityModifier = ({
      */
     const setWallsVisibilityFromState = () => {
         let tridimensionalScene = scene[TridimensionalRenderer.TRIDIMENSIONAL_SCENE];
-        if(isEmptyObject(tridimensionalScene) || !tridimensionalScene.wallsVisibility)
+        if(isEmptyObject(tridimensionalScene) || !tridimensionalScene.wallsVisibility || isEmptyObject(tridimensionalScene.wallsVisibility))
             return false;
         setWallsVisibility(tridimensionalScene.wallsVisibility);
         return true;

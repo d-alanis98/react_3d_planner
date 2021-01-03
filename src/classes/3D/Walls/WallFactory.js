@@ -11,7 +11,6 @@ export default class WallFactory {
     //Constants
     //Wall defaults
     static WALL_DEPTH    = 0.05;
-    static WALL_MODEL_ID = 60;
     static DEFAULT_COLOR = '#CFCFCF';
     //Sides
     static TOP_SIDE      = 'FRONT_SIDE';
@@ -99,7 +98,7 @@ export default class WallFactory {
     }
 
     createWall = side => {
-        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${WallFactory.WALL_MODEL_ID}/getModel`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/3d_editor/primitives/cube`;
         let { x, y, z } = this.getSideCoordinates(side);
         const { width, height, depth } = this.getSideDimensions(side);
         let loader = new GLTFLoader();

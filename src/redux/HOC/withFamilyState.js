@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+//Redux
 import { getFamilyAction } from '../reducers/familyDuck';
 
 const withFamilyState = WrappedComponent => {
@@ -49,6 +50,29 @@ const withFamilyState = WrappedComponent => {
             return targetProduct ? targetProduct.open_depth : '0,w';
         }
 
+        const canDoorBeOpenedOrClosed = lineId => {
+            const line = getLineById(lineId);
+            const { o_c: canBeOpenOrClosed } = line;
+            return Boolean(canBeOpenOrClosed);
+        }
+
+        const modelHasRightOrLeftVariant = lineId => {
+            const line = getLineById(lineId);
+            const { i_d: hasRightOrLeftVariant } = line;
+            return Boolean(hasRightOrLeftVariant);
+        }
+
+        const getProductInitialCoordinates = (productId, lineId) => {
+            let targetProduct = getProductByIdAndLine(productId, lineId);
+            let { alto: height } = targetProduct;
+            //Y must be the half of the height in meters (which is the "unit" in the 3D space), to appear baseline and not centered in origin
+            return {
+                x: 0,
+                y: Number(height) / 2000,
+                z: 0
+            };
+        }
+
         return <WrappedComponent 
             family = { family }
             getLine = { getLine }
@@ -59,6 +83,9 @@ const withFamilyState = WrappedComponent => {
             getProductName = { getProductName }
             fetchingFamily = { fetchingFamily }
             getProductDoorStatus = { getProductDoorStatus }
+            canDoorBeOpenedOrClosed = { canDoorBeOpenedOrClosed }
+            modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
+            getProductInitialCoordinates = { getProductInitialCoordinates }
             { ...ownProps }
         />
     }

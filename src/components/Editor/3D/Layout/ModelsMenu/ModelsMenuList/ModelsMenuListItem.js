@@ -22,7 +22,15 @@ const ModelsMenuListItem = ({
     //PROPS
     const project3DModel = projectModel[TRIDIMENSIONAL_SCENE];
     const { uuid: modelId } = project3DModel;
-    const { type: modelType, name: modelName, productLine: modelProductLine, modelState, modelDirection } = projectModel;
+    const { 
+        type: modelType, 
+        name: modelName, 
+        modelState, 
+        productLine: modelProductLine, 
+        modelDirection,
+        canDoorBeOpenedOrClosed,
+        modelHasRightOrLeftVariant 
+    } = projectModel;
 
     return (
         <li 
@@ -46,6 +54,8 @@ const ModelsMenuListItem = ({
                 modelProductLine = { modelProductLine }
                 handleStateChange = { handleStateChange }
                 handleDirectionChange = { handleDirectionChange }
+                canDoorBeOpenedOrClosed = { canDoorBeOpenedOrClosed }
+                modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
             />
         </li>
     );

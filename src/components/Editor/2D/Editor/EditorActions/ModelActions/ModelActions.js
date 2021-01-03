@@ -16,7 +16,7 @@ const ModelActions = ({
     modelToEdit, 
     rotateModel, 
     deleteModel,
-    handlePositionChange 
+    handlePositionChange
 }) => (
     modelToEdit ? 
         <FlexRow
@@ -32,6 +32,7 @@ const ModelActions = ({
                 rotate = { rotateModel }
             />
             <ModelPosition 
+                stepSize = { stepSize }
                 modelToEdit = { modelToEdit }
                 handlePositionChange = { handlePositionChange }
             />
