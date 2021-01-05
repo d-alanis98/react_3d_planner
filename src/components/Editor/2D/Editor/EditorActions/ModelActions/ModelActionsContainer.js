@@ -7,6 +7,7 @@ import with2DRendererContextConsumer from '../../../../../Renderer/2D/HOC/with2D
 import useSelectionBox from './hooks/useSelectionBox';
 //Classes
 import ModelEvents from '../../../../../../classes/2D/Models/ModelEvents';
+import BoundsFactory from '../../../../../../classes/2D/Models/BoundsFactory';
 import RoomBoundDetector from '../../../../../../classes/2D/Room/RoomBoundDetector';
 import BidimensionalModelRotation from '../../../../../../classes/2D/Models/BidimensionalModelRotation';
 
@@ -84,6 +85,9 @@ const ModelActionsContainer = ({
         moveTo(roomBoundX, roomBoundY);
         //We update the position in state
         updateModelPosition(modelToEdit._id, roomBoundX, roomBoundY);
+        //We update the model bounds
+        let boundFactory = new BoundsFactory(modelToEdit, sceneInstance);
+        boundFactory.create();
         //We make the correction in the selection box position
         correctSelectionBox();
     }

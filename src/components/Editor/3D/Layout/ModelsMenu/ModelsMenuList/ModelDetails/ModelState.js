@@ -39,7 +39,7 @@ export default ModelState;
 
 const ModelDoorStateModifier = ({ modelId, modelState, handleStateChange, canDoorBeOpenedOrClosed }) => 
     canDoorBeOpenedOrClosed 
-        && (
+        ? (
             <tr>
                 <th className='text-white'>Estado: </th>
                 <td>
@@ -61,7 +61,8 @@ const ModelDoorStateModifier = ({ modelId, modelState, handleStateChange, canDoo
                     </select>
                 </td>
             </tr>
-        );
+        )
+        : null;
 
 const ModelDirectionModifier = ({ modelId, modelDirection, handleDirectionChange, modelHasRightOrLeftVariant }) => (
     modelHasRightOrLeftVariant 
