@@ -24,7 +24,7 @@ const ModelState = ({
                 />
                 <ModelDirectionModifier 
                     modelId = { modelId }
-                    modelState = { modelState }
+                    modelDirection = { modelDirection }
                     handleDirectionChange = { handleDirectionChange }
                     modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
                 />
@@ -63,9 +63,9 @@ const ModelDoorStateModifier = ({ modelId, modelState, handleStateChange, canDoo
             </tr>
         );
 
-const ModelDirectionModifier = ({ modelId, modelDirection, handleDirectionChange, modelHasRightOrLeftVariant }) => 
+const ModelDirectionModifier = ({ modelId, modelDirection, handleDirectionChange, modelHasRightOrLeftVariant }) => (
     modelHasRightOrLeftVariant 
-        && (
+        ? (
             <tr>
                 <th  className='text-white'>Direccion: </th>
                 <td>
@@ -87,4 +87,6 @@ const ModelDirectionModifier = ({ modelId, modelDirection, handleDirectionChange
                     </select>
                 </td>
             </tr>
-        );
+        )
+        : null
+)

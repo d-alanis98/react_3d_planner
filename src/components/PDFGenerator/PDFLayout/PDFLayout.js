@@ -38,10 +38,10 @@ const PDFLayout = ({
                                     src = { projectToPDFItems[index + startIndex].dataUrl } 
                                     className = 'pdf-layout__image'
                                 />
-                                : <FontAwesomeIcon 
+                                : null  /*<FontAwesomeIcon 
                                     icon = { faImage }
                                     className = 'pdf-layout__image-thumbnail text-muted'
-                                />
+                                /> */ 
                         }
 
                     </div>

@@ -292,12 +292,14 @@ const getProgressDataFromState = getState => {
         editor, 
         project, 
     } = { ...getState() };
+    const { projectToPDFItems, projectToPDFPages, ...projectData } = project; 
     return {
         plane,
         editor, 
         project: {
-            ...project,
-            displayModelsMenu: false //By default we hide the models menu
+            ...projectData,
+            displayModelsMenu: false, //By default we hide the models menu
+            exportingProjectToPDF: false
         }
     }
 }

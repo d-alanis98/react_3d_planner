@@ -9,7 +9,7 @@
 
 export default class RoomCoordinatesCalculator {
     //CONSTANTS
-    static PLANE_PADDING  = 20;
+    static PLANE_PADDING  = 60;
 
     //CONSTRUCTOR
     constructor(roomWidth, roomHeight, containerWidth, containerHeight ) {

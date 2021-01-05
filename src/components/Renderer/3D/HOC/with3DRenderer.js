@@ -353,6 +353,7 @@ const with3DRenderer = (WrappedComponent) => {
             if(!sceneInstance)
                 return;
             let modelData = getModelData(modelId, modelState, modelDirection);
+
             sceneInstance.hotReplaceModel({
                 modelData,
                 onSuccess: object => hotReplaceSuccess(object, modelId, modelState, modelDirection),

@@ -13,7 +13,7 @@ import PlaneFactory from '../3D/Plane/PlaneFactory';
 import TextureFactory from '../3D/Models/TextureFactory';
 import WallFactory from '../3D/Walls/WallFactory';
 //Constants
-import { modelStates } from '../../constants/models/models';
+import { modelDirections, modelStates } from '../../constants/models/models';
 import RotationHelper from '../Helpers/RotationHelper';
 
 /**
@@ -338,22 +338,22 @@ export default class TridimensionalRenderer{
     applyDoorCorrection = (modelState, rotation, doorStatus, width, depth, z) => {
         /**
          * If model has door(s)
-         * depth += (width / numberOfDoors)
-         * z += (width / (2 * numberOfDoors))
+         * depth += (width / correctionFactor)
+         * z += (width / (2 * correctionFactor))
          * 
-         * hasDoor and numberOfDoors will come as parameter
+         * hasDoor and correctionFactor will come as parameter
          * @todo Change implementation of this function, to receive an object with the parameters, instead of the positional ones
          * The change must be done in with3DRenderer.js too.
          */
-        let [numberOfDoors] = doorStatus ? doorStatus.split(',') : 0;
-        numberOfDoors = Number(numberOfDoors);
-        if(modelState === modelStates.open && numberOfDoors > 0) {
+        let [correctionFactor] = doorStatus ? doorStatus.split(',') : 0;
+        correctionFactor = Number(correctionFactor);
+        if(modelState === modelStates.open && correctionFactor > 0) {
             if(RotationHelper.isNumberOfTurnsOdd(rotation)) {
-                depth += (width / numberOfDoors);
-                z += (width / (2 * numberOfDoors));
+                depth += (width * correctionFactor);
+                z += (width * (correctionFactor / 2));
             } else {
-                depth += (width / numberOfDoors);
-                z -= (width / (2 * numberOfDoors));
+                depth += (width * correctionFactor);
+                z -= (width * (correctionFactor / 2));
             }
         }
 
@@ -380,7 +380,7 @@ export default class TridimensionalRenderer{
         doorStatus = '0,w',
     ) {
         //We conform the uri of the model
-        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel?direction=${modelDirection}&state=${modelState}`;
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel/?state=${modelState}`;
         //We get the model dimensions
         let { width, height, depth } = DimensionsGetter.getDimensions(productLine, type);
         //We apply door corrections
@@ -405,6 +405,9 @@ export default class TridimensionalRenderer{
                         //We set the proper scale to be accurate between the real dimensions and the dimensions in the 3D scene
                         let scaleCalculator = new ModelScaleCalculator(object, width, height, depth);
                         let { x: scaleInX, y: scaleInY, z: scaleInZ } = scaleCalculator.calculateScale();
+                        //To show the door in the left side instead of the right one, we apply the scale in X as negative value
+                        if(modelDirection === modelDirections.left)
+                            scaleInX *= -1;
                         object.scale.set(scaleInX, scaleInY, scaleInZ)
                         //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
                         let yPosition = y === 0 ? this.getObjectYInitialPosition(y, object) : y; //Only on creation y will be exactly 0, then the position will be the exact one

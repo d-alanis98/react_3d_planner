@@ -9,7 +9,7 @@ export default class BoundsFactory {
     static RIGHT_BOUND  = 'RIGHT_BOUND';
     static BOTTOM_BOUND = 'BOTTOM_BOUND';
     //Others
-    static TEXT_MARGIN  = 4;
+    static TEXT_MARGIN  = 12;
 
     constructor(model, scene) {
         this.model = model;
@@ -52,9 +52,10 @@ export default class BoundsFactory {
     }
 
     setDataFromModel = () => {
-        const { attrs: { width, height, x, y } } = this.model;
+        const { attrs: { width, height, x, y }, _id: modelId } = this.model;
         this.modelX = x;
         this.modelY = y;
+        this.modelId = modelId;
         this.modelWidth = width;
         this.modelHeight = height;
     }
@@ -66,6 +67,11 @@ export default class BoundsFactory {
         this.boundsToCreate = boundsArray.map(bound => ({
             [bound]: this.getBoundDistance(bound)
         }));
+    }
+
+    getBoundId = boundData => {
+        const boundName = this.getBoundName(boundData);
+        return `${this.modelId}_${boundName}`;
     }
 
     getBoundName = boundData => {
@@ -174,65 +180,134 @@ export default class BoundsFactory {
         const { TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND, TEXT_MARGIN } = BoundsFactory;
         const bound = this.getBoundName(boundData);
         const { sizeOfTheBoundInX, sizeOfTheBoundInY } = this.getBoundSize(boundData);
+        const textToCreate = this.getBoundText(boundData);
         switch(bound) {
             case TOP_BOUND:
                 return {
                     x: this.modelX + TEXT_MARGIN,
-                    y: this.roomInitialY + (sizeOfTheBoundInY / 2)
+                    y: this.roomInitialY + (sizeOfTheBoundInY / 2) - (textToCreate.length * 3)
                 };
             case LEFT_BOUND:
                 return {
-                    x: this.roomInitialX + (sizeOfTheBoundInX / 2),
-                    y: this.modelY + TEXT_MARGIN
+                    x: this.roomInitialX + (sizeOfTheBoundInX / 2) - (textToCreate.length * 3),
+                    y: this.modelY - TEXT_MARGIN
                 };
             case RIGHT_BOUND:
                 return {
-                    x: this.modelX + (this.modelWidth / 2) + (sizeOfTheBoundInX / 2),
-                    y: this.modelY + TEXT_MARGIN
+                    x: this.modelX + (this.modelWidth / 2) + (sizeOfTheBoundInX / 2) - (textToCreate.length * 3),
+                    y: this.modelY - TEXT_MARGIN
                 };
             case BOTTOM_BOUND:
                 return {
                     x: this.modelX + TEXT_MARGIN,
-                    y: this.modelY + (this.modelHeight / 2) + (sizeOfTheBoundInY / 2),
+                    y: this.modelY + (this.modelHeight / 2) + (sizeOfTheBoundInY / 2) - (textToCreate.length * 3),
                 };
         }
     }
 
+    getBoundRotation = boundData => {
+        const { TOP_BOUND, BOTTOM_BOUND } = BoundsFactory;
+        const bound = this.getBoundName(boundData);
+        switch(bound) {
+            case TOP_BOUND:
+                return 90;
+            case BOTTOM_BOUND:
+                return 90;
+        }
+        return 0;
+    }
+
+
+    getDragBoundFunction = boundData => {
+        const { TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND } = BoundsFactory;
+        const bound = this.getBoundName(boundData);
+        if(bound === TOP_BOUND || bound === BOTTOM_BOUND)
+            return position => {
+                position.y = 0;
+                if(position.x > (this.modelWidth / 2))
+                    position.x = this.modelWidth / 2;
+                if(position.x < -(this.modelWidth / 2))
+                    position.x = -(this.modelWidth / 2);
+                return position;
+            };
+        if(bound === LEFT_BOUND || bound === RIGHT_BOUND)
+            return position => {
+                position.x = 0;
+                if(position.y > (this.modelHeight / 2))
+                    position.y = this.modelHeight / 2;
+                if(position.y < -(this.modelHeight / 2))
+                    position.y = -(this.modelHeight / 2);
+                return position;
+            }
+    }
 
     create = () => {
+        if(this.boundsAlreadyExist())
+            this.deleteExistingBounds();
+        //We create the bounds
         this.boundsToCreate.forEach((boundToCreate) => {
             const { x, y } = this.getBoundCoordinates(boundToCreate);
             let boundGroup = new Konva.Group({
+                id: this.getBoundId(boundToCreate),
                 draggable: true,
+                dragBoundFunc: this.getDragBoundFunction(boundToCreate)
             });
-
+            //We create the bound arrow
             let bound = new Konva.Arrow({
                 x,
                 y,
-                name: this.getBoundName(boundToCreate),
                 points: this.getBoundPoints(boundToCreate),
                 pointerLength: 4,
-                pointerWidth: 4,
+                pointerWidth: 5,
                 fill: 'black',
                 stroke: 'black',
                 strokeWidth: 1,
                 pointerAtBeginning: true,
             });
-
+            //We create the bound text
             let text = new Konva.Text({
                 fill: 'black',
                 text: this.getBoundText(boundToCreate),
+                draggable: true,
+                rotation: this.getBoundRotation(boundToCreate),
             });
-
             text.position(this.getBoundTextPosition(boundToCreate))
-
+            //We add the bound arrow and the text to the group
             boundGroup.add(bound);
-            boundGroup.add(text)
+            boundGroup.add(text);
+            //We add the bound to the plane layer
             this.scene.planeLayer.add(boundGroup)
         })
     }
 
-    makeVisible = (bound, boundToMakeVisible) => {
+    boundsAlreadyExist = () => {
+        const { TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND } = BoundsFactory;
+        let bounds = [TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND];
+        let boundsExist = true;
+        bounds.forEach(bound => {
+            let boundToUpdate = this.scene.planeLayer.find(`#${this.modelId}_${bound}`);
+            if(!boundToUpdate || Object.keys(boundToUpdate).length === 0)
+                boundsExist = false;
+        });
+        return boundsExist;
+    }
 
+    deleteExistingBounds = () => {
+        BoundsFactory.deleteModelBounds(this.modelId, this.scene);
+    }
+
+    static deleteModelBounds = (modelId, sceneInstance) => {
+        const { TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND } = BoundsFactory;
+        let bounds = [TOP_BOUND, LEFT_BOUND, RIGHT_BOUND, BOTTOM_BOUND];
+        bounds.forEach(bound => {
+            let boundsToDelete = sceneInstance.planeLayer.find(`#${modelId}_${bound}`);
+            boundsToDelete.forEach(group => {
+                group.remove();
+            })
+        });
+    }
+
+    static toggleVisibility = boundToToggle => {
+        boundToToggle.visible = !boundToToggle.visible;
     }
 }

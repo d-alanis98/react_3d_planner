@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v1 as uuidv1 } from 'uuid';
 //Components
 import Column from '../../../../../Layout/Grid/Column';
 import NoProducts from './NoProducts';
@@ -49,7 +50,7 @@ const Products = ({
         let initialCoordinates = getProductInitialCoordinates(type, productLine);
         //We create the object structure
         let objectToAdd = {
-            id: projectObjects.length,
+            id: uuidv1(),
             type,
             doorStatus,
             productKey,

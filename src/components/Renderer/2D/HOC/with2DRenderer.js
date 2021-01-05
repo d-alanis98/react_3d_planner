@@ -164,7 +164,7 @@ const with2DRenderer = WrappedComponent => {
                 //We get the objects array ordered in a suitable way to get the correct "layers" according to the view
                 const projectObjectsByLayer = BidimensionalModelLayerManager.getModelsArrayOrderedByLayers(projectObjects, editorView);
                 //We iterate over the existing models and create the 2d model
-                projectObjectsByLayer.forEach(model => {
+                projectObjectsByLayer.forEach((model, index) => {
                     //We get the type and the coordinates (of the 2d key)
                     const { type, name: modelName, rotation, productKey, productLine } = model;
                     //We get the coordinates from the calculation of them based on the existing 3d coordinates
@@ -182,7 +182,7 @@ const with2DRenderer = WrappedComponent => {
                             let { _id, attrs: { x: _x, y: _y } } = createdModel;
                             let modelWithUpdatedId = {
                                 ...model,
-                                name: modelName || `Modelo ${ model.id }`,
+                                name: modelName || 'Modelo',
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
                                     coordinates: { x: _x, y: _y }
@@ -190,7 +190,7 @@ const with2DRenderer = WrappedComponent => {
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
-                        modelName: modelName || `Modelo ${ model.id }`,
+                        modelName: modelName || 'Modelo',
                         productKey,
                         editorView,
                         productLine,

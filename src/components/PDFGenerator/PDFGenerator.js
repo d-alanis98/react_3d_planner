@@ -100,7 +100,7 @@ const PDFGenerator = ({
                         printPDF = { printPDF }
                         pageNumber = { index + 1 }
                         removePage = { removePage }
-                        shouldPDFDownloadEnable = { shouldPDFDownloadEnable(index + 1)}
+                        shouldPDFDownloadEnable = { true }
                     />
                 ))
             }

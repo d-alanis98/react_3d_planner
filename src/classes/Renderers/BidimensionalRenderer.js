@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 5.5.1
+ * @version 6.0.0
  * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
  * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
  */
@@ -24,6 +24,7 @@ export default class BidimensionalRenderer {
     static DEFAULT_HEIGHT = 5;
     //Plane
     static PLANE_PADDING = 10; //10 pixels
+    static BOUNDS_PADDING = 10;
     //CONSTRUCTOR
     constructor(roomWidth = BidimensionalRenderer.DEFAULT_WIDTH, roomHeight = BidimensionalRenderer.DEFAULT_HEIGHT, enablePlaneControls = false) {
         this.objects = [];
@@ -157,6 +158,60 @@ export default class BidimensionalRenderer {
         drawLinesInAxis(numberOfCols, COLUMN, roomHeight, gridSizeWidth, gridSizeHeight);
     }
 
+    drawRoomBounds() {
+        const { width: roomWidthInPixels, height: roomHeightInPixels } = this.roomDimensionInPixels;
+        let { initialX, initialY, finalX, finalY } = this.roomCoordinates;
+        let roomPadding = BidimensionalRenderer.BOUNDS_PADDING;
+        //Top bound
+        let topBoundGroup = new Konva.Group();
+        let topBound = new Konva.Arrow({
+            points: [initialX, initialY - roomPadding, initialX + roomWidthInPixels, initialY - roomPadding],
+            pointerLength: 4,
+            pointerWidth: 4,
+            fill: 'black',
+            stroke: 'black',
+            strokeWidth: 1,
+            pointerAtBeginning: true,
+        });
+
+        let planeWidth = `${this.roomWidth * 100} cm`;
+        let topBoundText = new Konva.Text({
+            x: initialX + (roomWidthInPixels / 2) - (planeWidth.length * 3),
+            y: initialY - (roomPadding * 2.25),
+            rotation: 0,
+            fontSize: 12,
+            text: planeWidth,
+        });
+
+        topBoundGroup.add(topBound);
+        topBoundGroup.add(topBoundText);
+        //Side bound
+        let sideBoundGroup = new Konva.Group();
+        let sideBound = new Konva.Arrow({
+            points: [initialX - roomPadding, initialY, initialX - roomPadding, initialY + roomHeightInPixels],
+            pointerLength: 4,
+            pointerWidth: 4,
+            fill: 'black',
+            stroke: 'black',
+            strokeWidth: 1,
+            pointerAtBeginning: true,
+        });
+
+        let planeHeight = `${this.roomHeight * 100} cm`;
+        let sideBoundText = new Konva.Text({
+            x: initialX - (roomPadding * 2.25),
+            y: initialY + (finalY / 2) + (planeHeight.length * 3),
+            rotation: 270,
+            text: planeHeight
+        });
+
+        sideBoundGroup.add(sideBound);
+        sideBoundGroup.add(sideBoundText);
+        //We add the bounds to the layer
+        this.planeLayer.add(topBoundGroup);
+        this.planeLayer.add(sideBoundGroup);
+    }
+
     drawRoom(){
         let { roomWidth, roomHeight, containerWidth, containerHeight } = this;
         //We create a new room coordinates calculator instance, this facade returns the optimal coordinates to get the more portion of the plane in the screen by applying the less scale posible
@@ -179,6 +234,8 @@ export default class BidimensionalRenderer {
                 strokeWidth: 1,
             })
         );
+
+        this.drawRoomBounds();
     }
 
     getRoomDimensionInPixels(){
@@ -215,17 +272,24 @@ export default class BidimensionalRenderer {
             type,
             scene, 
             rotation,
-            onUpdate,
+            onUpdate: event => {
+                //On every position change we are going to generate the new bounds
+                this.addBounds(event.target);
+                onUpdate(event);
+            },
             onSuccess: createdModel => {
                 onSuccess(createdModel);
                 this.objects.push(createdModel);
-                this.addBounds(createdModel)
+                this.addBounds(createdModel);
             }, 
             modelName,
             productKey,
             editorView,
             onSelection, 
-            onDragStart,
+            onDragStart: event => {
+                BoundsFactory.deleteModelBounds(event.target._id, this);
+                onDragStart(event);
+            },
             productLine,
             onModelClick
         });
