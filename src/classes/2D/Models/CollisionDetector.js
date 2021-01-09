@@ -125,13 +125,16 @@ export default class CollisionDetector {
      * of the type n * 90°, where n % 2 !== 0.
      * @param {object} attributes
      */
-    static getRelevantAttributes = ({ x, y, width, height, rotation }) =>({
+    static getRelevantAttributes = ({ x, y, width, height, visible, rotation }) =>({
             x, 
             y, 
             width: RotationHelper.isNumberOfTurnsOdd(rotation) ? width : height, 
             height: RotationHelper.isNumberOfTurnsOdd(rotation) ? height : width,
+            visible
         }
     );
+
+    static checkIntersectionWith
 
     /**
      * Main method, detects if there is a collision and snaps the object to the edges of the colliding one.
@@ -162,8 +165,8 @@ export default class CollisionDetector {
             //We get the data from the attributes (of the fixed object and the moving object)
             let movingObjectData = getRelevantAttributes(movingObjectAttributes);
             let fixedObjectData = getRelevantAttributes(fixedObjectAttributes);
-            //If there is an intersection we make the snap
-            if (haveIntersection(fixedObjectData, movingObjectData))
+            //If there is an intersection and if the object is not hidden, we make the snap 
+            if (haveIntersection(fixedObjectData, movingObjectData) && fixedObjectData.visible)
                 model.position(calculateSnapPosition(fixedObjectData, movingObjectData, movementDirection))
           });
     }

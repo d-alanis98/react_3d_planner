@@ -392,9 +392,9 @@ export default class TridimensionalRenderer{
         //We load the model
         let loader = new GLTFLoader();
         //We retrieve the scale data
-        const appliedScaleInX = modelScale.x ? Number(modelScale.x) : 1;
-        const appliedScaleInY = modelScale.y ? Number(modelScale.y) : 1;
-        const appliedScaleInZ = modelScale.z ? Number(modelScale.z) : 1;
+        const appliedScaleInX = modelScale?.x ? Number(modelScale.x) : 1;
+        const appliedScaleInY = modelScale?.y ? Number(modelScale.y) : 1;
+        const appliedScaleInZ = modelScale?.z ? Number(modelScale.z) : 1;
         loader.load(
             uri,
             gltf => {

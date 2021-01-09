@@ -31,7 +31,10 @@ const ModelActionsContainer = ({
     useEffect(() => {
         if(modelToEdit)
             window.onkeydown = handleKeyDown;
-        else window.onkeydown = null;
+        else { 
+            window.onkeydown = null;
+            correctSelectionBox();
+        }
     }, [modelToEdit, stepSize])
 
     //Effects
@@ -134,6 +137,7 @@ const ModelActionsContainer = ({
         rotateModel = { rotateModel }
         deleteModel = { deleteModel }
         sceneInstance = { sceneInstance }
+        correctSelectionBox = { correctSelectionBox }
         handlePositionChange = { handlePositionChange }
     />
 }

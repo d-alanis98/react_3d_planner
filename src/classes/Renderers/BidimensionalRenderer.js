@@ -1,6 +1,6 @@
 /**
  * @author Damián Alanís Ramírez
- * @version 6.0.0
+ * @version 6.1.3
  * @description Class that contains the logic to compose the 2D renderer, this class provide methods to add objects
  * to the scene and allows the mnipulation in several ways of the different components of the 2D scene.
  */
@@ -302,6 +302,10 @@ export default class BidimensionalRenderer {
             onModelClick
         });
 
+    }
+
+    removeModel = modelToRemove => {
+        this.objects = this.objects.filter(object => object._id !== modelToRemove._id);
     }
 
     addBounds = createdModel => {

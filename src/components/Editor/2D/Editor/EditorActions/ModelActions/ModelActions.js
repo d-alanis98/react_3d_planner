@@ -18,6 +18,7 @@ const ModelActions = ({
     rotateModel, 
     deleteModel,
     sceneInstance,
+    correctSelectionBox,
     handlePositionChange
 }) => (
     modelToEdit ? 
@@ -38,6 +39,7 @@ const ModelActions = ({
                 deleteModel = { deleteModel }
                 modelToEdit = { modelToEdit }
                 sceneInstance = { sceneInstance }
+                correctSelectionBox = { correctSelectionBox }
             />
         </FlexRow>
     : null

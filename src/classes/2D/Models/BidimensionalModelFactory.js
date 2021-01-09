@@ -69,9 +69,11 @@ export default class BidimensionalModelFactory {
             let group = new Konva.Group({
                 x: x || containerWidth / 2,
                 y: y || containerHeight / 2,
+                name: modelName,
                 type,
                 width,
                 height,
+                visible: true,
                 originalWidth,
                 originalHeight,
                 previousScaleX: widthScale,

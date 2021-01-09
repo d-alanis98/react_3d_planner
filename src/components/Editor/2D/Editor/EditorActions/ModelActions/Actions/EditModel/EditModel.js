@@ -10,7 +10,8 @@ const EditModel = ({
     rotate, 
     deleteModel,
     modelToEdit, 
-    sceneInstance 
+    sceneInstance,
+    correctSelectionBox 
 }) => {
     const [showEditMenu, setShowEditMenu] = useState(false);
     const [modelEditorInstance, setModelEditorInstance] = useState();
@@ -38,6 +39,8 @@ const EditModel = ({
                 deleteModel = { deleteModel }
                 modelToEdit = { modelToEdit }
                 showEditMenu =  { showEditMenu }
+                sceneInstance = { sceneInstance }
+                correctSelectionBox = { correctSelectionBox }
                 modelEditorInstance = { modelEditorInstance }
             />
         </Fragment>

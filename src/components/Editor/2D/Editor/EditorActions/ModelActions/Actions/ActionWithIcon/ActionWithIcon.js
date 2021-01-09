@@ -10,7 +10,8 @@ const ActionWithIcon = ({
     color,
     onClick, 
     className,
-    actionText 
+    actionText,
+    textClassName 
 }) => {
 
     const defaultClassName = 'justify-content-around p-2 rounded-pill border cursor-click action-with-icon';
@@ -26,7 +27,7 @@ const ActionWithIcon = ({
                 icon = { icon }
                 iconClassName = { `text-${getColor()}` }
             />
-            <span>{ actionText }</span>
+            <span className={textClassName}>{ actionText }</span>
         </FlexRow>
     );
 }

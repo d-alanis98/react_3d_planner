@@ -19,6 +19,7 @@ import withProjectState from '../../../../../../../../../redux/HOC/withProjectSt
 import './EditModelMenu.css';
 //Icons
 import { faArrowsAltH, faArrowsAltV, faCrop, faExpandArrowsAlt, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { VisibilityModifier } from '../../../../ModelsList/ModelsList';
 
 
 
@@ -31,6 +32,8 @@ const EditModelMenu = ({
     deleteModel,
     modelToEdit,
     showEditMenu,
+    sceneInstance,
+    correctSelectionBox,
     modelEditorInstance
 }) => (
     <div
@@ -41,6 +44,8 @@ const EditModelMenu = ({
             toggleMenu = { toggleMenu }
             deleteModel = { deleteModel }
             modelToEdit = { modelToEdit }
+            sceneInstance = { sceneInstance }
+            correctSelectionBox = { correctSelectionBox }
             modelEditorInstance = { modelEditorInstance }
         />
     </div>
@@ -54,13 +59,21 @@ const ModelMenuSections = ({
     toggleMenu,
     deleteModel,
     modelToEdit,
+    sceneInstance,
+    correctSelectionBox,
     modelEditorInstance
 }) => {
 
     const handleNameUpdate = newName => {
         modelEditorInstance.editName(newName);
+        modelToEdit.name(newName);
     }
 
+    const handleVisibilityChange = visible => {
+        if(visible)
+            correctSelectionBox();
+        else correctSelectionBox(true); //To hide selection box
+    }
     return (
         <div>
             <MenuHeader 
@@ -70,6 +83,9 @@ const ModelMenuSections = ({
             <QuickActions 
                 rotate = { rotate }
                 deleteModel = { deleteModel }
+                modelToEdit = { modelToEdit }
+                sceneInstance = { sceneInstance }
+                handleVisibilityChange = { handleVisibilityChange }
             />
             <NameModifier 
                 modelToEdit = { modelToEdit }
@@ -78,13 +94,20 @@ const ModelMenuSections = ({
             />
             <ScaleModifierWithState 
                 modelToEdit = { modelToEdit }
+                correctSelectionBox =  { correctSelectionBox }
                 modelEditorInstance = { modelEditorInstance }
             />
         </div>
     );
 }
 
-const QuickActions = ({ rotate, deleteModel }) => (
+const QuickActions = ({ 
+    rotate, 
+    deleteModel, 
+    modelToEdit,
+    sceneInstance,
+    handleVisibilityChange 
+}) => (
     <Fragment>
         <LabelWithIcon 
             icon = { faTools }
@@ -94,6 +117,12 @@ const QuickActions = ({ rotate, deleteModel }) => (
         <FlexRow
             className = 'align-items-center justify-content-around mb-2 p-2'
         >
+            <VisibilityModifier 
+                model = { modelToEdit }
+                onStateChange = { handleVisibilityChange }
+                sceneInstance = { sceneInstance }
+                withCircularIcon
+            />
             <RotateModel 
                 rotate = { rotate }
             />
@@ -116,6 +145,7 @@ const ScaleModifier = ({
     project, 
     modelToEdit,
     updateObject,
+    correctSelectionBox,
     modelEditorInstance,
     findObjectBy2DModelId 
 }) => {
@@ -159,6 +189,7 @@ const ScaleModifier = ({
             [axis]: value,
         });
         modelEditorInstance.editScale(axis, Number(value), project.scene['2d'].view);
+        correctSelectionBox();
         setLocalScale({
             ...localScale,
             [axis]: value

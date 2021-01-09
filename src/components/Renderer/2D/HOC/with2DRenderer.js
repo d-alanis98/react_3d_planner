@@ -264,7 +264,10 @@ const with2DRenderer = WrappedComponent => {
          */
         const deleteModelBounds = modelId => BoundsFactory.deleteModelBounds(modelId, sceneInstance);
 
-        const deleteModelInScene = model => model.destroy();
+        const deleteModelInScene = model => {
+            model.destroy();
+            sceneInstance.removeModel(model);
+        }
 
         const deleteModelInState = modelId => {
             let modelInState = findObjectBy2DModelId(modelId);

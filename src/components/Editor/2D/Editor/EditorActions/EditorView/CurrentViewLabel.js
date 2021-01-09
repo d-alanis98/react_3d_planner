@@ -19,7 +19,7 @@ const CurrentViewLabel = ({ editorView }) => {
         }
     }
     return (
-        <span>
+        <span className='text--medium'>
             <strong>Vista: </strong>
             { getViewName() }
         </span> 

@@ -26,4 +26,9 @@ input[type='file'] {
   display: none;
 }
 
+.text--medium {
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
 

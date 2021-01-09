@@ -27,6 +27,8 @@ const useSelectionBox = (modelToEdit, sceneInstance) => {
 
 
     const showSelectionBox = () => {
+        if(!modelToEdit)
+            return;
         let selectionBox = new Konva.Rect({
             x: modelToEdit.attrs.x,
             y: modelToEdit.attrs.y,
@@ -56,9 +58,10 @@ const useSelectionBox = (modelToEdit, sceneInstance) => {
         setSelectionBox(null);
     }
 
-    const correctSelectionBox = () => {
+    const correctSelectionBox = (justHideSelectionBox = false) => {
         hideSelectionBox();
-        showSelectionBox();
+        if(!justHideSelectionBox)
+            showSelectionBox();
     }
 
     return correctSelectionBox;

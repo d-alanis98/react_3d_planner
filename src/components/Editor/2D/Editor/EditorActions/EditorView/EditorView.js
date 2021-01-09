@@ -3,7 +3,7 @@ import React from 'react';
 import Dropup from '../../../../../Layout/Dropdowns/Dropup';
 import FlexRow from '../../../../../Layout/Flex/FlexRow';
 import LabelWithIcon from '../../../../../Layout/Labels/LabelWithIcon';
-import ButtonWithIcon from '../../../../../Layout/Buttons/ButtonWithIcon';
+import ActionWithIcon from '../ModelActions/Actions/ActionWithIcon/ActionWithIcon';
 import CurrentViewLabel from './CurrentViewLabel';
 //HOC
 import withProjectState from '../../../../../../redux/HOC/withProjectState';
@@ -44,16 +44,10 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
         >
             <Dropup
                 togglerText = { 
-                        <ButtonWithIcon 
+                        <ActionWithIcon 
                             icon = { faVideo }
-                            type = 'outline-secondary'
-                            className = 'btn-sm rounded-pill px-2 py-2'
-                            buttonText = { 
-                                <CurrentViewLabel 
-                                    editorView = { editorView }
-                                />
-                            } 
-                            iconClassName = 'mr-2'
+                            actionText = { <CurrentViewLabel editorView = { editorView } /> }
+                            textClassName = 'ml-1'
                         />
                  }
                 className = 'text-secondary'
