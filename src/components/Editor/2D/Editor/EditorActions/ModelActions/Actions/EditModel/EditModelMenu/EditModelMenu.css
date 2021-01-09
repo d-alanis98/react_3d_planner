@@ -1,0 +1,51 @@
+.edit-model-menu__container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 90vh;
+    width: 30vw;
+    margin: 0;
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #6c757d;
+    border-radius: 0.25rem;
+    background-color: #333333;
+    color: #ececec;
+    font-size: 0.9rem;
+    z-index: 10000;
+}
+
+.edit-model-menu--show {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: all 0.45s ease-out;
+}
+
+.edit-model-menu--hide {
+    z-index: -1;
+    opacity: 0;
+    transform: translate3d(0,-100px, 0);
+    transition: all 150ms ease-out;
+}
+
+.edit-model-menu__container > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: none;
+}
+
+
+@media (max-width: 900px) {
+    .edit-model-menu__container {
+        width: 50vw;
+    }
+}
+
+@media (max-width: 580px) {
+    .edit-model-menu__container {
+        width: 80vw;
+    }
+}
+

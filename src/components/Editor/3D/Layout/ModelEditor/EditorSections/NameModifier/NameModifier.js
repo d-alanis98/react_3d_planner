@@ -13,6 +13,9 @@ import './NameChanger.css';
 const NameModifier = ({
     modelToEdit,
     updateObject,
+    isFor2DModel,
+    onNameUpdate,
+    findObjectBy2DModelId,
     findObjectBy3DModelId,
 }) => {
     //HOOKS
@@ -31,8 +34,16 @@ const NameModifier = ({
     useEffect(() => {
         if(!modelToEdit)
             return;
-        const { uuid } = modelToEdit;
-        const projectModelData = findObjectBy3DModelId(uuid);
+            
+        let projectModelData;
+        if(isFor2DModel) {
+            const { _id } = modelToEdit;
+            projectModelData = findObjectBy2DModelId(_id);
+        } else {
+            const { uuid } = modelToEdit;
+            projectModelData = findObjectBy3DModelId(uuid);
+        }
+
         setProjectModelData(projectModelData);
     }, [modelToEdit]);
 
@@ -47,6 +58,7 @@ const NameModifier = ({
             ...projectModelData,
             name: value
         }
+        onNameUpdate && typeof onNameUpdate === 'function' && onNameUpdate(value);
         updateObject(updatedModelData);
     }
     

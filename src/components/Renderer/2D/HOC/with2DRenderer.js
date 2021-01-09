@@ -12,6 +12,7 @@ import CoordinatesTransformation from '../../../../classes/Coordinates/Coordinat
 import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
 import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
 import BidimensionalModelLayerManager from '../../../../classes/2D/Models/BidimensionalModelLayerManager';
+import BoundsFactory from '../../../../classes/2D/Models/BoundsFactory';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {
@@ -72,28 +73,6 @@ const with2DRenderer = WrappedComponent => {
             //We get the id and the coordinates from the dragged object
             const { _id, x, y } = draggedObject
             updateModelPosition(_id, x, y);
-            /*
-            let existingObject = findObjectBy2DModelId(_id);
-            if(!existingObject)
-                return;
-            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
-            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
-            let updatedObject = { 
-                ...existingObject,
-                [BIDIMENSIONAL]: {
-                    uuid: _id,
-                    coordinates: { x, y }
-                },
-                [TRIDIMENSIONAL]: {
-                    ...tridimensionalEditorState,
-                    coordinates: {
-                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
-                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
-                    }    
-                }
-            };
-            updateObject(updatedObject);
-            */
         }, [draggedObject]);
 
 
@@ -166,7 +145,7 @@ const with2DRenderer = WrappedComponent => {
                 //We iterate over the existing models and create the 2d model
                 projectObjectsByLayer.forEach((model, index) => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, name: modelName, rotation, productKey, productLine } = model;
+                    const { type, name: modelName, scale, rotation, productKey, productLine } = model;
                     //We get the coordinates from the calculation of them based on the existing 3d coordinates
                     let { x, y } = get2DCoordinatesFrom3DState(model);
                     //We update the model quantity
@@ -176,6 +155,7 @@ const with2DRenderer = WrappedComponent => {
                         x,
                         y,
                         type,
+                        scale,
                         rotation,
                         onUpdate: updateModel, //onUpdate
                         onSuccess: createdModel => { //onSuccess
@@ -275,18 +255,34 @@ const with2DRenderer = WrappedComponent => {
                 ...modelInState,
                 rotation: updatedRotation,
             };
+            BoundsFactory.refreshModelBounds(model, sceneInstance);
             updateObject(updatedObject);
         }
 
+        /**
+         * Model deletion functions
+         */
+        const deleteModelBounds = modelId => BoundsFactory.deleteModelBounds(modelId, sceneInstance);
+
+        const deleteModelInScene = model => model.destroy();
+
+        const deleteModelInState = modelId => {
+            let modelInState = findObjectBy2DModelId(modelId);
+            removeObject(modelInState);
+        }
+
+        const find2DObjectById = modelId => sceneInstance.objects.find(object => object._id === modelId);
 
         const handleModelDeletion = model => {
             let { _id: modelId } = model;
             if(!window.confirm('Está seguro de querer eliminar este modelo?'))
                 return;
-            let modelToDelete = sceneInstance.objects.find(object => object._id === modelId);
-            modelToDelete.destroy();
-            let modelInState = findObjectBy2DModelId(modelId);
-            removeObject(modelInState);
+            //We find the model in the 2D scene
+            let modelToDelete = find2DObjectById(modelId);
+            //We delete model's bounds, destroy the model from the 2D scene and remove it form the state
+            deleteModelBounds(modelId);
+            deleteModelInScene(modelToDelete);
+            deleteModelInState(modelId);
         }
 
 

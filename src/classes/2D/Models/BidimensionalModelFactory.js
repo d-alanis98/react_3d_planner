@@ -7,6 +7,7 @@ import BidimensionalModelRotation from './BidimensionalModelRotation';
 import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
 import { TOP, getModel2DUri } from '../../../constants/models/models';
+import BidimensionalModelScale from './BidimensionalModelScale';
 
 
 /**
@@ -35,6 +36,7 @@ export default class BidimensionalModelFactory {
         y,
         type,
         scene,
+        scale = { },
         rotation,
         modelName,
         productKey,
@@ -56,12 +58,24 @@ export default class BidimensionalModelFactory {
         Konva.Image.fromURL(path, imageNode => {
             let { containerWidth, containerHeight } = scene;
             //We create a new group to contain the model and the label
+            let { widthScale, heightScale } = BidimensionalModelScale.getScaleToApplyBasedOnViewAndRotation(scale, editorView, rotation);
+            //We save the "original" dimensions
+            let originalWidth = width;
+            let originalHeight = height;
+            //We set the new width and height based on the scale factor
+            width *= widthScale;
+            height *= heightScale;
+            //We create the group
             let group = new Konva.Group({
                 x: x || containerWidth / 2,
                 y: y || containerHeight / 2,
                 type,
                 width,
                 height,
+                originalWidth,
+                originalHeight,
+                previousScaleX: widthScale,
+                previousScaleY: heightScale,
                 //We set the center of the element
                 offsetX: width / 2,
                 offsetY: height / 2,
@@ -117,5 +131,14 @@ export default class BidimensionalModelFactory {
         let modelNameLength = modelName.length;
         let textSize = Math.floor((width - 2.5 * DEFAULT_TEXT_PADDING) / modelNameLength);
         return textSize >= MINIMUM_TEXT_SIZE ? textSize : MINIMUM_TEXT_SIZE;
+    }
+
+    static getUpdatedDragBoundFunc = (model, sceneInstance) => {
+        let { modelWidth, modelHeight } = BidimensionalModelRotation.getWidthAndHeightBasedOnRotation(model);
+        return position => RoomBoundDetector.boundDetection(sceneInstance, modelWidth, modelHeight, position);
+    }
+
+    static setUpdatedDragBoundFunc = (model, sceneInstance) => {
+        model.dragBoundFunc(BidimensionalModelFactory.getUpdatedDragBoundFunc(model, sceneInstance));
     }
 }

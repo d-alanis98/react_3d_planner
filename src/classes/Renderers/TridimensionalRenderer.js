@@ -378,6 +378,7 @@ export default class TridimensionalRenderer{
         modelState = 'O', 
         modelDirection = 'I',
         doorStatus = '0,w',
+        modelScale
     ) {
         //We conform the uri of the model
         let uri = `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${productLine}/getModel/?state=${modelState}`;
@@ -390,6 +391,10 @@ export default class TridimensionalRenderer{
         depth = doorCorrectedDepth;
         //We load the model
         let loader = new GLTFLoader();
+        //We retrieve the scale data
+        const appliedScaleInX = modelScale.x ? Number(modelScale.x) : 1;
+        const appliedScaleInY = modelScale.y ? Number(modelScale.y) : 1;
+        const appliedScaleInZ = modelScale.z ? Number(modelScale.z) : 1;
         loader.load(
             uri,
             gltf => {
@@ -408,7 +413,7 @@ export default class TridimensionalRenderer{
                         //To show the door in the left side instead of the right one, we apply the scale in X as negative value
                         if(modelDirection === modelDirections.left)
                             scaleInX *= -1;
-                        object.scale.set(scaleInX, scaleInY, scaleInZ)
+                        object.scale.set(scaleInX * appliedScaleInX, scaleInY * appliedScaleInY, scaleInZ * appliedScaleInZ);
                         //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
                         let yPosition = y === 0 ? this.getObjectYInitialPosition(y, object) : y; //Only on creation y will be exactly 0, then the position will be the exact one
                         object.position.set(x, yPosition, z);
@@ -434,6 +439,7 @@ export default class TridimensionalRenderer{
             texture,
             rotation,
             doorStatus,
+            modelScale,
             modelState,
             coordinates,
             productLine,
@@ -453,6 +459,7 @@ export default class TridimensionalRenderer{
             modelState,
             modelDirection,
             doorStatus,
+            modelScale
         );
     }
 

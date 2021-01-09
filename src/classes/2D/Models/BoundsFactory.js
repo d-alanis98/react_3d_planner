@@ -1,5 +1,6 @@
 import Konva from "konva";
-import { TOP } from "../../../constants/models/models";
+//Classes
+import BidimensionalModelRotation from "./BidimensionalModelRotation";
 
 export default class BoundsFactory {
     //Constants
@@ -52,12 +53,13 @@ export default class BoundsFactory {
     }
 
     setDataFromModel = () => {
-        const { attrs: { width, height, x, y }, _id: modelId } = this.model;
+        const { attrs: { x, y }, _id: modelId } = this.model;
+        let { modelWidth, modelHeight } = BidimensionalModelRotation.getWidthAndHeightBasedOnRotation(this.model);
         this.modelX = x;
         this.modelY = y;
         this.modelId = modelId;
-        this.modelWidth = width;
-        this.modelHeight = height;
+        this.modelWidth = modelWidth;
+        this.modelHeight = modelHeight;
     }
 
     setBoundToCreateArray = () => {
@@ -309,5 +311,9 @@ export default class BoundsFactory {
 
     static toggleVisibility = boundToToggle => {
         boundToToggle.visible = !boundToToggle.visible;
+    }
+
+    static refreshModelBounds = (model, sceneInstance) => {
+        (new BoundsFactory(model, sceneInstance)).create();
     }
 }

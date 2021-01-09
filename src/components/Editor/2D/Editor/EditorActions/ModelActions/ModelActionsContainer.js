@@ -133,6 +133,7 @@ const ModelActionsContainer = ({
         modelToEdit = { modelToEdit }
         rotateModel = { rotateModel }
         deleteModel = { deleteModel }
+        sceneInstance = { sceneInstance }
         handlePositionChange = { handlePositionChange }
     />
 }

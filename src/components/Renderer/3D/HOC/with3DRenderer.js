@@ -78,11 +78,12 @@ const with3DRenderer = (WrappedComponent) => {
                 //We iterate over the existing models and create the 2d model
                 projectObjects.forEach(model => {
                     //We get the type and the coordinates (of the 2d key)
-                    const { type, rotation, texture, productLine, doorStatus, modelState, modelDirection } = model;
+                    const { type, rotation, texture, scale: modelScale, productLine, doorStatus, modelState, modelDirection } = model;
                     const { coordinates } = model[TRIDIMENSIONAL_SCENE];
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the 3D model
+                    console.log({ modelScale })
                     sceneInstance.load3DModel(
                         type,
                         productLine,
@@ -92,7 +93,8 @@ const with3DRenderer = (WrappedComponent) => {
                         createdModel => onCreationSuccess(createdModel)(model, coordinates), //onSuccess
                         modelState,
                         modelDirection,
-                        doorStatus
+                        doorStatus,
+                        modelScale
                     );
                 });
                 setModels(modelsCopy);
@@ -335,12 +337,13 @@ const with3DRenderer = (WrappedComponent) => {
 
         const getModelData = (modelId, receivedModelState, receivedModelDirection) => {
             let model = findObjectBy3DModelId(modelId);
-            const { type, rotation, texture, productLine, doorStatus, modelState, modelDirection } = model;
+            const { type, rotation, texture, scale: modelScale, productLine, doorStatus, modelState, modelDirection } = model;
             const { coordinates } = model[TRIDIMENSIONAL_SCENE];
             return {
                 type,
                 texture,
                 rotation,
+                modelScale,
                 doorStatus,
                 modelState: receivedModelState || modelState,
                 coordinates,

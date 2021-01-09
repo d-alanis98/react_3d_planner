@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AxisModifier = ({ id, value, onChange, axisLabel }) => (
+const AxisModifier = ({ id, value, onChange, axisLabel, withoutUnits }) => (
     <div>
         <label className='mr-2'>{ axisLabel }</label>
         <div className='d-flex flex-row'>
@@ -12,7 +12,7 @@ const AxisModifier = ({ id, value, onChange, axisLabel }) => (
                 onChange = { onChange }
                 className = 'position-modifier__input mr-1'
             />
-            cm
+            { withoutUnits ? null : 'cm' }
         </div>
     </div>
 );

@@ -1,7 +1,7 @@
 import React from 'react';
 //Components
 import FlexRow from '../../../../../../../Layout/Flex/FlexRow';
-import ActionWithIcon from '../ActionWithIcon/ActionWithIcon';
+import CircularIcon from '../../../../../../../Layout/Icons/CircularIcon';
 //HOC
 import withProjectState from '../../../../../../../../redux/HOC/withProjectState';
 //Icons
@@ -12,14 +12,14 @@ import { TOP } from '../../../../../../../../constants/models/models';
 const RotateModel = ({ rotate, project }) => 
     shouldRotationRender(project) && (
         <FlexRow
-            className = 'align-items-center'
+            className = 'align-items-center justify-content-center px-2'
         >
-            <ActionWithIcon 
+            <CircularIcon 
                 icon = { faUndo }
                 onClick = { () => rotate(-90) }
                 className = 'mr-2'
             />
-            <ActionWithIcon 
+            <CircularIcon 
                 icon = { faRedo }
                 onClick = { () => rotate(90) }
             />

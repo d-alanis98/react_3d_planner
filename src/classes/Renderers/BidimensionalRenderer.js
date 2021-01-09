@@ -247,11 +247,17 @@ export default class BidimensionalRenderer {
         this.stage.batchDraw();
     }
 
+    static getScaleValues = scale => ({
+        scaleInX: scale?.x ? Number(scale.x) : 1,
+        scaleInY: scale?.y ? Number(scale.y) : 1,
+        scaleInZ: scale?.z ? Number(scale.z) : 1 
+    })
     
     loadSVGModel({
         x,
         y,
         type, 
+        scale,
         rotation, 
         onUpdate,
         onSuccess,
@@ -265,12 +271,14 @@ export default class BidimensionalRenderer {
     }){
         //We bind the instance to a variable
         let scene = this;
+        let scaleValues = BidimensionalRenderer.getScaleValues(scale);
         //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
         BidimensionalModelFactory.createModel({
             x, 
             y,
             type,
             scene, 
+            scale: scaleValues,
             rotation,
             onUpdate: event => {
                 //On every position change we are going to generate the new bounds

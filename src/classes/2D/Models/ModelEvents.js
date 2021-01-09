@@ -24,6 +24,8 @@ export default class ModelEvents {
      * @param {function} eventCallback 
      */
     static addEventListener = (model, eventType, eventCallback) => {
+        if(eventType in model.eventListeners)
+            model.removeEventListener(eventType, eventCallback);
         model.on(eventType, eventCallback);
     }
 
