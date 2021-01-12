@@ -7,9 +7,9 @@ import store from './redux/store';
 import App from './App';
 //Styles
 import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+//import 'bootstrap/dist/css/bootstrap.min.css';
 //Libraries
-import 'bootstrap/dist/js/bootstrap.bundle';
+//import 'bootstrap/dist/js/bootstrap.bundle';
 
 export default function init() {
 
