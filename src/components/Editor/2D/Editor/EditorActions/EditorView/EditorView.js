@@ -48,6 +48,7 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
                             icon = { faVideo }
                             actionText = { <CurrentViewLabel editorView = { editorView } /> }
                             textClassName = 'ml-1'
+                            onClick = { ev => ev.preventDefault() }
                         />
                  }
                 className = 'text-secondary'
