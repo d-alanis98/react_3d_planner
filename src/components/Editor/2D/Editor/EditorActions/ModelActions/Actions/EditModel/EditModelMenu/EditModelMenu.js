@@ -13,13 +13,15 @@ import EditorSection from '../../../../../../../3D/Layout/ModelEditor/EditorSect
 import LabelWithIcon from '../../../../../../../../Layout/Labels/LabelWithIcon';
 import AxisReference from '../../../../../../../../Miscelaneous/AxisReference/AxisReference';
 import AxisDescription from '../../../../../../../3D/Layout/ModelEditor/EditorSections/PositionModifier/AxisDescription';
+import { VisibilityModifier } from '../../../../ModelsList/ModelsList';
 //HOC
 import withProjectState from '../../../../../../../../../redux/HOC/withProjectState';
+//Classes
+import BoundsFactory from '../../../../../../../../../classes/2D/Models/BoundsFactory';
 //Style
 import './EditModelMenu.css';
 //Icons
-import { faArrowsAltH, faArrowsAltV, faCrop, faExpandArrowsAlt, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { VisibilityModifier } from '../../../../ModelsList/ModelsList';
+import { faArrowDown, faArrowLeft, faArrowRight, faArrowsAltH, faArrowsAltV, faArrowUp, faCrop, faExpandArrowsAlt, faEye, faEyeSlash, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -95,6 +97,10 @@ const ModelMenuSections = ({
             <ScaleModifierWithState 
                 modelToEdit = { modelToEdit }
                 correctSelectionBox =  { correctSelectionBox }
+                modelEditorInstance = { modelEditorInstance }
+            />
+            <EditModelBoundsWithState
+                modelToEdit = { modelToEdit }
                 modelEditorInstance = { modelEditorInstance }
             />
         </div>
@@ -255,3 +261,168 @@ const ScaleModifier = ({
 }
 
 const ScaleModifierWithState = withProjectState(ScaleModifier);
+
+const EditModelBounds = ({
+    modelToEdit,
+    updateObject,
+    modelEditorInstance,
+    findObjectBy2DModelId
+}) => {
+
+    const [bounds, setBounds] = useState(boundsData);
+
+    useEffect(() => {
+        if(!modelToEdit || isEmptyObject(modelToEdit))
+            return;
+        const restoreVisibilityFromState = () => {
+            const projectObject = findObjectBy2DModelId(modelToEdit._id);
+            if(!projectObject || !projectObject['2d'] || !modelEditorInstance)
+                return;
+            const visibilityData = projectObject['2d'].boundsVisibility;
+            if(!visibilityData)
+                return;
+            visibilityData.forEach(bound => {
+                setBoundVisibility(bound.id, bound.visible)
+            });
+            //We set the bounds in local state
+            setBounds(bounds.map((bound, index) => ({
+                ...bound,
+                visible: visibilityData[index].visible
+            })));
+        }
+
+        restoreVisibilityFromState();
+        
+    }, [modelToEdit, modelEditorInstance]);
+
+
+    const updateInGeneralState = bounds => {
+        const getBoundsWithDataToKeepInState = () => (
+            bounds.map(bound => ({
+                id: bound.id,
+                visible: isBoundVisible(bound)
+            }))
+        );
+        //We update the bound state in the global store
+        const projectObject = findObjectBy2DModelId(modelToEdit._id);
+        if(!projectObject || !projectObject['2d'])
+            return;
+        const boundsWithDataToKeepInState = getBoundsWithDataToKeepInState();
+        const projectObjectBidimensionalData = projectObject['2d'];
+        const updatedObject = {
+            ...projectObject,
+            '2d': {
+                ...projectObjectBidimensionalData,
+                boundsVisibility: boundsWithDataToKeepInState,
+            }
+        }
+        updateObject(updatedObject);
+    }
+
+
+    const isBoundVisible = bound => bound.visible !== undefined ? bound.visible : true;
+
+    const getBoundsWithVisibilityChange = (boundId, visible) => (
+        bounds.map(bound => {
+            return bound.id !== boundId
+                ? bound
+                : {
+                    ...bound,
+                    visible,
+                }
+        })
+    );
+
+    const setBoundVisibility = (boundId, visible) => {
+        modelEditorInstance.editBoundsVisibility(boundId, visible);
+        setBounds(getBoundsWithVisibilityChange(boundId, visible));
+    }
+
+    const toggleBoundVisibility = boundId => {
+        const boundToToggle = bounds.find(bound => bound.id === boundId);
+        if(!boundToToggle)
+            return;
+        updateInGeneralState(getBoundsWithVisibilityChange(boundId, !isBoundVisible(boundToToggle)))
+        setBoundVisibility(boundId, !isBoundVisible(boundToToggle));
+        
+    }
+
+    return (
+        <EditorSection
+            targetId = 'model_bounds_modifier'
+            sectionIcon = { faArrowsAltH }
+            sectionName = 'Visibilidad de las cotas'
+        > 
+            <ul className='edit-bounds-visibility__list'>
+                {
+                    bounds.map(bound => (
+                        <EditModelBoundsItem 
+                            key = { bound.id }
+                            icon = { bound.icon }
+                            visible = {  isBoundVisible(bound) }
+                            boundId = { bound.id }
+                            boundName = { bound.name }
+                            toggleBoundVisibility = { toggleBoundVisibility }
+                        />
+                    ))
+                }
+            </ul>
+        </EditorSection>
+    );
+}
+
+const EditModelBoundsWithState = withProjectState(EditModelBounds);
+
+const EditModelBoundsItem = ({ 
+    icon, 
+    visible, 
+    boundId,
+    boundName,
+    toggleBoundVisibility
+}) => {
+
+    const getIcon = () => visible ? faEyeSlash : faEye;
+
+    const getLabelText = () => visible ? 'Ocultar' : 'Mostrar';
+
+    return (
+        <li
+            onClick = { () => toggleBoundVisibility(boundId) }
+        >
+            <LabelWithIcon 
+                icon = { getIcon() }
+                className = 'cursor-click mb-0  mr-2' 
+                labelText = { getLabelText() }
+            />
+            <LabelWithIcon 
+                icon = { icon }
+                labelText = { `(Cota ${ boundName })` }
+                className = 'mb-0 cursor-click text--medium'
+            />
+        </li>
+    );
+}
+
+//DATA
+const boundsData = [
+    {
+        id: BoundsFactory.RIGHT_BOUND,
+        icon: faArrowRight,
+        name: 'derecha'
+    },
+    {
+        id: BoundsFactory.LEFT_BOUND,
+        icon: faArrowLeft,
+        name: 'izquierda'
+    },
+    {
+        id: BoundsFactory.TOP_BOUND,
+        icon: faArrowUp,
+        name: 'superior'
+    },
+    {
+        id: BoundsFactory.BOTTOM_BOUND,
+        icon: faArrowDown,
+        name: 'inferior'
+    }
+];

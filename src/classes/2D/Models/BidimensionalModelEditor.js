@@ -5,6 +5,7 @@ import BidimensionalModelFactory from './BidimensionalModelFactory';
 import { FRONT, FRONT_RIGHT, TOP } from '../../../constants/models/models';
 
 export default class BidimensionalModelEditor {
+
     constructor(modelToEdit, sceneInstance) {
         this.modelToEdit = modelToEdit;
         this.sceneInstance = sceneInstance;
@@ -86,6 +87,33 @@ export default class BidimensionalModelEditor {
         BidimensionalModelFactory.setUpdatedDragBoundFunc(this.modelToEdit, this.sceneInstance);
         //We refresh the bounds
         BoundsFactory.refreshModelBounds(this.modelToEdit, this.sceneInstance);
+    }
+
+    getBoundsVisibility = () => {
+        const existingBoundsVisibility = this.modelToEdit.getAttr(BoundsFactory.VISIBILITY_ATTR);
+        return existingBoundsVisibility ? existingBoundsVisibility : BoundsFactory.INITIAL_BOUNDS_ATTRS;
+    }
+
+    setUpdatedBoundsVisibilityInAttrs = (boundId, visible) => {
+        const updatedBoundsVisibility = this.getBoundsVisibility().map(bound => {
+            return bound.id !== boundId 
+                ? bound
+                : {
+                    ...bound,
+                    visible
+                } 
+        });
+        this.modelToEdit.setAttr(BoundsFactory.VISIBILITY_ATTR, updatedBoundsVisibility);
+    }
+
+    editBoundsVisibility = (bound, visible) => {
+        BoundsFactory.toggleVisibility({ 
+            bound,
+            visible,
+            modelId: this.modelToEdit._id,
+            sceneInstance: this.sceneInstance
+        });
+        this.setUpdatedBoundsVisibilityInAttrs(bound, visible);
     }
 
 }

@@ -181,7 +181,7 @@ export let VisibilityModifier = ({
     const [visible, setVisible] = useState();
 
     useEffect(() => {
-        if(visible !== undefined)
+        if(visible !== undefined && model)
             model.visible(visible);
         else return;
         //Handling model's bounds
@@ -192,7 +192,7 @@ export let VisibilityModifier = ({
     }, [visible]);
 
     useEffect(() => {
-        setVisible(model.visible());
+        model && setVisible(model.visible());
     }, [model]);
 
     const getIcon = () => visible ? faEyeSlash : faEye;

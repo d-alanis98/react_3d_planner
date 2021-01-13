@@ -267,7 +267,8 @@ export default class BidimensionalRenderer {
         onSelection,
         onDragStart,
         productLine,
-        onModelClick      
+        onModelClick,
+        boundsVisibility      
     }){
         //We bind the instance to a variable
         let scene = this;
@@ -288,7 +289,7 @@ export default class BidimensionalRenderer {
             onSuccess: createdModel => {
                 onSuccess(createdModel);
                 this.objects.push(createdModel);
-                this.addBounds(createdModel);
+                this.addBounds(createdModel, boundsVisibility);
             }, 
             modelName,
             productKey,
@@ -308,8 +309,10 @@ export default class BidimensionalRenderer {
         this.objects = this.objects.filter(object => object._id !== modelToRemove._id);
     }
 
-    addBounds = createdModel => {
+    addBounds = (createdModel, boundsVisibility) => {
         let boundFactory = new BoundsFactory(createdModel, this);
+        if(boundsVisibility)
+            boundFactory.setBoundsVisibility(boundsVisibility);
         boundFactory.create();
     } 
 

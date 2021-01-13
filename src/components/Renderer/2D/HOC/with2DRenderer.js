@@ -160,12 +160,14 @@ const with2DRenderer = WrappedComponent => {
                         onUpdate: updateModel, //onUpdate
                         onSuccess: createdModel => { //onSuccess
                             let { _id, attrs: { x: _x, y: _y } } = createdModel;
+                            let modelBoundsData = model[BIDIMENSIONAL].boundsVisibility;
                             let modelWithUpdatedId = {
                                 ...model,
                                 name: modelName || 'Modelo',
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
-                                    coordinates: { x: _x, y: _y }
+                                    coordinates: { x: _x, y: _y },
+                                    boundsVisibility: modelBoundsData
                                 },
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
@@ -176,7 +178,8 @@ const with2DRenderer = WrappedComponent => {
                         productLine,
                         onSelection: onSelectedModel, //onSelection
                         onDragStart,
-                        onModelClick
+                        onModelClick,
+                        boundsVisibility: model[BIDIMENSIONAL].boundsVisibility,
                     });
                 });
                 setModels(modelsCopy);
@@ -189,12 +192,14 @@ const with2DRenderer = WrappedComponent => {
             if(!existingObject)
                 return;
             let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
+            let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL] };
             const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
             let updatedObject = { 
                 ...existingObject,
                 [BIDIMENSIONAL]: {
                     uuid: modelId,
-                    coordinates: { x, y }
+                    coordinates: { x, y },
+                    ...bidimensionalEditorState
                 },
                 [TRIDIMENSIONAL]: {
                     ...tridimensionalEditorState,

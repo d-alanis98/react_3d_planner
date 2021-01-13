@@ -10,7 +10,9 @@ export default class BoundsFactory {
     static RIGHT_BOUND  = 'RIGHT_BOUND';
     static BOTTOM_BOUND = 'BOTTOM_BOUND';
     //Others
-    static TEXT_MARGIN  = 12;
+    static TEXT_MARGIN          = 12;
+    static VISIBILITY_ATTR      = 'boundsVisibility';
+    static INITIAL_BOUNDS_ATTRS = [{id: BoundsFactory.RIGHT_BOUND}, {id: BoundsFactory.LEFT_BOUND}, {id: BoundsFactory.TOP_BOUND}, {id: BoundsFactory.BOTTOM_BOUND}]
 
     constructor(model, scene) {
         this.model = model;
@@ -278,7 +280,26 @@ export default class BoundsFactory {
             boundGroup.add(bound);
             boundGroup.add(text);
             //We add the bound to the plane layer
-            this.scene.planeLayer.add(boundGroup)
+            this.scene.planeLayer.add(boundGroup);
+            this.manageVisibility();
+        })
+    }
+
+    setBoundsVisibility = boundsVisibility => {
+        this.model.setAttr(BoundsFactory.VISIBILITY_ATTR, boundsVisibility);
+    }
+
+    manageVisibility = () => {
+        let boundsVisibility = this.model.getAttr(BoundsFactory.VISIBILITY_ATTR);
+        if(!boundsVisibility)
+            return;
+        boundsVisibility.forEach(bound => {
+            BoundsFactory.toggleVisibility({
+                bound: bound.id,
+                modelId: this.modelId, 
+                visible: bound.visible !== undefined ? bound.visible : true,
+                sceneInstance: this.scene
+            })
         })
     }
 
@@ -309,8 +330,12 @@ export default class BoundsFactory {
         });
     }
 
-    static toggleVisibility = boundToToggle => {
-        boundToToggle.visible = !boundToToggle.visible;
+    static toggleVisibility = ({ modelId, bound, visible, sceneInstance }) => {
+        let boundToToggle = sceneInstance.planeLayer.find(`#${modelId}_${bound}`);
+        if(!boundToToggle)
+            return;
+
+        visible ? boundToToggle.show() : boundToToggle.hide();
     }
 
     static refreshModelBounds = (model, sceneInstance) => {

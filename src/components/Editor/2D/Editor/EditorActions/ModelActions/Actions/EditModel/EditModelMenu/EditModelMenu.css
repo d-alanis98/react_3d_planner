@@ -36,6 +36,29 @@
     overflow-x: none;
 }
 
+.edit-bounds-visibility__list {
+    list-style: none;
+    padding: 0.5rem 0.5rem;
+}
+
+.edit-bounds-visibility__list li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    list-style: none;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 0.5rem;
+}
+
+.edit-bounds-visibility__list li:hover {
+    transform: scale(1.02);
+    transition: transform 50ms ease-in-out;
+}
+
 
 @media (max-width: 900px) {
     .edit-model-menu__container {
