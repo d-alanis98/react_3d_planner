@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import $ from 'jquery';
 //Components
 import Container from '../../../../../../Layout/Containers/Container';
 import EditorSection from '../EditorSection';
@@ -28,7 +27,8 @@ const NameModifier = ({
     //Effects
     useEffect(() => {
         //Input field shown by default
-        $('#name_modifier').collapse('show');
+        document.querySelector('#name_modifier').classList.add('show');
+        //$('#name_modifier').collapse('show');
     }, []);
 
     useEffect(() => {
