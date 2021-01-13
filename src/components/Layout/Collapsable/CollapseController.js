@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import $ from 'jquery';
 //Components
 import LabelWithIcon from '../Labels/LabelWithIcon';
 //Icons
@@ -15,7 +14,8 @@ const CollapseController = ({ icon, expanded, targetId, className, dropupIcon, d
 
     useEffect(() => {
         expanded &&
-            $(`#${targetId}`).collapse('show')
+            document.querySelector(`#${targetId}`).classList.add('show')
+            //$(`#${targetId}`).collapse('show')
     }, [expanded]);
 
     const getIcon = () => collapsed 
