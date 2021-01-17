@@ -47,7 +47,7 @@ const EditorView = ({ project: projectState, setProjectScene }) => {
                         <ActionWithIcon 
                             icon = { faVideo }
                             actionText = { <CurrentViewLabel editorView = { editorView } /> }
-                            textClassName = 'ml-1'
+                            textClassName = 'ml-1 p-0 my-0'
                             onClick = { ev => ev.preventDefault() }
                         />
                  }

@@ -19,10 +19,10 @@ const CurrentViewLabel = ({ editorView }) => {
         }
     }
     return (
-        <span className='text--medium'>
-            <strong>Vista: </strong>
+        <div className='d-flex flex-row align-items-center text--medium h-100'>
+            <strong className='mr-1'>Vista: </strong>
             { getViewName() }
-        </span> 
+        </div> 
     );
 }
 

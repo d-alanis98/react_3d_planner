@@ -6,13 +6,13 @@ import withProjectState from '../../../../redux/HOC/withProjectState';
 import withEditorState from '../../../../redux/HOC/withEditorState';
 import with2DRendererContextConsumer from './with2DRendererContextConsumer';
 //Classes
+import BoundsFactory from '../../../../classes/2D/Models/BoundsFactory';
 import BidimensionalRenderer from '../../../../classes/Renderers/BidimensionalRenderer';
 import TridimensionalRenderer from '../../../../classes/Renderers/TridimensionalRenderer';
 import CoordinatesTransformation from '../../../../classes/Coordinates/CoordinatesTransformation';
 import BidimensionalModelRotation from '../../../../classes/2D/Models/BidimensionalModelRotation';
 import BidimensionalSceneHelper from '../../../../classes/2D/BidimensionalSceneHelper';
 import BidimensionalModelLayerManager from '../../../../classes/2D/Models/BidimensionalModelLayerManager';
-import BoundsFactory from '../../../../classes/2D/Models/BoundsFactory';
 
 const with2DRenderer = WrappedComponent => {
     const With2DRenderer = props => {

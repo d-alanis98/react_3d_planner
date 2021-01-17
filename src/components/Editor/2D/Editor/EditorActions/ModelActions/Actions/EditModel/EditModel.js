@@ -2,9 +2,10 @@ import React, { useState, Fragment, useEffect } from 'react';
 //Components
 import EditModelMenu from './EditModelMenu/EditModelMenu';
 import ActionWithIcon from '../ActionWithIcon/ActionWithIcon';
+//Classes
+import BidimensionalModelEditor from '../../../../../../../../classes/2D/Models/BidimensionalModelEditor';
 //Icons
 import { faCog } from '@fortawesome/free-solid-svg-icons';
-import BidimensionalModelEditor from '../../../../../../../../classes/2D/Models/BidimensionalModelEditor';
 
 const EditModel = ({ 
     rotate, 
