@@ -13,18 +13,15 @@ export default class BidimensionalModelEditor {
         this.originalHeight = this.modelToEdit.attrs.originalHeight;
         this.previousScaleX = this.modelToEdit.attrs.previousScaleX || 1;
         this.previousScaleY = this.modelToEdit.attrs.previousScaleY || 1;
+        this.originalDimensions = null;
     }
 
     editName = newName => {
         const [modelName] = this.modelToEdit.find('Text');
         if(!modelName || !modelName.attrs || !modelName.attrs.text)
             return;
-        //We get the name components (the name \n productLine)
-        const modelNameComponents = modelName.attrs.text.split('\n');
-        //We preserve the productLine
-        const { 1: productLine } = modelNameComponents;
         //We set the new name
-        modelName.setAttr('text', `${ newName } \n ${ productLine.trim() }`);
+        modelName.setAttr('text', newName);
     }
 
     setScaleInX = scale => {
@@ -87,6 +84,59 @@ export default class BidimensionalModelEditor {
         BidimensionalModelFactory.setUpdatedDragBoundFunc(this.modelToEdit, this.sceneInstance);
         //We refresh the bounds
         BoundsFactory.refreshModelBounds(this.modelToEdit, this.sceneInstance);
+    }
+
+    getNormalizedDimensions = ({ width, height, depth, scaleToApply }) => ({
+        width: (Number(width) / 10) * Number(scaleToApply.x || 1),
+        height: (Number(height) / 10) * Number(scaleToApply.y || 1),
+        depth: (Number(depth) / 10) * Number(scaleToApply.z || 1)
+    });
+
+    setOriginalDimensions = (originalWidth, originalHeight, originalDepth) => {
+        this.originalDimensions = {
+            width: Number(originalWidth) / 10,
+            height: Number(originalHeight) / 10,
+            depth: Number(originalDepth) / 10
+        };
+    }
+
+    getDimensionAxis = dimension => {
+        switch(dimension) {
+            case 'width':
+                return 'x';
+            case 'height':
+                return 'y';
+            case 'depth':
+                return 'z';
+            default:
+                return 'x';
+        }
+    }
+
+    getScaleToApply = ({ 
+        value,
+        dimension,
+        existingScale
+    }) => {
+        let scaleX = Number(existingScale.x || 1);
+        let scaleY = Number(existingScale.y || 1);
+        let scaleZ = Number(existingScale.z || 1);
+        switch(dimension) {
+            case 'width':
+                scaleX = Number(value) / this.originalDimensions.width; 
+                break;
+            case 'height':
+                scaleY = Number(value) / this.originalDimensions.height;
+                break;
+            case 'depth':
+                scaleZ = Number(value) / this.originalDimensions.depth;
+                break;              
+        }
+        return {
+            scaleX,
+            scaleY,
+            scaleZ
+        }
     }
 
     getBoundsVisibility = () => {

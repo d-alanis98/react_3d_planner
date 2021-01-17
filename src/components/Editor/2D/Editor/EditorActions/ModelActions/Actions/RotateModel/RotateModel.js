@@ -28,4 +28,4 @@ const RotateModel = ({ rotate, project }) =>
 
 export default withProjectState(RotateModel);
 
-let shouldRotationRender = project => project && project.scene && project.scene['2d'].view === TOP;
+export let shouldRotationRender = project => project && project.scene && project.scene['2d'].view === TOP;

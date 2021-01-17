@@ -53,10 +53,10 @@ const ModelActionsContainer = ({
 
     //Functions
 
-    const rotateModel = degrees => {
+    const rotateModel = (degrees, overrideValue = false) => {
         if(!modelToEdit)
             return;
-        handleModelRotation(modelToEdit, degrees);
+        handleModelRotation(modelToEdit, degrees, overrideValue);
         correctSelectionBox();
     }
 

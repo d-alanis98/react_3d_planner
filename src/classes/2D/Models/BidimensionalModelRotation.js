@@ -7,8 +7,10 @@ import RoomBoundDetector from "../Room/RoomBoundDetector"
  */
 export default class BidimensionalModelRotation {
 
-    static rotate = (model, degrees, scene) => {
-        model.rotate(degrees);
+    static rotate = (model, degrees, scene, absolute = false) => {
+        if(!absolute)
+            model.rotate(degrees);
+        else model.rotation(degrees);
         //We set the new drag bound function, as the width and height changed with rotation
         BidimensionalModelRotation.setNewDragBoundFunction(model, scene);
         scene.layer.batchDraw();

@@ -83,7 +83,6 @@ const with3DRenderer = (WrappedComponent) => {
                     //We update the model quantity
                     modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
                     //We create the 3D model
-                    console.log({ modelScale })
                     sceneInstance.load3DModel(
                         type,
                         productLine,

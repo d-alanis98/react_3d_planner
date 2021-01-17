@@ -102,7 +102,7 @@ export default class BidimensionalModelFactory {
 
             //We add the text (with the model's name) to the group, at last, in order to get it at the front layer
             group.add(new Konva.Text({
-                text: `${modelName} \n${productKey}`,
+                text: modelName,
                 fill: BidimensionalModelFactory.DEFAULT_TEXT_COLOR,
                 width,
                 height,

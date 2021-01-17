@@ -83,6 +83,7 @@ const withFamilyState = WrappedComponent => {
             getProductName = { getProductName }
             fetchingFamily = { fetchingFamily }
             getProductDoorStatus = { getProductDoorStatus }
+            getProductByIdAndLine = { getProductByIdAndLine }
             canDoorBeOpenedOrClosed = { canDoorBeOpenedOrClosed }
             modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
             getProductInitialCoordinates = { getProductInitialCoordinates }

@@ -163,7 +163,7 @@ const with2DRenderer = WrappedComponent => {
                             let modelBoundsData = model[BIDIMENSIONAL].boundsVisibility;
                             let modelWithUpdatedId = {
                                 ...model,
-                                name: modelName || 'Modelo',
+                                name: modelName || productKey,
                                 [BIDIMENSIONAL]: {
                                     uuid: _id,
                                     coordinates: { x: _x, y: _y },
@@ -172,7 +172,7 @@ const with2DRenderer = WrappedComponent => {
                             };
                             updateObject(modelWithUpdatedId) //updateCallback
                         },
-                        modelName: modelName || 'Modelo',
+                        modelName: modelName || productKey,
                         productKey,
                         editorView,
                         productLine,
@@ -248,17 +248,18 @@ const with2DRenderer = WrappedComponent => {
             setContextMenuPosition({ x, y });
         }
 
-        const handleModelRotation = (model, degrees) => {
+        const handleModelRotation = (model, degrees, overrideValue = false) => {
             let { _id: modelId } = model;
             let rotatingModel = sceneInstance.objects.find(object => object._id === modelId);
-            BidimensionalModelRotation.rotate(rotatingModel, degrees, sceneInstance);
             let modelInState = findObjectBy2DModelId(modelId);
+            //We perform the rotation in 2D model
+            BidimensionalModelRotation.rotate(rotatingModel, degrees, sceneInstance, overrideValue);
             //We retrieve the existing rotation in state to add it to the new one
             let { rotation } = modelInState;
             let updatedRotation = degrees + (rotation || 0);
             let updatedObject = { 
                 ...modelInState,
-                rotation: updatedRotation,
+                rotation: overrideValue ? degrees : updatedRotation,
             };
             BoundsFactory.refreshModelBounds(model, sceneInstance);
             updateObject(updatedObject);
