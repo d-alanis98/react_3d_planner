@@ -1,0 +1,42 @@
+.model-position-offset {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.1);
+    padding: 0;
+    border-radius: 50%;
+}
+
+.model-position-offset .circular-icon__container {
+    width: 100%;
+    height: 100%;
+}
+
+.model-position-offset .circular-icon__icon {
+    color: rgba(0,0,0,0.35);
+}
+
+.model-position-offset #offset_menu {
+    padding: 0.4rem;
+    border-radius: 0.2rem;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.model-position-offset label {
+    width: 100%;
+    padding: 0.35rem;
+    background-color: rgba(255,255,255,0.15);
+    border-radius: 0.2rem;
+    color: #eeee;
+    cursor: pointer;
+}
+
+.model-position-offset--active {
+    color: #525252!important;
+    background-color: rgba(255,255,255,0.65)!important;
+}
+
+.model-position-offset label:hover {
+    background-color: rgba(255,255,255,0.25);
+}

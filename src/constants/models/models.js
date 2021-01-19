@@ -125,3 +125,11 @@ export let modelDirections = {
     left: 'I',
     right: 'D',
 };
+
+export let modelOffsetPositions = {
+    center: 'CENTER',
+    topLeft: 'TOP_LEFT',
+    topRight: 'TOP_RIGHT',
+    bottomLeft: 'BOTTOM_LEFT',
+    bottomRight: 'BOTTOM_RIGHT'
+}
