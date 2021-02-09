@@ -1,7 +1,9 @@
 .page-builder {
     position: relative;
     height: 80%;
-    background-color: rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 0.2rem;
+    box-shadow: 0 0 0.2rem rgba(0,0,0,0.5);
     margin-bottom: 0.75rem;
     padding: 0 0.5rem;
 }
@@ -13,6 +15,7 @@
 
 .page-builder__content {
     height: 95%;
+    background-color: #ffffff;
 }
 
 .page-builder__print-icon {

@@ -132,12 +132,13 @@ const withPDFGeneration = WrappedComponent => {
         const printPDF = containerId => {
             const domNodeToInsertInPDF = document.getElementById(containerId);
             const scale = 2;
-            domToImage.toPng(domNodeToInsertInPDF, {
+            domToImage.toJpeg(domNodeToInsertInPDF, {
                 height: domNodeToInsertInPDF.offsetHeight * scale,
                 style: {
                     transform: `scale(${scale}) translate(${domNodeToInsertInPDF.offsetWidth / 2 / scale}px, ${domNodeToInsertInPDF.offsetHeight / 2 / scale}px)`
                 },
-                width: domNodeToInsertInPDF.offsetWidth * scale
+                width: domNodeToInsertInPDF.offsetWidth * scale,
+                quality: 1
               })
                 .then(dataUrl => {
                     const pdfDocument = new jsPDF({
@@ -148,7 +149,7 @@ const withPDFGeneration = WrappedComponent => {
                     const documentWidth = pdfDocument.internal.pageSize.getWidth();
                     const documentHeight = pdfDocument.internal.pageSize.getHeight();
                     pdfDocument.text(projectName, 5, 7.5)
-                    pdfDocument.addImage(dataUrl, 'PNG', 0, 7.5, documentWidth, documentHeight - 7.5);
+                    pdfDocument.addImage(dataUrl, 'JPEG', 0, 7.5, documentWidth, documentHeight - 7.5);
                     pdfDocument.save('sample-document.pdf');
                 })
                 .catch(error => {
