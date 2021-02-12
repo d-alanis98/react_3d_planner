@@ -129,33 +129,55 @@ const withPDFGeneration = WrappedComponent => {
                 .length
         );
 
-        const printPDF = containerId => {
-            const domNodeToInsertInPDF = document.getElementById(containerId);
+        /**
+         * @todo make smaller functions for each part of the process
+         */
+        const printPDF = () => {
+            const pages = document.querySelectorAll('.page-builder__content');
+            //We create the PDF
+            const pdfDocument = new jsPDF({
+                orientation: 'landscape', 
+                unit: 'mm',
+                format: 'a4',
+            });
+            //Document parameters
             const scale = 2;
-            domToImage.toJpeg(domNodeToInsertInPDF, {
-                height: domNodeToInsertInPDF.offsetHeight * scale,
-                style: {
-                    transform: `scale(${scale}) translate(${domNodeToInsertInPDF.offsetWidth / 2 / scale}px, ${domNodeToInsertInPDF.offsetHeight / 2 / scale}px)`
-                },
-                width: domNodeToInsertInPDF.offsetWidth * scale,
-                quality: 1
-              })
-                .then(dataUrl => {
-                    const pdfDocument = new jsPDF({
-                        orientation: 'landscape', 
-                        unit: 'mm',
-                        format: 'a4'
-                    });
-                    const documentWidth = pdfDocument.internal.pageSize.getWidth();
-                    const documentHeight = pdfDocument.internal.pageSize.getHeight();
-                    pdfDocument.text(projectName, 5, 7.5)
-                    pdfDocument.addImage(dataUrl, 'JPEG', 0, 7.5, documentWidth, documentHeight - 7.5);
-                    pdfDocument.save('sample-document.pdf');
+            const documentWidth = pdfDocument.internal.pageSize.getWidth();
+            const documentHeight = pdfDocument.internal.pageSize.getHeight();
+            //Images
+            const domCapturePromises = [];
+            //We capture the DOM node
+            pages.forEach(page => {
+                domCapturePromises.push(
+                    new Promise((resolve, reject) => {
+                        const domNodeToInsertInPDF = page;
+                        domToImage.toJpeg(domNodeToInsertInPDF, {
+                            height: domNodeToInsertInPDF.offsetHeight * scale,
+                            style: {
+                                transform: `scale(${scale}) translate(${domNodeToInsertInPDF.offsetWidth / 2 / scale}px, ${domNodeToInsertInPDF.offsetHeight / 2 / scale}px)`
+                            },
+                            width: domNodeToInsertInPDF.offsetWidth * scale,
+                            quality: 1
+                        })
+                            .then(dataUrl => resolve(dataUrl))
+                            .catch(error => reject(error))
+                    })
+                );
+            });
+            //We set the PDF pages
+            Promise.all(domCapturePromises)
+                .then(images => {
+                    images.forEach((image, imageNumber) => {
+                        if(imageNumber > 0)
+                            pdfDocument.addPage();
+                        pdfDocument.text(projectName, 5, 7.5)
+                        pdfDocument.addImage(image, 'JPEG', 0, 7.5, documentWidth, documentHeight - 7.5);
+                    })
+                    //We save and download the PDF
+                    pdfDocument.save(`${projectName}.pdf`);
                 })
-                .catch(error => {
-                    console.error(error);
-                })
-
+                .catch(error => console.error(error));
+            
             
         }
 
