@@ -27,6 +27,7 @@ const SET_DEFAULT_TEXTURE           = 'SET_DEFAULT_TEXTURE';
 const SET_PROJECT_OBJECTS           = 'SET_PROJECT_OBJECTS';
 const SET_PROJECT_DESCRIPTION       = 'SET_PROJECT_DESCRIPTION';
 const SET_DISPLAY_MODELS_MENU       = 'SET_DISPLAY_MODELS_MENU';
+const SET_MISC_PROJECT_OBJECTS      = 'SET_MISC_PROJECT_OBJECTS';
 const SET_PROJECT_TO_PDF_ITEMS      = 'SET_PROJECT_TO_PDF_ITEMS';
 const SET_PROJECT_TO_PDF_PAGES      = 'SET_PROJECT_TO_PDF_PAGES';
 const SET_EXPORTING_PROJECT_TO_PDF  = 'SET_EXPORTING_PROJECT_TO_PDF';
@@ -45,6 +46,7 @@ const initialState = {
     scene: initialScene,
     objects: [],
     description: '',
+    otherObjects: [],
     cotizationId: '',
     isNewProject: true,
     defaultTexture: '',
@@ -114,6 +116,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 displayModelsMenu: payload,
+            };
+        case SET_MISC_PROJECT_OBJECTS:
+            return {
+                ...state,
+                otherObjects: payload,
             };
         case SET_PROJECT_TO_PDF_ITEMS:
             return {
@@ -453,6 +460,16 @@ export let setProjectObjectsAction = projectObjects => (dispatch, getState) => {
 }
 
 /**
+ * This action sets misc project´s objects
+ */
+export let setMiscProjectObjectsAction = otherObjects => (dispatch, getState) => {
+    dispatch({
+        type: SET_MISC_PROJECT_OBJECTS,
+        payload: otherObjects,
+    });
+}
+
+/**
  * This action sets project´s description
  */
 export let setProjectDescriptionAction = projectDescription => (dispatch, getState) => {
@@ -493,6 +510,40 @@ export let removeObjectFromProjectAction = objectToRemove => (dispatch, getState
     let { objects } = { ...getState().project };
     let newProjectObjects = objects.filter(object => object.id != objectToRemove.id);
     setProjectObjectsAction(newProjectObjects)(dispatch, getState);
+}
+
+/**
+ * This action adds a new misc object to the misc objects array
+ */
+export let addMiscObjectToProjectAction = objectToAdd => (dispatch, getState) => {
+    let { otherObjects } = { ...getState().project };
+    let newMiscProjectObjects = otherObjects.concat(objectToAdd);
+    setMiscProjectObjectsAction(newMiscProjectObjects)(dispatch, getState);
+}
+
+
+/**
+ * This action updates a certain misc object
+ * @param {object} updatedObject 
+ */
+export let updateMiscProjectObjectAction = updatedObject => (dispatch, getState) => {
+    let { otherObjects } = { ...getState().project };
+    //We update the objects by replacing the updatedObject in the existing objects array
+    let updatedMiscObjects = otherObjects.map(object => {
+        if(object.id === updatedObject.id)
+            return updatedObject;
+        return object;
+    });
+    setMiscProjectObjectsAction(updatedMiscObjects)(dispatch, getState);
+}
+
+/**
+ * This action removes a misc object from the misc objects array
+ */
+export let removeMiscObjectFromProjectAction = objectToRemove => (dispatch, getState) => {
+    let { otherObjects } = { ...getState().project };
+    let newMiscProjectObjects = otherObjects.filter(object => object.id != objectToRemove.id);
+    setMiscProjectObjectsAction(newMiscProjectObjects)(dispatch, getState);
 }
 
 /**

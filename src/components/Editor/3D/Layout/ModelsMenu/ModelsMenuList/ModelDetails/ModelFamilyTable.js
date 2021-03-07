@@ -1,4 +1,5 @@
 import React from 'react';
+//HOC
 import withFamilyState from '../../../../../../../redux/HOC/withFamilyState';
 
 const ModelFamilyTable = ({ 
@@ -8,7 +9,7 @@ const ModelFamilyTable = ({
     modelProductLine
  }) => (
     <table
-        className = 'models-menu-list__item-details-table'
+        className = 'models-menu-list__item-details-table mt-2'
     >
         <tbody>
             <tr>

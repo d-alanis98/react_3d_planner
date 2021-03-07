@@ -1,11 +1,11 @@
 import React from 'react';
 //Components
 import FlexRow from '../../../../../../Layout/Flex/FlexRow';
+import ModelState from './ModelState';
 import ModelThumbnail from './ModelThumbnail';
 import ModelFamilyTable from './ModelFamilyTable';
 import CollapsableContent from '../../../../../../Layout/Collapsable/CollapsableContent';
 import ModelRotationControls from './ModelRotationControls';
-import ModelState from './ModelState';
 
 
 const ModelDetails = ({ 

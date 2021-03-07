@@ -112,6 +112,7 @@ export default class ModelEvents {
             onUpdate(event);
             clearInterval(movementInterval);
         });
+        addDragStartListener(model, onDragStart);
         //Collision detection events
         if(detectCollisions) {
             //On drag start, we start an interval to clear the mouse direction every 10 ms

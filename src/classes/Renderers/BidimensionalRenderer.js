@@ -305,6 +305,53 @@ export default class BidimensionalRenderer {
 
     }
 
+    loadMiscSVGModel = ({
+        x,
+        y,
+        scale,
+        modelId,
+        rotation, 
+        onUpdate,
+        onSuccess,
+        modelName,
+        editorView,
+        onSelection,
+        onDragStart,
+        onModelClick,
+        boundsVisibility  
+    }) => {
+        //We bind the instance to a variable
+        let scene = this;
+        let scaleValues = BidimensionalRenderer.getScaleValues(scale);
+        //We create the model, and execute the bussiness logic after its creation via the BidimensionalModelFactory
+        BidimensionalModelFactory.createOtherModel({
+            x, 
+            y,
+            scene, 
+            scale: scaleValues,
+            modelId,
+            rotation,
+            onUpdate: event => {
+                //On every position change we are going to generate the new bounds
+                this.addBounds(event.target);
+                onUpdate(event);
+            },
+            onSuccess: createdModel => {
+                onSuccess(createdModel);
+                this.objects.push(createdModel);
+                this.addBounds(createdModel, boundsVisibility);
+            }, 
+            modelName,
+            editorView,
+            onSelection, 
+            onDragStart: event => {
+                BoundsFactory.deleteModelBounds(event.target._id, this);
+                onDragStart(event);
+            },
+            onModelClick
+        });
+    }
+
     removeModel = modelToRemove => {
         this.objects = this.objects.filter(object => object._id !== modelToRemove._id);
     }

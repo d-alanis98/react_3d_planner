@@ -4,7 +4,6 @@ import './ModelThumbnail.css';
 
 
 const ModelThumbnail = ({ title, model, onClick, className, modelQuantity, imageClassName }) => {
-
     return(
         <div 
             title = { title }

@@ -20,7 +20,9 @@ const MainSectionRender = props => {
         getFamily,
         saveProject,
         editorState: { editorType }, 
+        getMiscObjects,
         fetchingFamily,
+        fetchingOtherObjects
     } = props;
     
     //HOOKS
@@ -34,6 +36,10 @@ const MainSectionRender = props => {
         projectType, 
         isNewProject
     ]);
+
+    useEffect(() => {
+        getMiscObjects()
+    }, []);
 
     /**
      * Interval to save the project every 30 seconds
@@ -53,7 +59,12 @@ const MainSectionRender = props => {
         return <FamilyLoader 
             fetchingFamily = { fetchingFamily }
         />
-    
+
+    if(fetchingOtherObjects)
+        return <FamilyLoader 
+            loadingText = 'Obteniendo objetos adicionales...'
+            fetchingFamily = { fetchingOtherObjects }
+        />
     
     else return (
         shouldSectionComponentRender() ?

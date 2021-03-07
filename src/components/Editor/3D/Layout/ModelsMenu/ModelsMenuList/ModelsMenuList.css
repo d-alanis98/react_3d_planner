@@ -77,3 +77,10 @@
     border: 1px #dee2e6 solid;
     padding: 0.5rem 0.5rem;
 }
+
+
+.models-menu-list__rotation-controls {
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}

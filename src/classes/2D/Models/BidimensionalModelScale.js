@@ -1,7 +1,5 @@
 import { FRONT, FRONT_RIGHT, TOP } from "../../../constants/models/models";
 import RotationHelper from "../../Helpers/RotationHelper";
-import RoomBoundDetector from "../Room/RoomBoundDetector";
-import BidimensionalModelRotation from "./BidimensionalModelRotation";
 
 export default class BidimensionalModelScale {
 

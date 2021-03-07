@@ -27,8 +27,11 @@ const with2DRenderer = WrappedComponent => {
             editorState: { editorDepth, editorWidth, editorHeight },
             updateObject, 
             removeObject, 
+            updateMiscObject,
+            removeMiscObject,
             set2DRoomDimensions,
             set2DSceneDimensions,
+            findMiscObjectBy2DModelId,
             //From 2d renderer context consumer HOC
             rendererState,
             setRendererState, 
@@ -38,6 +41,7 @@ const with2DRenderer = WrappedComponent => {
         const { 
             scene: projectScene,
             objects: projectObjects, 
+            otherObjects
         } = project;
         //Project scene
         const bidimensionalScene = projectScene[BIDIMENSIONAL];
@@ -50,6 +54,7 @@ const with2DRenderer = WrappedComponent => {
         const [sceneInstance, setSceneInstance] = useState();
         const [draggedObject, setDraggedObject] = useState();
         const [contextMenuModel, setContextMenuModel] = useState({});
+        const [draggedMiscObject, setDraggedMiscObject] = useState();
         const [displayContextMenu, setDisplayContextMenu] = useState(false);
         const [contextMenuPosition, setContextMenuPosition] = useState({});
         
@@ -76,6 +81,16 @@ const with2DRenderer = WrappedComponent => {
         }, [draggedObject]);
 
 
+        /**
+         * Effect used to update the dragged misc object
+         */
+        useEffect(() => {
+            if(!draggedMiscObject)
+                return;
+            //We get the id and the coordinates from the dragged object
+            const { _id, x, y } = draggedMiscObject;
+            updateMiscModelPosition(_id, x, y);
+        }, [draggedMiscObject]);
 
 
         useEffect(() => {
@@ -184,8 +199,51 @@ const with2DRenderer = WrappedComponent => {
                 });
                 setModels(modelsCopy);
             }
+
+            const restoreOtherModels = () => {
+                //We iterate over the existing models and create the 2d model
+                otherObjects.forEach((model, index) => {
+                    //We get the type and the coordinates (of the 2d key)
+                    const { modelId, modelName, scale, rotation } = model;
+                    //We get the coordinates from the calculation of them based on the existing 3d coordinates
+                    let { x, y } = get2DCoordinatesFrom3DState(model);
+                    //We create the SVG model
+                    sceneInstance.loadMiscSVGModel({
+                        x,
+                        y,
+                        scale,
+                        modelId,
+                        rotation,
+                        onUpdate: updateMiscModel, //onUpdate
+                        onSuccess: createdModel => { //onSuccess
+                            let { _id, attrs: { x: _x, y: _y } } = createdModel;
+                            let modelBoundsData = model[BIDIMENSIONAL].boundsVisibility;
+                            let modelWithUpdatedId = {
+                                ...model,
+                                name: modelName,
+                                [BIDIMENSIONAL]: {
+                                    uuid: _id,
+                                    coordinates: { x: _x, y: _y },
+                                    boundsVisibility: modelBoundsData
+                                },
+                            };
+                            updateMiscObject(modelWithUpdatedId) //updateCallback
+                        },
+                        modelName: modelName,
+                        editorView,
+                        onSelection: onSelectedModel, //onSelection
+                        onDragStart,
+                        onModelClick,
+                        boundsVisibility: model[BIDIMENSIONAL].boundsVisibility,
+                    });
+                });
+            }
+            //We restore cotization models and other models
             restoreModels();
+            restoreOtherModels();
         }
+
+        
 
         const updateModelPosition = (modelId, x, y) => {
             let existingObject = findObjectBy2DModelId(modelId);
@@ -213,6 +271,32 @@ const with2DRenderer = WrappedComponent => {
         }
 
 
+        const updateMiscModelPosition = (modelId, x, y) => {
+            let existingObject = findMiscObjectBy2DModelId(modelId);
+            if(!existingObject)
+                return;
+            let tridimensionalEditorState = { ...existingObject[TRIDIMENSIONAL] };
+            let bidimensionalEditorState = { ...existingObject[BIDIMENSIONAL] };
+            const { coordinates: existingTridimensionalCoordinates } = tridimensionalEditorState;
+            let updatedObject = { 
+                ...existingObject,
+                [BIDIMENSIONAL]: {
+                    uuid: modelId,
+                    coordinates: { x, y },
+                    ...bidimensionalEditorState
+                },
+                [TRIDIMENSIONAL]: {
+                    ...tridimensionalEditorState,
+                    coordinates: {
+                        ...existingTridimensionalCoordinates, //Actually just y, but is important to preserve the original y
+                        ...get3DCoordinates(x, y), //We get the 3D coordinates, because movements in 2D editor take effect on 3D editor too
+                    }    
+                }
+            };
+            updateMiscObject(updatedObject);
+        }
+
+
 
         /**
          * This method return the complete object based on it´s 2d model id
@@ -227,6 +311,15 @@ const with2DRenderer = WrappedComponent => {
             const { target: { _id, attrs: { x, y } } } = event;
             setModelToEdit(null);
             setDraggedObject({ x, y, _id });       
+        }
+
+        const updateMiscModel = event => {
+            if(!event.target)
+                return;
+            //We get the 2d model id and the new coordinates
+            const { target: { _id, attrs: { x, y } } } = event;
+            setModelToEdit(null);
+            setDraggedMiscObject({ x, y, _id });   
         }
 
 
@@ -251,7 +344,9 @@ const with2DRenderer = WrappedComponent => {
         const handleModelRotation = (model, degrees, overrideValue = false) => {
             let { _id: modelId } = model;
             let rotatingModel = sceneInstance.objects.find(object => object._id === modelId);
-            let modelInState = findObjectBy2DModelId(modelId);
+            let modelInState = isProjectObject(model)
+                ? findObjectBy2DModelId(modelId)
+                : findMiscObjectBy2DModelId(modelId);
             //We perform the rotation in 2D model
             BidimensionalModelRotation.rotate(rotatingModel, degrees, sceneInstance, overrideValue);
             //We retrieve the existing rotation in state to add it to the new one
@@ -262,8 +357,11 @@ const with2DRenderer = WrappedComponent => {
                 rotation: overrideValue ? degrees : updatedRotation,
             };
             BoundsFactory.refreshModelBounds(model, sceneInstance);
-            updateObject(updatedObject);
+            isProjectObject(model)
+                ? updateObject(updatedObject)
+                : updateMiscObject(updatedObject);
         }
+        
 
         /**
          * Model deletion functions
@@ -275,9 +373,10 @@ const with2DRenderer = WrappedComponent => {
             sceneInstance.removeModel(model);
         }
 
-        const deleteModelInState = modelId => {
-            let modelInState = findObjectBy2DModelId(modelId);
-            removeObject(modelInState);
+        const deleteModelInState = model => {
+            if(isProjectObject(model)) 
+                removeObject(findObjectBy2DModelId(model._id));
+            else removeMiscObject(findMiscObjectBy2DModelId(model._id))
         }
 
         const find2DObjectById = modelId => sceneInstance.objects.find(object => object._id === modelId);
@@ -290,20 +389,10 @@ const with2DRenderer = WrappedComponent => {
             let modelToDelete = find2DObjectById(modelId);
             //We delete model's bounds, destroy the model from the 2D scene and remove it form the state
             deleteModelBounds(modelId);
+            deleteModelInState(model);
             deleteModelInScene(modelToDelete);
-            deleteModelInState(modelId);
         }
 
-
-        /**
-         * This method increases the quantity of the specified model
-         * @param {string} type 
-         */
-        const increaseModelQuantity = type => {
-            let modelsCopy = { ...models };
-            modelsCopy[type] ? modelsCopy[type].quantity++ : modelsCopy[type] = { quantity: 1 };
-            setModels(modelsCopy);
-        }
 
         /**
          * This method transforms the 2D coordinates to the corresponding 3D ones, to get the object placed in the same
@@ -318,6 +407,8 @@ const with2DRenderer = WrappedComponent => {
             let roomHeight = editorDepth;
             return coordinatesTransformation.bidimensionalToTridimensionalCoordinates(editorView, roomHeight);
         }
+
+        const isProjectObject = modelToEdit => modelToEdit?.attrs?.type;
 
         return (
             <Fragment>

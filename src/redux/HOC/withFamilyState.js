@@ -1,14 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 //Redux
-import { getFamilyAction } from '../reducers/familyDuck';
+import { 
+    getFamilyAction,
+    getMiscObjectsAction 
+} from '../reducers/familyDuck';
 
 const withFamilyState = WrappedComponent => {
     const WithFamilyState = props => {
         let {
             family, 
+            otherObjects,
             fetchingFamily,
             getFamilyAction,
+            getMiscObjectsAction,
+            fetchingOtherObjects,
             ...ownProps
         } = props;
 
@@ -73,20 +79,49 @@ const withFamilyState = WrappedComponent => {
             };
         }
 
+        const getMiscObjectInitialCoordinates = modelId => {
+            const { height } = getMiscObjectDimensions(modelId);
+            //Y must be the half of the height in meters (which is the "unit" in the 3D space), to appear baseline and not centered in origin
+            return {
+                x: 0,
+                y: Number(height) / 2000,
+                z: 0
+            };
+        }
+
+        const getMiscObjectById = modelId => otherObjects.find(model => model.id_extra === Number(modelId));
+
+        const getMiscObjectDimensions = modelId => {
+            let model = getMiscObjectById(modelId);
+            if(!model)
+                return;
+            return {
+                width: model.width || 500,
+                height: model.height || 500,
+                depth: model.depth || 500
+            }
+        }
+
         return <WrappedComponent 
             family = { family }
             getLine = { getLine }
             getFamily = { getFamilyAction }
             subFamilies = { family.subFamilias }
             getLineName = { getLineName }
+            otherObjects = { otherObjects }
             getProductKey = { getProductKey }
+            getMiscObjects = { getMiscObjectsAction }
             getProductName = { getProductName }
             fetchingFamily = { fetchingFamily }
+            getMiscObjectById = { getMiscObjectById }
+            fetchingOtherObjects = { fetchingOtherObjects }
             getProductDoorStatus = { getProductDoorStatus }
             getProductByIdAndLine = { getProductByIdAndLine }
+            getMiscObjectDimensions = { getMiscObjectDimensions }
             canDoorBeOpenedOrClosed = { canDoorBeOpenedOrClosed }
             modelHasRightOrLeftVariant = { modelHasRightOrLeftVariant }
             getProductInitialCoordinates = { getProductInitialCoordinates }
+            getMiscObjectInitialCoordinates = { getMiscObjectInitialCoordinates }
             { ...ownProps }
         />
     }
@@ -94,7 +129,9 @@ const withFamilyState = WrappedComponent => {
     const mapStateToProps = (state, ownProps) => {
         return {
             family: state.family.family,
+            otherObjects: state.family.otherObjects,
             fetchingFamily: state.family.fetching,
+            fetchingOtherObjects: state.family.fetchingOtherObjects,
             ...ownProps
         }
     };
@@ -102,7 +139,8 @@ const withFamilyState = WrappedComponent => {
     return connect(
         mapStateToProps,
         {
-            getFamilyAction
+            getFamilyAction,
+            getMiscObjectsAction
         }
     )(WithFamilyState);
 }

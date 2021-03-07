@@ -15,6 +15,7 @@ import WallFactory from '../3D/Walls/WallFactory';
 //Constants
 import { modelDirections, modelStates } from '../../constants/models/models';
 import RotationHelper from '../Helpers/RotationHelper';
+import OtherObjectDimensionsGetter from '../Models/OtherModels/OtherObjectDimensionsGetter';
 
 /**
  * @author Damián Alanís Ramírez
@@ -432,6 +433,71 @@ export default class TridimensionalRenderer{
             },
         );
     }
+
+    load3DMiscModel(
+        modelId,
+        { x = 0, y = 0, z = 0 }, 
+        rotation, 
+        texture = null, 
+        onSuccess, 
+        modelState = 'O', 
+        modelDirection = 'I',
+        doorStatus = '0,w',
+        modelScale
+    ) {
+        //We conform the uri of the model
+        let uri = `${process.env.MIX_APP_API_ENDPOINT}/3d_editor/extras/${modelId}`;
+        //We get the model dimensions
+        let { width, height, depth } = OtherObjectDimensionsGetter.getDimensionsById(modelId);
+        //We apply door corrections
+        let { z: doorCorrectedZ, width: doorCorrectedWidth, depth: doorCorrectedDepth } = this.applyDoorCorrection(modelState, rotation, doorStatus, width, depth, z);
+        z = doorCorrectedZ;
+        width = doorCorrectedWidth;
+        depth = doorCorrectedDepth;
+        //We load the model
+        let loader = new GLTFLoader();
+        //We retrieve the scale data
+        const appliedScaleInX = modelScale?.x ? Number(modelScale.x) : 1;
+        const appliedScaleInY = modelScale?.y ? Number(modelScale.y) : 1;
+        const appliedScaleInZ = modelScale?.z ? Number(modelScale.z) : 1;
+        loader.load(
+            uri,
+            gltf => {
+                //Scaled to real dimensions
+                gltf.scene.scale.set(1, 1, 1);
+                //New objects starts at origin
+                gltf.scene.position.set(0, 0, 0);
+                //We add the object to the scene
+                this.addToScene(gltf.scene)
+                //We get the object of the scene and apply additional settings, finally we add it to the objects array (needed for drag controls)
+                gltf.scene.traverse( object => {
+                    if(object.isMesh) {
+                        //We set the proper scale to be accurate between the real dimensions and the dimensions in the 3D scene
+                        let scaleCalculator = new ModelScaleCalculator(object, width, height, depth);
+                        let { x: scaleInX, y: scaleInY, z: scaleInZ } = scaleCalculator.calculateScale();
+                        //To show the door in the left side instead of the right one, we apply the scale in X as negative value
+                        if(modelDirection === modelDirections.left)
+                            scaleInX *= -1;
+                        object.scale.set(scaleInX * appliedScaleInX, scaleInY * appliedScaleInY, scaleInZ * appliedScaleInZ);
+                        //We set the object´s position, for the Y axis, we calculate the exact position to get the desired height
+                        let yPosition = y === 0 ? this.getObjectYInitialPosition(y, object) : y; //Only on creation y will be exactly 0, then the position will be the exact one
+                        object.position.set(x, yPosition, z);
+                        if(rotation)
+                            object.rotateY(rotation * Math.PI / 180);
+                        //We load the default texture to the object if this does not have one already
+                        if(!object.material.map)
+                            this.addTextureToObject(object, TextureFactory.getTextureUriFromId(texture));
+                        if(onSuccess && typeof(onSuccess) === 'function')
+                            onSuccess(object);
+                        
+                        //We add the object to the array
+                        this.addObject(object);
+                    }
+                }) 
+            },
+        );
+    }
+
 
     hotReplaceModel({
         modelData: { 

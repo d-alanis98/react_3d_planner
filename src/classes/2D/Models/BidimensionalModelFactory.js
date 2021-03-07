@@ -3,12 +3,12 @@ import Konva from 'konva';
 //Classes
 import ModelEvents from './ModelEvents';
 import RoomBoundDetector from '../Room/RoomBoundDetector';
+import BidimensionalModelScale from './BidimensionalModelScale';
 import BidimensionalModelRotation from './BidimensionalModelRotation';
+import OtherObjectDimensionsGetter from '../../Models/OtherModels/OtherObjectDimensionsGetter';
 import BidimensionalModelDimensions from './BidimensionalModelDimensions';
 //Constants and functions
 import { TOP, getModel2DUri } from '../../../constants/models/models';
-import BidimensionalModelScale from './BidimensionalModelScale';
-
 
 /**
  * @author Damián Alanís Ramírez
@@ -89,6 +89,99 @@ export default class BidimensionalModelFactory {
 
             //We add the group's event listeners (drag -> onUpdate, right click -> onSelection, click -> onModelClick)
             ModelEvents.addModelBasicEventListeners(group, onUpdate, onSelection, onDragStart);
+            ModelEvents.addClickListener(group, onModelClick);
+            
+            //We set the image width and height (100% of the group 'container')
+            imageNode.setAttrs({
+                width,
+                height,   
+            });
+            
+            //We add the image to the group
+            group.add(imageNode);
+
+            //We add the text (with the model's name) to the group, at last, in order to get it at the front layer
+            group.add(new Konva.Text({
+                text: modelName,
+                fill: BidimensionalModelFactory.DEFAULT_TEXT_COLOR,
+                width,
+                height,
+                padding: BidimensionalModelFactory.DEFAULT_TEXT_PADDING,
+                fontSize: BidimensionalModelFactory.getTextSizeBasedOnWidth(width, modelName),
+                fontFamily: 'Calibri',
+                align: 'center',
+                verticalAlign: 'middle',
+            }))
+            //We add the object to the layer
+            scene.layer.add(group);
+            //If rotation is not null (or 0) we rotate the model and update the drag bound function
+            if(rotation && editorView === TOP){
+                BidimensionalModelRotation.rotate(group, rotation, scene);
+            }
+
+            //If given, we execute the success callback passing the created object as argument
+            if(onSuccess && typeof(onSuccess) === 'function')
+                onSuccess(group);
+                
+            //We update the layer
+            scene.layer.batchDraw();
+        });
+    }
+
+    static createOtherModel = ({
+        x, 
+        y,
+        scene, 
+        scale,
+        modelId,
+        rotation,
+        onUpdate,
+        onSuccess, 
+        modelName,
+        editorView,
+        onSelection, 
+        onDragStart,
+        onModelClick    
+    }) => {
+        //We load the path from catalog based on the model type
+        let path = getModel2DUri(null, TOP); //We get the TOP view
+        //We get the dimensions of the object based on the current view and rotation
+        let { width: modelWidth, height: modelHeight } = OtherObjectDimensionsGetter.getDimensionsBasedOnViewAndRotation(editorView, rotation, modelId);
+        //We get the scaled dimensions, making use of the class BidimensionalModelDimensions, which calculates the pixel size of the model based on the ratio (screen dimensions / room dimensions)
+        let { width, height } = OtherObjectDimensionsGetter.calculate(scene, modelWidth, modelHeight);
+        
+        Konva.Image.fromURL(path, imageNode => {
+            let { containerWidth, containerHeight } = scene;
+            //We create a new group to contain the model and the label
+            let { widthScale, heightScale } = BidimensionalModelScale.getScaleToApplyBasedOnViewAndRotation(scale, editorView, rotation);
+            //We save the "original" dimensions
+            let originalWidth = width;
+            let originalHeight = height;
+            //We set the new width and height based on the scale factor
+            width *= widthScale;
+            height *= heightScale;
+            //We create the group
+            let group = new Konva.Group({
+                x: x || containerWidth / 2,
+                y: y || containerHeight / 2,
+                name: modelName,
+                width,
+                height,
+                modelId,
+                visible: true,
+                originalWidth,
+                originalHeight,
+                previousScaleX: widthScale,
+                previousScaleY: heightScale,
+                //We set the center of the element
+                offsetX: width / 2,
+                offsetY: height / 2,
+                //We enable the drag and drop interaction for this element
+                draggable: true,
+            });
+
+            //We add the group's event listeners (drag -> onUpdate, right click -> onSelection, click -> onModelClick)
+            ModelEvents.addModelBasicEventListeners(group, onUpdate, onSelection, onDragStart, false); //The last flag is the detectCollisions, which we are going to disable
             ModelEvents.addClickListener(group, onModelClick);
             
             //We set the image width and height (100% of the group 'container')

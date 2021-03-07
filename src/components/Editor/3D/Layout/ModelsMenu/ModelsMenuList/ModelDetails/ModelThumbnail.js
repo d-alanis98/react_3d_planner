@@ -4,7 +4,7 @@ const ModelThumbnail = ({ modelProductLine }) => (
     <img 
         className = 'models-menu__thumbnail mb-1'
         alt = { modelProductLine }
-        src = { `https://dev.qpr.mx/api/productos/lineas/${modelProductLine}/getPic?small=true` }
+        src = { `${process.env.MIX_APP_API_ENDPOINT}/productos/lineas/${modelProductLine}/getPic?small=true` }
     />
 );
 

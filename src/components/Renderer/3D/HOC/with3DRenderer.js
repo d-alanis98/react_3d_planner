@@ -28,6 +28,8 @@ const with3DRenderer = (WrappedComponent) => {
             editorState: { editorWidth, editorHeight, editorDepth: roomHeight },
             updateObject, 
             removeObject, 
+            updateMiscObject,
+            removeMiscObject,
             //From 3d renderer context consumer HOC
             rendererState,
             setRendererState,
@@ -38,7 +40,11 @@ const with3DRenderer = (WrappedComponent) => {
             plane: { planeTexture, wallsColor },
             ...extraProps
         } = props;
-        const { objects: projectObjects, defaultTexture } = project;
+        const { 
+            objects: projectObjects, 
+            otherObjects, 
+            defaultTexture 
+        } = project;
 
         //CONSTANTS
         const { BIDIMENSIONAL_SCENE } = BidimensionalRenderer;
@@ -98,7 +104,30 @@ const with3DRenderer = (WrappedComponent) => {
                 });
                 setModels(modelsCopy);
             }
+
+            const restoreOtherModels = () => {
+                //We iterate over the existing models and create the 2d model
+                otherObjects.forEach(model => {
+                    //We get the type and the coordinates (of the 2d key)
+                    const { rotation, texture, scale: modelScale, modelId, doorStatus, modelState, modelDirection } = model;
+                    const { coordinates } = model[TRIDIMENSIONAL_SCENE];
+                    //We create the 3D model
+                    sceneInstance.load3DMiscModel(
+                        modelId,
+                        coordinates,
+                        rotation,
+                        texture || defaultTexture,
+                        createdModel => onMiscCreationSuccess(createdModel)(model, coordinates), //onSuccess
+                        modelState,
+                        modelDirection,
+                        doorStatus,
+                        modelScale
+                    );
+                });
+            }
+            //We reatore the cotization and other models
             restoreModels();
+            restoreOtherModels();
             //Freeing up memory
             return () => {
                 sceneInstance.deleteScene();
@@ -282,6 +311,28 @@ const with3DRenderer = (WrappedComponent) => {
                 }
             };
             updateObject(modelWithUpdatedId);
+        }
+
+
+        const onMiscCreationSuccess = createdModel => (projectModelData, coordinates) => {
+            const { uuid } = createdModel;
+            const { id, name } = projectModelData;
+            //We calculate the model max point in y, to be able to render models by layers in 2D editor
+            const maxPointInY =  ModelPositionCalculator.getMaximumPointInY(createdModel);
+            const maxPointInZ = ModelPositionCalculator.getMaximumPointInZ(createdModel);
+            //We create the updated model object
+            let modelWithUpdatedId = {
+                ...projectModelData,
+                name: name,
+                [TRIDIMENSIONAL_SCENE]: {
+                    uuid: uuid,
+                    container: getBoxBound(createdModel),
+                    coordinates,
+                    maxPointInY,
+                    maxPointInZ
+                }
+            };
+            updateMiscObject(modelWithUpdatedId);
         }
 
         /**

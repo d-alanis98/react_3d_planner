@@ -13,7 +13,9 @@ const ModelRotationControls = ({ modelId, rotateModel }) => {
     }
 
     return (
-        <FlexRow>
+        <FlexRow
+            className = 'models-menu-list__rotation-controls'
+        >
             <CircularIcon 
                 icon = { faRedo }
                 onClick = { event => handleRotation(event, modelId, -90) }

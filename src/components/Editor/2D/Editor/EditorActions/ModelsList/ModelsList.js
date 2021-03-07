@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //Components
 import Flex from '../../../../../Layout/Flex/Flex';
@@ -86,17 +86,42 @@ const Models = ({
     rotateModel,
     sceneInstance 
 }) => {
+    const getCotizationModels = () => models.filter(model => isProjectObject(model));
+
+    const getMiscModels = () => models.filter(model => !isProjectObject(model));
+
     if(models.length === 0)
         return <EmptyModels />
-    return models.map(model => (
-        <ModelListItem 
-            key = { model._id }
-            model = { model }
-            deleteModel = { deleteModel }
-            rotateModel = { rotateModel }
-            sceneInstance = { sceneInstance }
-        />
-    ))
+
+    return (
+        <Fragment>
+            <h6>Modelos de la cotización</h6>
+            {
+                getCotizationModels().map(model => (
+                    <ModelListItem 
+                        key = { model._id }
+                        model = { model }
+                        deleteModel = { deleteModel }
+                        rotateModel = { rotateModel }
+                        sceneInstance = { sceneInstance }
+                    />
+                ))
+            }
+            <hr />
+            <h6>Modelos extra</h6>
+            {
+                getMiscModels().map(model => (
+                    <ModelListItem 
+                        key = { model._id }
+                        model = { model }
+                        deleteModel = { deleteModel }
+                        rotateModel = { rotateModel }
+                        sceneInstance = { sceneInstance }
+                    />
+                ))
+            }
+        </Fragment>
+    )
 }
 
 const ModelListItem = ({ 
@@ -131,7 +156,9 @@ const ModelSelector = ({
         <ModelIcon 
             modelId = { model._id }
         />
-        { model.name() }
+        <ModelSelectorName 
+            model = { model }
+        />
         <VisibilityModifier 
             model = { model }
             sceneInstance = { sceneInstance }
@@ -142,6 +169,12 @@ const ModelSelector = ({
             className = 'text-danger mr-2'
         />
     </FlexRow>
+);
+
+const ModelSelectorName = ({ model }) => (
+    <div className = 'models-list__item-name' >
+        { model.name() }
+    </div>
 );
 
 const ModelDetails = ({ model, rotateModel }) => (
@@ -216,3 +249,5 @@ export let VisibilityModifier = ({
                 className = { getIconClassName() }
             />
 }
+
+const isProjectObject = modelToEdit => modelToEdit?.attrs?.type;

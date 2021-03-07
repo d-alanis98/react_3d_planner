@@ -157,10 +157,13 @@ const DimensionsModifier = ({
     project,
     modelToEdit,
     updateObject,
+    updateMiscObject,
     correctSelectionBox,
     modelEditorInstance,
     findObjectBy2DModelId,
-    getProductByIdAndLine
+    getProductByIdAndLine,
+    getMiscObjectDimensions,
+    findMiscObjectBy2DModelId
 }) => {
     const [dimensions, setDimensions] = useState({});
     const [scaleToApply, setScaleToApply] = useState({});
@@ -169,10 +172,26 @@ const DimensionsModifier = ({
         if(!modelEditorInstance)
             return;
         //We retireve the model's data
-        const projectModel = findObjectBy2DModelId(modelToEdit._id);
-        const { scale: existingScale = { }, productLine, type: productId } = projectModel; 
-        const productCatalogData = getProductByIdAndLine(productId, productLine);
-        const { ancho: width, alto: height, fondo: depth } = productCatalogData;
+        const object = isProjectObject(modelToEdit)
+            ? getProjectObject()
+            : getMiscObject();
+        const { scale: existingScale = { } } = object; 
+        //If it is project object
+        let width, height, depth;
+        if(isProjectObject(modelToEdit)) {
+            const { productLine, type: productId } = object;
+            const productCatalogData = getProductByIdAndLine(productId, productLine);
+            const { ancho, alto, fondo } = productCatalogData;
+            width = ancho;
+            height = alto;
+            depth = fondo;
+        }
+        else {
+            let miscObjectDimensions = getMiscObjectDimensions(object.modelId);
+            width = miscObjectDimensions.width;
+            height = miscObjectDimensions.height;
+            depth = miscObjectDimensions.depth;
+        }
         modelEditorInstance.setOriginalDimensions(width, height, depth);
         //We set the model dimensions
         setDimensions(modelEditorInstance.getNormalizedDimensions({ 
@@ -185,12 +204,22 @@ const DimensionsModifier = ({
     }, [modelToEdit, modelEditorInstance]);
 
 
+    const getProjectObject = () => findObjectBy2DModelId(modelToEdit._id);
+
+    const getMiscObject = () => findMiscObjectBy2DModelId(modelToEdit._id); 
+
     const updateScaleInState = () => {
-        const projectModel = findObjectBy2DModelId(modelToEdit._id);
-        updateObject({
+        const projectModel = isProjectObject(modelToEdit)   
+            ? getProjectObject()
+            : getMiscObject();
+        //We set the updated data
+        let updatedObject = {
             ...projectModel,
             scale: scaleToApply
-        });
+        };
+        isProjectObject(modelToEdit)
+            ? updateObject(updatedObject)
+            : updateMiscObject(updatedObject);
     }
 
     /**
@@ -292,18 +321,24 @@ const RotationModifier = ({
     rotate,
     project,
     modelToEdit,
-    findObjectBy2DModelId
+    findObjectBy2DModelId,
+    findMiscObjectBy2DModelId
 }) => {
     const [rotation, setRotation] = useState(0);
 
     useEffect(() => {
         if(!modelToEdit || isEmptyObject(modelToEdit))
             return;
-        const projectModel = findObjectBy2DModelId(modelToEdit._id);
-        const { rotation: existingRotation = 0 } = projectModel;
-        setRotation(existingRotation);
+        const object = isProjectObject(modelToEdit)
+            ? getProjectObject()
+            : getMiscObject();
+        const { rotation: existingRotation = 0 } = object;
+        setRotation(existingRotation);  
     }, [modelToEdit]);
 
+    const getProjectObject = () => findObjectBy2DModelId(modelToEdit._id);
+
+    const getMiscObject = () => findMiscObjectBy2DModelId(modelToEdit._id);
 
     const handleRotation = event => {
         const { target: { value: rotation } } = event;
@@ -314,6 +349,7 @@ const RotationModifier = ({
 
     if(!shouldRotationRender(project))
         return null;
+
     return (
         <EditorSection
             targetId = 'rotation_modifier'
@@ -342,18 +378,22 @@ const ScaleModifier = ({
     project, 
     modelToEdit,
     updateObject,
+    updateMiscObject,
     correctSelectionBox,
     modelEditorInstance,
-    findObjectBy2DModelId 
+    findObjectBy2DModelId,
+    findMiscObjectBy2DModelId 
 }) => {
 
     const [scale, setScale] = useState({});
     const [localScale, setLocalScale] = useState({});
 
     useEffect(() => {
-        const projectModel = findObjectBy2DModelId(modelToEdit._id);
+        const object = isProjectObject(modelToEdit)
+            ? getProjectObject()
+            : getMiscObject();
         
-        const { scale: existingScale = { } } = projectModel; 
+        const { scale: existingScale = { } } = object; 
         setLocalScale(existingScale);
         setScale({
             x: existingScale.x || 1,
@@ -362,12 +402,22 @@ const ScaleModifier = ({
         });
     }, [modelToEdit]);
 
+    const getProjectObject = () => findObjectBy2DModelId(modelToEdit._id);
+
+    const getMiscObject = () => findMiscObjectBy2DModelId(modelToEdit._id);
+
     const updateScaleInState = () => {
-        const projectModel = findObjectBy2DModelId(modelToEdit._id);
-        updateObject({
+        const projectModel = isProjectObject(modelToEdit)
+            ? getProjectObject()
+            : getMiscObject();
+        //We set the updated model
+        let updatedObject = {
             ...projectModel,
-            scale: localScale
-        });
+            scale: localScale,
+        }
+        isProjectObject(modelToEdit) 
+            ? updateObject(updatedObject)
+            : updateMiscObject(updatedObject)
     }
 
     /**
@@ -457,8 +507,10 @@ const ScaleModifierWithState = withProjectState(ScaleModifier);
 const EditModelBounds = ({
     modelToEdit,
     updateObject,
+    updateMiscObject,
     modelEditorInstance,
-    findObjectBy2DModelId
+    findObjectBy2DModelId,
+    findMiscObjectBy2DModelId
 }) => {
 
     const [bounds, setBounds] = useState(boundsData);
@@ -467,7 +519,9 @@ const EditModelBounds = ({
         if(!modelToEdit || isEmptyObject(modelToEdit))
             return;
         const restoreVisibilityFromState = () => {
-            const projectObject = findObjectBy2DModelId(modelToEdit._id);
+            const projectObject = isProjectObject(modelToEdit)
+                ? getProjectObject()
+                : getMiscObject();
             if(!projectObject || !projectObject['2d'] || !modelEditorInstance)
                 return;
             const visibilityData = projectObject['2d'].boundsVisibility;
@@ -487,6 +541,9 @@ const EditModelBounds = ({
         
     }, [modelToEdit, modelEditorInstance]);
 
+    const getProjectObject = () => findObjectBy2DModelId(modelToEdit._id);
+
+    const getMiscObject = () => findMiscObjectBy2DModelId(modelToEdit._id);
 
     const updateInGeneralState = bounds => {
         const getBoundsWithDataToKeepInState = () => (
@@ -496,7 +553,9 @@ const EditModelBounds = ({
             }))
         );
         //We update the bound state in the global store
-        const projectObject = findObjectBy2DModelId(modelToEdit._id);
+        const projectObject = isProjectObject(modelToEdit)
+            ? getProjectObject()
+            : getMiscObject();
         if(!projectObject || !projectObject['2d'])
             return;
         const boundsWithDataToKeepInState = getBoundsWithDataToKeepInState();
@@ -508,7 +567,9 @@ const EditModelBounds = ({
                 boundsVisibility: boundsWithDataToKeepInState,
             }
         }
-        updateObject(updatedObject);
+        isProjectObject(modelToEdit)
+            ? updateObject(updatedObject)
+            : updateMiscObject(updatedObject);
     }
 
 
@@ -536,7 +597,6 @@ const EditModelBounds = ({
             return;
         updateInGeneralState(getBoundsWithVisibilityChange(boundId, !isBoundVisible(boundToToggle)))
         setBoundVisibility(boundId, !isBoundVisible(boundToToggle));
-        
     }
 
     return (
@@ -594,6 +654,9 @@ const EditModelBoundsItem = ({
         </li>
     );
 }
+
+//HELPERS
+const isProjectObject = modelToEdit => modelToEdit?.attrs?.type;
 
 //DATA
 const boundsData = [

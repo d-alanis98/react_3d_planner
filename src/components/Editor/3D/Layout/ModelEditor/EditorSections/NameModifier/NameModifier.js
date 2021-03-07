@@ -14,8 +14,10 @@ const NameModifier = ({
     updateObject,
     isFor2DModel,
     onNameUpdate,
+    updateMiscObject,
     findObjectBy2DModelId,
     findObjectBy3DModelId,
+    findMiscObjectBy2DModelId
 }) => {
     //HOOKS
     //State
@@ -38,7 +40,9 @@ const NameModifier = ({
         let projectModelData;
         if(isFor2DModel) {
             const { _id } = modelToEdit;
-            projectModelData = findObjectBy2DModelId(_id);
+            projectModelData = isProjectObject(modelToEdit) 
+                ? getProjectObject()
+                : getMiscObject();
         } else {
             const { uuid } = modelToEdit;
             projectModelData = findObjectBy3DModelId(uuid);
@@ -52,14 +56,23 @@ const NameModifier = ({
             modelNameInput.current.value = projectModelData.name;
     }, [projectModelData])
 
+    const isProjectObject = modelToEdit => modelToEdit?.attrs?.type;
+
+    const getProjectObject = () => findObjectBy2DModelId(modelToEdit._id);
+
+    const getMiscObject = () => findMiscObjectBy2DModelId(modelToEdit._id);
+
     const handleNameChange = event => {
         const { target: { value } } = event;
         const updatedModelData = {
             ...projectModelData,
-            name: value
+            name: value,
+            modelName: value
         }
         onNameUpdate && typeof onNameUpdate === 'function' && onNameUpdate(value);
-        updateObject(updatedModelData);
+        isProjectObject(modelToEdit)
+            ?   updateObject(updatedModelData)
+            :   updateMiscObject(updatedModelData);
     }
     
     

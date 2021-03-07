@@ -47,6 +47,10 @@
     margin-bottom: 0.5rem;
 }
 
+.models-list__item-name {
+    width: 45%;
+}
+
 @media (max-width: 900px) {
     .models-list-menu__container {
         width: 50vw;

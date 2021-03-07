@@ -2,7 +2,15 @@ import React from 'react';
 import FlexRow from '../Flex/FlexRow';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const LabelWithIcon = ({ id, icon, onClick, className, labelText, ...extraProps }) => (
+const LabelWithIcon = ({ 
+    id, 
+    icon, 
+    onClick, 
+    className, 
+    labelText, 
+    iconClassName,
+    ...extraProps 
+}) => (
     <label
         id = { id }
         onClick = { onClick }
@@ -14,7 +22,7 @@ const LabelWithIcon = ({ id, icon, onClick, className, labelText, ...extraProps 
         >
             <FontAwesomeIcon 
                 icon = { icon }
-                className = 'mr-2'
+                className = { `mr-2 ${iconClassName || ''}` }
             />
             { labelText }
         </FlexRow>

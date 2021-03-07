@@ -13,7 +13,7 @@ const ModelState = ({
 }) => {
     return (
         <table
-            className = 'table table-sm table-borderless'
+            className = 'table table-sm table-borderless mt-2'
         >
             <tbody>
                 <ModelDoorStateModifier 
